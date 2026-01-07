@@ -1,0 +1,12 @@
+{
+    "shell": {
+        "executable": "bash",
+        "args": ["-lc"]
+    },
+    "command": {
+        "prefix": "./vendor/bin/sail",
+        "env": {
+            "APP_ENV": "local"
+        }
+    }
+}

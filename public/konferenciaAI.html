@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Konferencia o umelej inteligencii vo vzdelávaní</title>
+  <style>
+    :root{
+      --bg:#0b4b67;
+      --bg2:#08384d;
+      --card:rgba(255,255,255,.08);
+      --text:#f3f7fb;
+      --muted:rgba(243,247,251,.82);
+      --accent:#f6c453;
+      --accent2:#9fe7ff;
+      --radius:16px;
+      --max:980px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    body{
+      margin:0;
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(159,231,255,.18), transparent 60%),
+                  radial-gradient(900px 500px at 90% 20%, rgba(246,196,83,.12), transparent 55%),
+                  linear-gradient(180deg, var(--bg), var(--bg2));
+      min-height:100vh;
+    }
+    a{ color: var(--accent2); text-decoration: none; }
+    a:hover{ text-decoration: underline; }
+    .wrap{ max-width: var(--max); margin: 0 auto; padding: 32px 18px 48px; }
+    header{
+      display:flex; gap:18px; align-items:flex-start; justify-content:space-between;
+      padding: 22px 22px 18px;
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    h1{ margin:0 0 6px; font-size: clamp(24px, 3.2vw, 40px); letter-spacing:.02em; }
+    .sub{ margin:0; font-style: italic; color: var(--muted); font-size: 16px; }
+    .meta{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .meta b{ color: var(--accent); font-weight: 700; }
+    .grid{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 18px;
+      align-items:start;
+    }
+    @media (max-width: 860px){
+      header{ flex-direction: column; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+    .card{
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 18px 18px 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.14);
+    }
+    h2{
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing:.01em;
+      color: var(--accent);
+    }
+    h3{
+      margin: 16px 0 8px;
+      font-size: 16px;
+      color: var(--accent2);
+    }
+    p{ margin: 8px 0; color: var(--muted); line-height: 1.5; }
+    ul{ margin: 6px 0 0 20px; color: var(--muted); line-height: 1.55; }
+    .pill{
+      display:inline-block;
+      background: rgba(246,196,83,.16);
+      border: 1px solid rgba(246,196,83,.35);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 650;
+      margin: 10px 0 0;
+    }
+    footer{
+      margin-top: 18px;
+      text-align:center;
+      color: rgba(243,247,251,.7);
+      font-size: 14px;
+    }
+    .org{
+      margin-top:10px;
+      font-size: 14px;
+      color: rgba(243,247,251,.75);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>KONFERENCIA O UMELEJ INTELIGENCII VO VZDELÁVANÍ</h1>
+        <p class="sub">(Conference on AI in education)</p>
+
+        <div class="meta">
+          <div><b>Miesto konania:</b> Fakulta riadenia a informatiky, Žilinská univerzita v Žiline</div>
+          <div><b>Termín:</b> 10. 2. 2026</div>
+        </div>
+
+        <div class="org">
+          Žilinská univerzita v Žiline — Fakulta riadenia a informatiky
+        </div>
+      </div>
+
+      <div class="card" style="min-width:260px; max-width:360px;">
+        <h2>Prihlasovanie</h2>
+        <p><b>Registrácia príspevkov:</b></p>
+        <div class="pill">do 31. 1. 2026</div>
+        <p style="margin-top:12px;">
+          Web: <a href="https://konferenciaAI.fri.uniza.sk" target="_blank" rel="noopener">konferenciaAI.fri.uniza.sk</a>
+        </p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main class="card">
+        <h2>Obsah</h2>
+
+        <h3>Úvodný blok – Vízia a trendy</h3>
+        <p><b>Cieľ:</b> predstaviť aktuálne smerovanie AI v oblasti vzdelávania a výskumu.</p>
+        <p><b>Témy:</b></p>
+        <ul>
+          <li>Úloha umelej inteligencie v transformácii vysokého školstva</li>
+          <li>Vzdelávanie pre budúcnosť: aké zručnosti musia mať absolventi v ére AI</li>
+          <li>Etika, zodpovednosť a dôvera v AI vo vzdelávacom prostredí</li>
+        </ul>
+
+        <h3>Blok 1 – AI vo výučbe a výskume</h3>
+        <p><b>Cieľ:</b> zdieľať skúsenosti univerzít a stredných škôl so zavádzaním AI do vzdelávania.</p>
+        <p><b>Témy:</b></p>
+        <ul>
+          <li>AI asistenti vo výučbe (ChatGPT, Copilot, Claude a iné nástroje)</li>
+          <li>Automatizované hodnotenie a spätná väzba pomocou AI</li>
+          <li>AI pri tvorbe študijných materiálov a interaktívnych kurzov</li>
+        </ul>
+
+        <h3>Blok 2 – AI v praxi</h3>
+        <p><b>Cieľ:</b> prepojiť univerzitné prostredie s potrebami firiem.</p>
+        <p><b>Témy:</b></p>
+        <ul>
+          <li>Ako firmy používajú AI v praxi a čo očakávajú od absolventov</li>
+          <li>Spolupráca univerzít a firiem pri vývoji AI riešení</li>
+          <li>Etické a právne aspekty nasadzovania AI v praxi</li>
+        </ul>
+
+        <h3>Blok 3 – AI očami študentov</h3>
+        <p><b>Cieľ:</b> dať priestor študentom prezentovať svoje projekty a názory.</p>
+        <p><b>Témy:</b></p>
+        <ul>
+          <li>Ako študenti používajú AI nástroje pri učení, príprave projektov alebo písaní záverečných prác</li>
+          <li>Ako študenti vnímajú zodpovedné využívanie AI, plagiátorstvo a akademickú integritu</li>
+          <li>Nápady na zlepšenie vzdelávania a podporu študentov prostredníctvom AI</li>
+        </ul>
+
+        <h3>Panelová diskusia</h3>
+        <p>„Ako AI mení spôsob, akým (sa) učíme?“</p>
+      </main>
+
+      <aside class="card">
+        <h2>Rýchle info</h2>
+        <p><b>Miesto:</b> Fakulta riadenia a informatiky (FRI), Žilinská univerzita v Žiline</p>
+        <p><b>Dátum:</b> 10. 2. 2026</p>
+        <p><b>Deadline príspevkov:</b> 31. 1. 2026</p>
+        <p><b>Web:</b> <a href="https://konferenciaAI.fri.uniza.sk" target="_blank" rel="noopener">konferenciaAI.fri.uniza.sk</a></p>
+      </aside>
+    </div>
+
+    <footer>
+      <div>© Konferencia o umelej inteligencii vo vzdelávaní</div>
+    </footer>
+  </div>
+</body>
+</html>
