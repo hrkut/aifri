@@ -41,6 +41,8 @@
             <p><b>Miesto:</b> Fakulta riadenia a informatiky (FRI), Žilinská univerzita v Žiline</p>
             <p><b>Dátum:</b> {{ $date }}</p>
             <p><b>Deadline na prihlasovanie príspevkov:</b> {{ $deadline }}</p>
+            <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
+
         </section>
 
         <main class="card">
