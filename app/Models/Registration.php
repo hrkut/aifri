@@ -10,7 +10,9 @@ class Registration extends Model
     use HasFactory;
 
     protected $fillable = [
+        'title_before',
         'name',
+        'title_after',
         'email',
         'phone',
         'institution',

@@ -86,9 +86,25 @@
                     <h3>Základné údaje</h3>
 
                     <div class="formGroup">
+                        <label for="title_before">Titul pred menom</label>
+                        <input type="text" id="title_before" name="title_before" value="{{ old('title_before') }}" placeholder="napr. Dr., Prof., Ing." class="@error('title_before') has-error @enderror">
+                        @error('title_before')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="formGroup">
                         <label for="name">Meno a priezvisko *</label>
                         <input type="text" id="name" name="name" value="{{ old('name') }}" class="@error('name') has-error @enderror">
                         @error('name')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="formGroup">
+                        <label for="title_after">Titul po mene</label>
+                        <input type="text" id="title_after" name="title_after" value="{{ old('title_after') }}" placeholder="napr. PhD., MBA" class="@error('title_after') has-error @enderror">
+                        @error('title_after')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
