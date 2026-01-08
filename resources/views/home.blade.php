@@ -11,9 +11,11 @@
 @endphp
 
 @section('content')
-    <div class="siteHeader">
-        <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
-    </div>
+    <a href="{{ route('home') }}" class="siteHeaderLink">
+        <div class="siteHeader">
+            <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
+        </div>
+    </a>
 
     <header>
         <div>

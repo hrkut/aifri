@@ -199,8 +199,11 @@ h1 {
     margin-top: 14px;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 8px;
     color: var(--muted);
+    font-size: 15px;
+}
+
+.meta p {
     font-size: 15px;
 }
 
@@ -267,6 +270,7 @@ p {
     margin: 8px 0;
     color: var(--muted);
     line-height: 1.5;
+    font-size: 15px;
 }
 
 .loginCard a {
@@ -317,6 +321,25 @@ p {
 }
 
 .card a[href*="maps.app.goo.gl"]:hover {
+    color: #5ffff0;
+    text-decoration: none;
+}
+
+/* Maps links in header */
+.meta a[href*="maps.app.goo.gl"]::before {
+    content: "📍 ";
+    font-size: 16px;
+    display: inline-block;
+}
+
+.meta a[href*="maps.app.goo.gl"] {
+    color: #00e5cc;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.meta a[href*="maps.app.goo.gl"]:hover {
     color: #5ffff0;
     text-decoration: none;
 }
@@ -590,6 +613,17 @@ footer {
         width: 100%;
         text-align: center;
     }
+}
+
+.siteHeaderLink {
+    display: block;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.siteHeaderLink:hover {
+    opacity: 0.8;
 }
 
 .siteHeader {

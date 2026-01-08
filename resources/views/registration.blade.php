@@ -5,14 +5,16 @@
 
 @php
     $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline';
-    $date = '11. 2. 2026';
+    $date = '11. 2. 2026 (streda) od 9:00';
     $deadline = '31. 1. 2026';
 @endphp
 
 @section('content')
-    <div class="siteHeader">
-        <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
-    </div>
+    <a href="{{ route('home') }}" class="siteHeaderLink">
+        <div class="siteHeader">
+            <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
+        </div>
+    </a>
 
     <header>
         <div>
@@ -26,9 +28,10 @@
             </div>
 
             <div class="meta">
-                <div><b>Miesto konania:</b> {{ $place }}</div>
-                <div><b>Termín:</b> {{ $date }}</div>
-                <div><b>Deadline:</b> {{ $deadline }}</div>
+                <p><b>Organizátor:</b> Fakulta riadenia a informatiky (FRI), Žilinská univerzita v Žiline</p>
+                <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
+                <p><b>Dátum:</b> {{ $date }}</p>
+                <p><b>Deadline:</b> {{ $deadline }}</p>
             </div>
         </div>
     </header>
@@ -102,7 +105,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="title_after">Titul po mene</label>
+                        <label for="title_after">Titul za menom</label>
                         <input type="text" id="title_after" name="title_after" value="{{ old('title_after') }}" placeholder="napr. PhD., MBA" class="@error('title_after') has-error @enderror">
                         @error('title_after')
                             <div class="error-message">{{ $message }}</div>
