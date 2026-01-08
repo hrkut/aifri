@@ -269,6 +269,58 @@ p {
     line-height: 1.5;
 }
 
+.loginCard a {
+    color: #00e5cc;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.loginCard a::before {
+    content: "📋️";
+    font-size: 18px;
+    display: inline-block;
+}
+
+.loginCard a:hover {
+    color: #5ffff0;
+    text-decoration: none;
+}
+
+.card a[href^="mailto"] {
+    color: #00e5cc;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.card a[href^="mailto"]:hover {
+    color: #5ffff0;
+    text-decoration: none;
+}
+
+.card a[href*="maps.app.goo.gl"]::before {
+    content: "📍 ";
+    font-size: 16px;
+    display: inline-block;
+}
+
+.card a[href*="maps.app.goo.gl"] {
+    color: #00e5cc;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.card a[href*="maps.app.goo.gl"]:hover {
+    color: #5ffff0;
+    text-decoration: none;
+}
+
 ul {
     margin: 6px 0 0 20px;
     color: var(--muted);
@@ -568,7 +620,7 @@ footer {
 .infoIllustration {
     position: absolute;
     right: 16px;
-    top: 10px;
+    top: 50px;
     width: 300px;
     height: auto;
     object-fit: contain;

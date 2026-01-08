@@ -4,8 +4,8 @@
 @section('meta_description', 'Konferencia o umelej inteligencii vo vzdelávaní — AI in education')
 
 @php
-    $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline';
-    $date = '11. 2. 2026';
+    $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline, Univerzitná 8215/1, 010 26 Žilina';
+    $date = '11. 2. 2026 (streda) od 9:00';
     $deadline = '31. 1. 2026';
     $webUrl = 'https://konferenciaAI.fri.uniza.sk';
 @endphp
@@ -29,7 +29,7 @@
 
         <div class="card loginCard" style="min-width:280px; max-width:360px;">
             <h2>Prihlasovanie</h2>
-            <p><a href="{{ route('registration') }}">Registrácia účasti a príspevkov</a></p>
+            <p><a href="{{ route('registration') }}">Registrácia na konferenciu</a></p>
             <div class="pill">do {{ $deadline }}</div>
         </div>
     </header>
@@ -38,7 +38,8 @@
         <section class="card infoCard">
             <h2>Rýchle info</h2>
             <img class="infoIllustration" src="{{ asset('images/bulb.png') }}" alt="Ilustrácia: žiarovka (nápady a inovácie)" loading="lazy"/>
-            <p><b>Miesto:</b> Fakulta riadenia a informatiky (FRI), Žilinská univerzita v Žiline</p>
+            <p><b>Organizátor:</b> Fakulta riadenia a informatiky (FRI), Žilinská univerzita v Žiline</p>
+            <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
             <p><b>Dátum:</b> {{ $date }}</p>
             <p><b>Deadline na prihlasovanie príspevkov:</b> {{ $deadline }}</p>
             <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
