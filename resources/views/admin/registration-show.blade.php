@@ -51,13 +51,24 @@
             <!-- Typ účasti -->
             <section>
                 <h3 class="text-lg font-semibold text-slate-100 mb-4 pb-2 border-b border-slate-800">Typ účasti</h3>
-                <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Typ účasti</p>
-                    @if($registration->participation_type === 'presentation')
-                        <span class="inline-block px-3 py-1 bg-blue-900 text-blue-200 rounded-lg text-sm font-medium">Aktívna účasť – prednáška</span>
-                    @else
-                        <span class="inline-block px-3 py-1 bg-gray-700 text-gray-200 rounded-lg text-sm font-medium">Pasívna účasť (poslucháč)</span>
-                    @endif
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Typ účasti</p>
+                        @if($registration->participation_type === 'presentation')
+                            <span class="inline-block px-3 py-1 bg-blue-900 text-blue-200 rounded-lg text-sm font-medium">Aktívna účasť – prednáška</span>
+                        @else
+                            <span class="inline-block px-3 py-1 bg-gray-700 text-gray-200 rounded-lg text-sm font-medium">Pasívna účasť (poslucháč)</span>
+                        @endif
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Forma účasti</p>
+                        @if($registration->online_participation)
+                            <span class="inline-block px-3 py-1 bg-emerald-900 text-emerald-200 rounded-lg text-sm font-medium">Online</span>
+                        @else
+                            <span class="inline-block px-3 py-1 bg-slate-700 text-slate-200 rounded-lg text-sm font-medium">Prezenčne</span>
+                        @endif
+                    </div>
                 </div>
             </section>
 

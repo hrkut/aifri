@@ -35,6 +35,7 @@ Route::post('/prihlasenie', function (Request $request) {
         'institution' => ['required', 'string', 'max:255'],
         'position' => ['nullable', 'string', 'max:255'],
         'participation_type' => ['required', 'in:passive,presentation'],
+        'online_participation' => ['sometimes', 'accepted'],
         'title' => ['required_if:participation_type,presentation', 'nullable', 'string', 'max:255'],
         'abstract' => ['required_if:participation_type,presentation', 'nullable', 'string'],
         'keywords' => ['nullable', 'string', 'max:255'],
@@ -51,6 +52,8 @@ Route::post('/prihlasenie', function (Request $request) {
         'abstract.required_if' => 'Abstrakt je povinný pre aktívnu účasť',
         'block.in' => 'Vyberte platný blok',
     ]);
+
+    $data['online_participation'] = $request->boolean('online_participation');
 
     // Word-count validation for abstract (max 300 words)
     if (($data['participation_type'] ?? '') === 'presentation') {

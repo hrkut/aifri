@@ -41,9 +41,10 @@
             <h2>Rýchle info</h2>
             <img class="infoIllustration" src="{{ asset('images/bulb.png') }}" alt="Ilustrácia: žiarovka (nápady a inovácie)" loading="lazy"/>
             <p><b>Organizátor:</b> Fakulta riadenia a informatiky (FRI), Žilinská univerzita v Žiline</p>
+            <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
             <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
             <p><b>Dátum:</b> {{ $date }}</p>
-            <p><b>Deadline na prihlasovanie príspevkov:</b> {{ $deadline }}</p>
+            <p><b>Deadline na registráciu:</b> {{ $deadline }}</p>
             <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
 
         </section>

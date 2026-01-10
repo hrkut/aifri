@@ -146,6 +146,20 @@
                 </div>
 
                 <div class="formSection">
+                    <h3>Forma účasti</h3>
+
+                    <div class="formGroup">
+                        <label style="display:flex; align-items:center; gap:10px; font-weight:600;">
+                            <input type="checkbox" name="online_participation" value="1" {{ old('online_participation') ? 'checked' : '' }}>
+                            Online účasť
+                        </label>
+                        <div style="margin-top:6px; color: rgba(255,255,255,.75); font-size: 0.95em;">
+                            Ak zaškrtnete, budeme s vami počítať ako s online účastníkom.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formSection">
                     <h3>Typ účasti *</h3>
 
                     <div class="formGroup radioGroup">
