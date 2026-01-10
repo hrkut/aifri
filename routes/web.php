@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\Registration;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewRegistrationNotification;
 
 Route::get('/', function () {
     $allowed = ['jpg','jpeg','png','gif','webp','svg'];
@@ -66,7 +68,9 @@ Route::post('/prihlasenie', function (Request $request) {
         }
     }
 
-    Registration::create($data);
+    $registration = Registration::create($data);
+
+    Mail::to('konferenciaAI@fri.uniza.sk')->send(new NewRegistrationNotification($registration));
 
     return redirect()->route('registration')
         ->with('success', 'Ďakujeme za prihlásenie! Potvrdenie vám pošleme na e-mail.');

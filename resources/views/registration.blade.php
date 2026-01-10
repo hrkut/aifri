@@ -29,6 +29,7 @@
 
             <div class="meta">
                 <p><b>Organizátor:</b> Fakulta riadenia a informatiky (FRI), Žilinská univerzita v Žiline</p>
+                <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
                 <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
                 <p><b>Dátum:</b> {{ $date }}</p>
                 <p><b>Deadline:</b> {{ $deadline }}</p>

@@ -1,11 +1,15 @@
 <?php
 
+use App\Mail\NewRegistrationNotification;
 use App\Models\Registration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
 it('stores online_participation as true when checkbox is checked', function () {
+    Mail::fake();
+
     $payload = [
         'name' => 'Test User',
         'email' => 'test@example.com',
@@ -24,9 +28,15 @@ it('stores online_participation as true when checkbox is checked', function () {
         'email' => 'test@example.com',
         'online_participation' => 1,
     ]);
+
+    Mail::assertSent(NewRegistrationNotification::class, function ($mail) {
+        return $mail->hasTo('konferenciaAI@fri.uniza.sk');
+    });
 });
 
 it('stores online_participation as false when checkbox is not present', function () {
+    Mail::fake();
+
     $payload = [
         'name' => 'Test User 2',
         'email' => 'test2@example.com',
@@ -43,5 +53,8 @@ it('stores online_participation as false when checkbox is not present', function
 
     $reg = Registration::where('email', 'test2@example.com')->firstOrFail();
     expect($reg->online_participation)->toBeFalse();
-});
 
+    Mail::assertSent(NewRegistrationNotification::class, function ($mail) {
+        return $mail->hasTo('konferenciaAI@fri.uniza.sk');
+    });
+});
