@@ -64,7 +64,7 @@
         </section>
 
         <main class="card lightCard">
-            <h2>Registračný formulár</h2>
+            <h2 id="registration-form">Registračný formulár</h2>
 
             @if(session('success'))
                 <div class="success-message">
@@ -257,6 +257,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // If the page was redirected back with a success flash, scroll the registration form into view.
+            @if(session('success'))
+                const heading = document.getElementById('registration-form');
+                if (heading) {
+                    heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            @endif
+
             const contributionSection = document.querySelector('.contributionSection');
             const titleField = document.getElementById('title');
             const abstractField = document.getElementById('abstract');

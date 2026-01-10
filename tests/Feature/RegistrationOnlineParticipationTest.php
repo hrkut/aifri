@@ -22,7 +22,7 @@ it('stores online_participation as true when checkbox is checked', function () {
 
     $response = $this->post(route('registration.submit'), $payload);
 
-    $response->assertRedirect(route('registration'));
+    $response->assertRedirect(route('registration') . '#registration-form');
 
     $this->assertDatabaseHas('registrations', [
         'email' => 'test@example.com',
@@ -49,7 +49,7 @@ it('stores online_participation as false when checkbox is not present', function
 
     $response = $this->post(route('registration.submit'), $payload);
 
-    $response->assertRedirect(route('registration'));
+    $response->assertRedirect(route('registration') . '#registration-form');
 
     $reg = Registration::where('email', 'test2@example.com')->firstOrFail();
     expect($reg->online_participation)->toBeFalse();

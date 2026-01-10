@@ -72,7 +72,7 @@ Route::post('/prihlasenie', function (Request $request) {
 
     Mail::to('konferenciaAI@fri.uniza.sk')->send(new NewRegistrationNotification($registration));
 
-    return redirect()->route('registration')
+    return redirect()->to(route('registration') . '#registration-form')
         ->with('success', 'Ďakujeme za prihlásenie! Potvrdenie vám pošleme na e-mail.');
 })->name('registration.submit');
 
