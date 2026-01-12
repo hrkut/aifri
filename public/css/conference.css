@@ -320,7 +320,7 @@ p {
     transition: all 0.2s ease;
 }
 
-.card a[href*="maps.app.goo.gl"]:hover {
+.card a:hover {
     color: #5ffff0;
     text-decoration: none;
 }
@@ -332,14 +332,14 @@ p {
     display: inline-block;
 }
 
-.meta a[href*="maps.app.goo.gl"] {
+.meta a {
     color: #00e5cc;
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s ease;
 }
 
-.meta a[href*="maps.app.goo.gl"]:hover {
+.meta a:hover {
     color: #5ffff0;
     text-decoration: none;
 }
