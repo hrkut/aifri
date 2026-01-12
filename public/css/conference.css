@@ -313,7 +313,7 @@ p {
     display: inline-block;
 }
 
-.card a[href*="maps.app.goo.gl"] {
+.card a {
     color: #00e5cc;
     font-weight: 600;
     text-decoration: none;

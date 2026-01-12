@@ -22,17 +22,19 @@
             <div class="heroTitle">
                 <div class="heroText">
                     <div>
-                        <h1>KONFERENCIA O UMELEJ INTELIGENCII VO VZDELÁVANÍ</h1>
+                        <h1>KONFERENCIA O UMELEJ INTELIGENCII<br>VO VZDELÁVANÍ</h1>
                         <p class="sub">(Conference on AI in education)</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card loginCard" style="min-width:280px; max-width:360px;">
+        <div class="card loginCard" style="min-width:325px; max-width:360px;">
             <h2>Prihlasovanie</h2>
             <p><a href="{{ route('registration') }}">Registrácia na konferenciu</a></p>
             <div class="pill">do {{ $deadline }}</div>
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
+            <p><a href="{{ route('committee') }}">Programový a organizačný výbor</a></p>
         </div>
     </header>
 
@@ -40,7 +42,7 @@
         <section class="card infoCard">
             <h2>Rýchle info</h2>
             <img class="infoIllustration" src="{{ asset('images/bulb.png') }}" alt="Ilustrácia: žiarovka (nápady a inovácie)" loading="lazy"/>
-            <p><b>Organizátor:</b> Fakulta riadenia a informatiky (FRI), Žilinská univerzita v Žiline</p>
+            <p><b>Organizátor:</b> <a href="https://www.fri.uniza.sk" target="_blank">Fakulta riadenia a informatiky</a> Žilinská univerzita v Žiline</p>
             <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
             <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
             <p><b>Dátum:</b> {{ $date }}</p>

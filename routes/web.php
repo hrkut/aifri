@@ -29,6 +29,10 @@ Route::get('/prihlasenie', function () {
     return view('registration');
 })->name('registration');
 
+Route::get('/vybor', function () {
+    return view('committee');
+})->name('committee');
+
 Route::post('/prihlasenie', function (Request $request) {
     $data = $request->validate([
         'name' => ['required', 'string', 'max:255'],
