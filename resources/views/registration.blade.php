@@ -33,8 +33,13 @@
                 <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
                 <p><b>Dátum:</b> {{ $date }}</p>
                 <p><b>Deadline:</b> {{ $deadline }}</p>
-                <p style="margin-top: 1rem;"><a href="{{ route('committee') }}">→ Programový a organizačný výbor</a></p>
             </div>
+        </div>
+
+        <div class="card loginCard" style="min-width:325px; max-width:360px;">
+            <h2>Navigácia</h2>
+            <p><a href="{{ route('home') }}">Späť na úvodnú stránku</a></p>
+            <p><a href="{{ route('committee') }}">Programový a organizačný výbor</a></p>
         </div>
     </header>
 
