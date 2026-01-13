@@ -33,27 +33,27 @@
             <div style="margin-top: 1.5rem;">
                 <div class="committee-member" style="margin-bottom: 1.5rem;">
                     <h4 style="margin-bottom: 0.25rem; font-weight: 600;">doc. Ing. Michal Kvet, PhD.</h4>
-                    <p style="color: #666; margin-bottom: 0.25rem;">Predseda programového výboru</p>
+                    <p style="color: #666; margin-bottom: 0.25rem;">Predseda programového a organizačného výboru</p>
                     <p style="color: #666;">Vedúci katedry informatiky, Fakulta riadenia a informatiky, Žilinská univerzita v Žiline</p>
                 </div>
                 <div class="committee-member" style="margin-bottom: 1.5rem;">
                     <h4 style="margin-bottom: 0.25rem; font-weight: 600;">doc. Ing. Patrik Hrkút, PhD.</h4>
-                    <p style="color: #666; margin-bottom: 0.25rem;">Člen programového výboru</p>
+                    <p style="color: #666; margin-bottom: 0.25rem;">Člen programového a organizačného výboru</p>
                     <p style="color: #666;">Vedúci katedry softvérových technológií, Fakulta riadenia a informatiky, Žilinská univerzita v Žiline</p>
                 </div>
                 <div class="committee-member" style="margin-bottom: 1.5rem;">
                     <h4 style="margin-bottom: 0.25rem; font-weight: 600;">doc. Ing. Viliam Lendel, PhD.</h4>
-                    <p style="color: #666; margin-bottom: 0.25rem;">Člen programového výboru</p>
+                    <p style="color: #666; margin-bottom: 0.25rem;">Člen programového a organizačného výboru</p>
                     <p style="color: #666;">Prodekan FRI pre vzdelávanie, Fakulta riadenia a informatiky, Žilinská univerzita v Žiline</p>
                 </div>
                 <div class="committee-member" style="margin-bottom: 1.5rem;">
                     <h4 style="margin-bottom: 0.25rem; font-weight: 600;">doc. Ing. Marek Kvet, PhD.</h4>
-                    <p style="color: #666; margin-bottom: 0.25rem;">Člen programového výboru</p>
+                    <p style="color: #666; margin-bottom: 0.25rem;">Člen programového a organizačného výboru</p>
                     <p style="color: #666;">Katedra informatiky, Fakulta riadenia a informatiky, Žilinská univerzita v Žiline</p>
                 </div>
                 <div class="committee-member" style="margin-bottom: 1.5rem;">
                     <h4 style="margin-bottom: 0.25rem; font-weight: 600;">Ing. Michal Ďuračík, PhD.</h4>
-                    <p style="color: #666; margin-bottom: 0.25rem;">Člen programového výboru</p>
+                    <p style="color: #666; margin-bottom: 0.25rem;">Člen programového a organizačného výboru</p>
                     <p style="color: #666;">Katedra softvérových technológií, Fakulta riadenia a informatiky, Žilinská univerzita v Žiline</p>
                 </div>
             </div>
