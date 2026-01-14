@@ -10,7 +10,8 @@
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Meno</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Email</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Typ</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Typ účasti</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Forma účasti</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Inštitúcia</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Vytvorené</th>
                         <th class="px-4 py-3 text-center text-xs font-semibold text-slate-300 uppercase tracking-wider">Akcia</th>
@@ -21,7 +22,12 @@
                         <tr class="hover:bg-slate-800 transition-colors">
                             <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->name }}</td>
                             <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->email }}</td>
-                            <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->participation_type }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-200">
+                                {{ $registration->participation_type === 'presentation' ? 'Aktívna' : 'Pasívna' }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-slate-200">
+                                {{ $registration->online_participation ? 'Online' : 'Prezenčne' }}
+                            </td>
                             <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->institution }}</td>
                             <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->created_at?->format('d.m.Y H:i') }}</td>
                             <td class="px-4 py-3 text-center">
@@ -35,7 +41,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-6 text-center text-sm text-slate-500">Žiadne registrácie.</td>
+                            <td colspan="7" class="px-4 py-6 text-center text-sm text-slate-500">Žiadne registrácie.</td>
                         </tr>
                     @endforelse
                 </tbody>
