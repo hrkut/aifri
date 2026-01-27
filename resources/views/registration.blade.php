@@ -6,7 +6,7 @@
 @php
     $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline';
     $date = '11. 2. 2026 (streda) od 9:00';
-    $deadline = '31. 1. 2026';
+    $deadline = '4. 2. 2026';
 @endphp
 
 @section('content')
