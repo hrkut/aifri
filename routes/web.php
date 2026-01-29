@@ -101,9 +101,60 @@ Route::get('/debug-auth', function () {
 })->middleware(['auth']);
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', function () {
-        $registrations = Registration::latest()->paginate(20);
-        return view('admin.dashboard', compact('registrations'));
+    Route::get('/', function (Request $request) {
+        $sortable = [
+            'name' => 'name',
+            'email' => 'email',
+            // UI: "Typ účasti" (Aktívna/Pasívna)
+            'participation_type' => 'participation_type',
+            // UI: "Forma účasti" (Online/Prezenčne)
+            'online_participation' => 'online_participation',
+            'institution' => 'institution',
+            'created_at' => 'created_at',
+        ];
+
+        $q = trim((string) $request->query('q', ''));
+        $filterActive = $request->boolean('only_active');
+        $filterInPerson = $request->boolean('only_in_person');
+
+        $sort = (string) $request->query('sort', 'created_at');
+        $direction = strtolower((string) $request->query('direction', 'desc'));
+
+        if (!array_key_exists($sort, $sortable)) {
+            $sort = 'created_at';
+        }
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
+        $registrationsQuery = Registration::query();
+
+        if ($q !== '') {
+            // Basic text search across name/email/institution
+            $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
+            $registrationsQuery->where(function ($query) use ($like) {
+                $query->where('name', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhere('institution', 'like', $like);
+            });
+        }
+
+        // Checkbox filters
+        if ($filterActive) {
+            // Active = presentation
+            $registrationsQuery->where('participation_type', 'presentation');
+        }
+        if ($filterInPerson) {
+            // In-person = not online
+            $registrationsQuery->where('online_participation', false);
+        }
+
+        $registrations = $registrationsQuery
+            ->orderBy($sortable[$sort], $direction)
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.dashboard', compact('registrations', 'sort', 'direction', 'q', 'filterActive', 'filterInPerson'));
     })->name('dashboard');
 
     Route::get('/registration/{registration}', function (Registration $registration) {
