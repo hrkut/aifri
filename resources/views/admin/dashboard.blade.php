@@ -55,6 +55,13 @@
                     Hľadať
                 </button>
 
+                <a
+                    href="{{ route('admin.registrations.export', request()->except('page')) }}"
+                    class="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-medium"
+                >
+                    Export
+                </a>
+
                 @if(!empty($q) || !empty($filterActive) || !empty($filterInPerson))
                     <a href="{{ route('admin.dashboard', ['sort' => $sort ?? 'created_at', 'direction' => $direction ?? 'desc']) }}" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium">
                         Vymazať

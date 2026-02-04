@@ -6,6 +6,8 @@ use App\Models\Registration;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NewRegistrationNotification;
+use App\Exports\RegistrationsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', function () {
     $allowed = ['jpg','jpeg','png','gif','webp','svg'];
@@ -156,6 +158,54 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
         return view('admin.dashboard', compact('registrations', 'sort', 'direction', 'q', 'filterActive', 'filterInPerson'));
     })->name('dashboard');
+
+    Route::get('/export', function (Request $request) {
+        $sortable = [
+            'name' => 'name',
+            'email' => 'email',
+            'participation_type' => 'participation_type',
+            'online_participation' => 'online_participation',
+            'institution' => 'institution',
+            'created_at' => 'created_at',
+        ];
+
+        $q = trim((string) $request->query('q', ''));
+        $filterActive = $request->boolean('only_active');
+        $filterInPerson = $request->boolean('only_in_person');
+
+        $sort = (string) $request->query('sort', 'created_at');
+        $direction = strtolower((string) $request->query('direction', 'desc'));
+
+        if (!array_key_exists($sort, $sortable)) {
+            $sort = 'created_at';
+        }
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
+        $registrationsQuery = Registration::query();
+
+        if ($q !== '') {
+            $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
+            $registrationsQuery->where(function ($query) use ($like) {
+                $query->where('name', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhere('institution', 'like', $like);
+            });
+        }
+
+        if ($filterActive) {
+            $registrationsQuery->where('participation_type', 'presentation');
+        }
+        if ($filterInPerson) {
+            $registrationsQuery->where('online_participation', false);
+        }
+
+        $registrationsQuery->orderBy($sortable[$sort], $direction);
+
+        $fileName = 'registrations_' . now()->format('Y-m-d_His') . '.xlsx';
+        return Excel::download(new RegistrationsExport($registrationsQuery), $fileName);
+    })->name('registrations.export');
 
     Route::get('/registration/{registration}', function (Registration $registration) {
         return view('admin.registration-show', compact('registration'));
