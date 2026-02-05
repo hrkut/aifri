@@ -42,10 +42,8 @@ Route::post('/prihlasenie', function (Request $request) {
         'phone' => ['nullable', 'string', 'max:100'],
         'institution' => ['required', 'string', 'max:255'],
         'position' => ['nullable', 'string', 'max:255'],
-        'participation_type' => ['required', 'in:passive,presentation'],
-        'online_participation' => ['sometimes', 'accepted'],
-        'title' => ['required_if:participation_type,presentation', 'nullable', 'string', 'max:255'],
-        'abstract' => ['required_if:participation_type,presentation', 'nullable', 'string'],
+        'title' => ['nullable', 'string', 'max:255'],
+        'abstract' => ['nullable', 'string'],
         'keywords' => ['nullable', 'string', 'max:255'],
         'block' => ['nullable', 'in:intro,teaching,practice,students'],
         'notes' => ['nullable', 'string', 'max:2000'],
@@ -54,32 +52,18 @@ Route::post('/prihlasenie', function (Request $request) {
         'email.required' => 'E-mail je povinné pole',
         'email.email' => 'Zadajte platnú e-mailovú adresu',
         'institution.required' => 'Inštitúcia / Organizácia je povinné pole',
-        'participation_type.required' => 'Vyberte typ účasti',
-        'participation_type.in' => 'Neplatný typ účasti',
-        'title.required_if' => 'Názov príspevku je povinný pre aktívnu účasť',
-        'abstract.required_if' => 'Abstrakt je povinný pre aktívnu účasť',
         'block.in' => 'Vyberte platný blok',
     ]);
 
-    $data['online_participation'] = $request->boolean('online_participation');
-
-    // Word-count validation for abstract (max 300 words)
-    if (($data['participation_type'] ?? '') === 'presentation') {
-        $abstract = $data['abstract'] ?? '';
-        $wordCount = str_word_count($abstract);
-        if ($wordCount > 300) {
-            return back()
-                ->withErrors(['abstract' => 'Abstrakt prekračuje limit 300 slov (aktuálne: ' . $wordCount . ' slov)'])
-                ->withInput();
-        }
-    }
+    $data['participation_type'] = 'passive';
+    $data['online_participation'] = true;
 
     $registration = Registration::create($data);
 
     Mail::to('konferenciaAI@fri.uniza.sk')->send(new NewRegistrationNotification($registration));
 
     return redirect()->to(route('registration') . '#registration-form')
-        ->with('success', 'Ďakujeme za prihlásenie! Potvrdenie vám pošleme na e-mail.');
+        ->with('success', 'Ďakujeme za prihlásenie! Vašu prihlášku sme zaregistrovali.');
 })->name('registration.submit');
 
 Route::get('/dashboard', function () {

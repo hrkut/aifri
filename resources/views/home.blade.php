@@ -6,7 +6,7 @@
 @php
     $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline, Univerzitná 8215/1, 010 26 Žilina';
     $date = '11. 2. 2026 (streda) od 9:00';
-    $deadline = '4. 2. 2026';
+    $deadline = 'Už len online do 9. 2. 2026';
     $webUrl = 'https://konferenciaAI.fri.uniza.sk';
 @endphp
 
@@ -32,7 +32,7 @@
         <div class="card loginCard" style="min-width:325px; max-width:360px;">
             <h2>Prihlasovanie</h2>
             <p><a href="{{ route('registration') }}">Registrácia na konferenciu</a></p>
-            <div class="pill">do {{ $deadline }}</div>
+            <div class="pill">{{ $deadline }}</div>
             <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
             <p><a href="{{ route('committee') }}">Programový a organizačný výbor</a></p>
         </div>

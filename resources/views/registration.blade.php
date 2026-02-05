@@ -6,7 +6,7 @@
 @php
     $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline';
     $date = '11. 2. 2026 (streda) od 9:00';
-    $deadline = '4. 2. 2026';
+    $deadline = 'Už len online do 9. 2. 2026';
 @endphp
 
 @section('content')
@@ -46,23 +46,14 @@
     <div class="stack">
         <section class="card lightCard">
             <h2>Typy účasti</h2>
-            <p>Vyberte si formu vašej účasti na konferencii:</p>
+            <p><b>Účasť je možná už len online a prihlasovanie príspevkov je uzatvorené.</b></p>
 
             <div class="registrationTypes">
                 <div class="regType">
-                    <h3>Aktívna účasť s príspevkom</h3>
-                    <p>Pre autorov, ktorí chcú prezentovať svoje skúsenosti.</p>
-                    <ul class="list">
-                        <li>Príspevok (max. 15 minút)</li>
-                        <li>Diskutujúci na panelovej diskusii (v prípade záujmu)</li>
-                    </ul>
-                </div>
-
-                <div class="regType">
-                    <h3>Pasívna účasť</h3>
+                    <h3>Pasívna účasť (online)</h3>
                     <p>Pre účastníkov, ktorí sa chcú zúčastniť ako poslucháči.</p>
                     <ul class="list">
-                        <li>Prístup na všetky prednášky</li>
+                        <li>Online prístup na všetky prednášky</li>
                         <li>Účasť na panelových diskusiách</li>
                     </ul>
                 </div>
@@ -153,42 +144,19 @@
                 </div>
 
                 <div class="formSection">
-                    <h3>Forma účasti</h3>
-
+                    <h3>Forma a typ účasti</h3>
                     <div class="formGroup">
-                        <label style="display:flex; align-items:center; gap:10px; font-weight:600;">
-                            <input type="checkbox" name="online_participation" value="1" {{ old('online_participation') ? 'checked' : '' }}>
-                            Online účasť
-                        </label>
-                        <div style="margin-top:6px; color: rgba(255,255,255,.75); font-size: 0.95em;">
-                            Ak zaškrtnete, budeme s vami počítať ako s online účastníkom.
+                        <div style="color: rgba(255,255,255,.85); font-size: 0.98em;">
+                            Účasť je <b>len online</b> a <b>len pasívna</b>.
                         </div>
                     </div>
                 </div>
 
-                <div class="formSection">
-                    <h3>Typ účasti *</h3>
-
-                    <div class="formGroup radioGroup">
-                        <label>
-                            <input type="radio" name="participation_type" value="presentation" {{ old('participation_type', 'presentation') == 'presentation' ? 'checked' : '' }}>
-                            Aktívna účasť – prednáška
-                        </label>
-                        <label>
-                            <input type="radio" name="participation_type" value="passive" {{ old('participation_type') == 'passive' ? 'checked' : '' }}>
-                            Pasívna účasť (poslucháč)
-                        </label>
-                    </div>
-                    @error('participation_type')
-                        <div class="error-message">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="formSection contributionSection">
+                <div class="formSection contributionSection" style="display:none;">
                     <h3>Informácie o príspevku</h3>
 
                     <div class="formGroup">
-                        <label for="title">Názov príspevku *</label>
+                        <label for="title">Názov príspevku</label>
                         <input type="text" id="title" name="title" value="{{ old('title') }}" class="@error('title') has-error @enderror">
                         @error('title')
                             <div class="error-message">{{ $message }}</div>
@@ -196,7 +164,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="abstract">Abstrakt (max 300 slov) *</label>
+                        <label for="abstract">Abstrakt (max 300 slov)</label>
                         <textarea id="abstract" name="abstract" rows="6" class="@error('abstract') has-error @enderror">{{ old('abstract') }}</textarea>
                         @error('abstract')
                             <div class="error-message">{{ $message }}</div>
@@ -204,7 +172,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="keywords">Klúčové slová (oddelené čiarkou)</label>
+                        <label for="keywords">Kľúčové slová (oddelené čiarkou)</label>
                         <input type="text" id="keywords" name="keywords" value="{{ old('keywords') }}" class="@error('keywords') has-error @enderror">
                         @error('keywords')
                             <div class="error-message">{{ $message }}</div>
@@ -271,32 +239,6 @@
                 }
             @endif
 
-            const contributionSection = document.querySelector('.contributionSection');
-            const titleField = document.getElementById('title');
-            const abstractField = document.getElementById('abstract');
-
-            // Initial setup - hide or show based on selection
-            function updateContributionVisibility() {
-                const active = document.querySelector('input[name="participation_type"]:checked');
-                if (active && active.value === 'presentation') {
-                    contributionSection.style.display = 'block';
-                    titleField.required = true;
-                    abstractField.required = true;
-                } else {
-                    contributionSection.style.display = 'none';
-                    titleField.required = false;
-                    abstractField.required = false;
-                }
-            }
-
-            // Set initial visibility
-            updateContributionVisibility();
-
-            // Show/hide contribution fields based on participation type
-            document.querySelectorAll('input[name="participation_type"]').forEach(radio => {
-                radio.addEventListener('change', updateContributionVisibility);
-            });
-
             // Form validation
             const form = document.querySelector('.regForm');
 
@@ -339,32 +281,8 @@
                     }
                 }
 
-                // Validate contribution fields if active participation
-                const participationType = document.querySelector('input[name="participation_type"]:checked').value;
-                if (participationType !== 'passive') {
-                    const titleField = document.getElementById('title');
-                    const abstractField = document.getElementById('abstract');
-
-                    if (!titleField.value.trim()) {
-                        showError(titleField, 'Názov príspevku je povinný');
-                        hasErrors = true;
-                    }
-
-                    if (!abstractField.value.trim()) {
-                        showError(abstractField, 'Abstrakt je povinný');
-                        hasErrors = true;
-                    } else {
-                        const wordCount = abstractField.value.trim().split(/\s+/).length;
-                        if (wordCount > 300) {
-                            showError(abstractField, `Abstrakt prekračuje limit 300 slov (aktuálne: ${wordCount} slov)`);
-                            hasErrors = true;
-                        }
-                    }
-                }
-
                 if (hasErrors) {
                     e.preventDefault();
-                    // Scroll to first error
                     const firstError = document.querySelector('.has-error');
                     if (firstError) {
                         firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
