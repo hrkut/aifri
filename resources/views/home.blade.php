@@ -30,11 +30,11 @@
         </div>
 
         <div class="card loginCard" style="flex: 0 0 auto; min-width: 300px;">
-            <h2>Prihlasovanie</h2>
-            <p><a href="{{ route('registration') }}">Registrácia na konferenciu</a></p>
-            <div class="pill">{{ $deadline }}</div>
-            <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
+            <h2>Informácie</h2>
             <p><a href="{{ route('program') }}">Program konferencie</a></p>
+            {{-- <p><a href="{{ route('registration') }}">Registrácia na konferenciu</a></p>
+            <div class="pill">{{ $deadline }}</div>--}}
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
             <p><a href="{{ route('committee') }}">Programový a organizačný výbor</a></p>
         </div>
     </header>
@@ -47,56 +47,56 @@
             <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
             <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
             <p><b>Dátum:</b> {{ $date }}</p>
-            <p><b>Deadline na registráciu:</b> {{ $deadline }}</p>
-            <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
+    {{--<p><b>Deadline na registráciu:</b> {{ $deadline }}</p>--}}
+    <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
 
-        </section>
+</section>
 
-        <main class="card">
-            <h2>Obsah</h2>
+<main class="card">
+    <h2>Obsah</h2>
 
-            <h3>Úvodný blok – Vízia a trendy</h3>
-            <p><b>Cieľ:</b> predstaviť aktuálne smerovanie AI v oblasti vzdelávania a výskumu.</p>
-            <p><b>Témy:</b></p>
-            <ul>
-                <li>Úloha umelej inteligencie v transformácii vysokého školstva</li>
-                <li>Vzdelávanie pre budúcnosť: aké zručnosti musia mať absolventi v ére AI</li>
-                <li>Etika, zodpovednosť a dôvera v AI vo vzdelávacom prostredí</li>
-            </ul>
+    <h3>Úvodný blok – Vízia a trendy</h3>
+    <p><b>Cieľ:</b> predstaviť aktuálne smerovanie AI v oblasti vzdelávania a výskumu.</p>
+    <p><b>Témy:</b></p>
+    <ul>
+        <li>Úloha umelej inteligencie v transformácii vysokého školstva</li>
+        <li>Vzdelávanie pre budúcnosť: aké zručnosti musia mať absolventi v ére AI</li>
+        <li>Etika, zodpovednosť a dôvera v AI vo vzdelávacom prostredí</li>
+    </ul>
 
-            <h3>Blok 1 – AI vo výučbe a výskume</h3>
-            <p><b>Cieľ:</b> zdieľať skúsenosti univerzít a stredných škôl so zavádzaním AI do vzdelávania.</p>
-            <p><b>Témy:</b></p>
-            <ul>
-                <li>AI asistenti vo výučbe (ChatGPT, Copilot, Claude a iné nástroje)</li>
-                <li>Automatizované hodnotenie a spätná väzba pomocou AI</li>
-                <li>AI pri tvorbe študijných materiálov a interaktívnych kurzov</li>
-            </ul>
+    <h3>Blok 1 – AI vo výučbe a výskume</h3>
+    <p><b>Cieľ:</b> zdieľať skúsenosti univerzít a stredných škôl so zavádzaním AI do vzdelávania.</p>
+    <p><b>Témy:</b></p>
+    <ul>
+        <li>AI asistenti vo výučbe (ChatGPT, Copilot, Claude a iné nástroje)</li>
+        <li>Automatizované hodnotenie a spätná väzba pomocou AI</li>
+        <li>AI pri tvorbe študijných materiálov a interaktívnych kurzov</li>
+    </ul>
 
-            <div class="block2">
-                <h3>Blok 2 – AI v praxi</h3>
-                <img class="blockIllustration" src="{{ asset('images/brain.png') }}" alt="Ilustrácia: mozog (umelá inteligencia)" loading="lazy"/>
-                <p><b>Cieľ:</b> prepojiť univerzitné prostredie s potrebami firiem.</p>
-                <p><b>Témy:</b></p>
-                <ul>
-                    <li>Ako firmy používajú AI v praxi a čo očakávajú od absolventov</li>
-                    <li>Spolupráca univerzít a firiem pri vývoji AI riešení</li>
-                    <li>Etické a právne aspekty nasadzovania AI v praxi</li>
-                </ul>
-            </div>
-
-            <h3>Blok 3 – AI očami študentov</h3>
-            <p><b>Cieľ:</b> dať priestor študentom prezentovať svoje projekty a názory.</p>
-            <p><b>Témy:</b></p>
-            <ul>
-                <li>Ako študenti používajú AI nástroje pri učení, príprave projektov alebo písaní záverečných prác</li>
-                <li>Ako študenti vnímajú zodpovedné využívanie AI, plagiátorstvo a akademickú integritu</li>
-                <li>Nápady na zlepšenie vzdelávania a podporu študentov prostredníctvom AI</li>
-            </ul>
-
-            <h3>Panelová diskusia</h3>
-            <p>„Ako AI mení spôsob, akým (sa) učíme?“</p>
-        </main>
+    <div class="block2">
+        <h3>Blok 2 – AI v praxi</h3>
+        <img class="blockIllustration" src="{{ asset('images/brain.png') }}" alt="Ilustrácia: mozog (umelá inteligencia)" loading="lazy"/>
+        <p><b>Cieľ:</b> prepojiť univerzitné prostredie s potrebami firiem.</p>
+        <p><b>Témy:</b></p>
+        <ul>
+            <li>Ako firmy používajú AI v praxi a čo očakávajú od absolventov</li>
+            <li>Spolupráca univerzít a firiem pri vývoji AI riešení</li>
+            <li>Etické a právne aspekty nasadzovania AI v praxi</li>
+        </ul>
     </div>
+
+    <h3>Blok 3 – AI očami študentov</h3>
+    <p><b>Cieľ:</b> dať priestor študentom prezentovať svoje projekty a názory.</p>
+    <p><b>Témy:</b></p>
+    <ul>
+        <li>Ako študenti používajú AI nástroje pri učení, príprave projektov alebo písaní záverečných prác</li>
+        <li>Ako študenti vnímajú zodpovedné využívanie AI, plagiátorstvo a akademickú integritu</li>
+        <li>Nápady na zlepšenie vzdelávania a podporu študentov prostredníctvom AI</li>
+    </ul>
+
+    <h3>Panelová diskusia</h3>
+    <p>„Ako AI mení spôsob, akým (sa) učíme?“</p>
+</main>
+</div>
 @endsection
 
