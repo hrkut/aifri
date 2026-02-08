@@ -61,21 +61,25 @@
         align-items: center;
         gap: 0.5rem;
         width: 100%;
+        justify-content: space-between;
     }
 
-    .program-toggle:focus-visible {
-        outline: 2px solid rgba(0, 229, 204, 0.7);
-        outline-offset: 2px;
-        border-radius: 6px;
+    .program-toggle .program-title-text {
+        flex: 1 1 auto;
+        min-width: 0;
     }
 
     .title-icon {
         cursor: pointer;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         margin-left: 0.25rem;
         transition: transform 0.25s ease;
-        font-size: 0.85rem;
-        flex: 0 0 auto;
+        flex: 0 0 18px;
+        width: 18px;
+        height: 18px;
+        color: #cbd5e1;
     }
 
     .program-title-cell.expanded .title-icon {
@@ -163,6 +167,32 @@
             padding: 0.75rem !important;
         }
     }
+
+    @media print {
+        /* Hide header/logo link */
+        .siteHeaderLink,
+        .siteHeader,
+        .friLogo {
+            display: none !important;
+        }
+
+        /* Hide back button if present in layout */
+        a[href="{{ route('home') }}"] {
+            display: none !important;
+        }
+
+        /* Hide toggle arrows/icons */
+        .title-icon,
+        .program-toggle svg,
+        .program-toggle .title-icon {
+            display: none !important;
+        }
+
+        /* Ensure details are expanded sensibly in print */
+        .details-row[hidden] {
+            display: none !important;
+        }
+    }
 </style>
 
 <script>
@@ -242,16 +272,18 @@
                                     <td style="padding: 0.75rem; color: #cbd5e1; font-weight: 500;" data-label="Čas">{{ $timeVal }}</td>
                                     <td style="padding: 0.75rem; color: #cbd5e1;" data-label="Trvanie">{{ $durVal }} min</td>
                                     <td style="padding: 0.75rem; color: #f3f7fb;" data-label="Prednášajúci">
-                                        @if($registration->title_before){{ $registration->title_before }} @endif
                                         {{ $registration->name }}
-                                        @if($registration->title_after), {{ $registration->title_after }}@endif
                                     </td>
                                     <td style="padding: 0.75rem; color: #cbd5e1;" data-label="Inštitúcia">{{ $registration->institution }}</td>
                                     <td style="padding: 0.75rem; color: #f3f7fb;" data-label="Názov príspevku" @if($hasDetails)class="program-title-cell" @endif>
                                         @if($hasDetails)
                                             <button type="button" class="program-toggle" data-program-toggle="{{ $registration->id }}" aria-expanded="false">
-                                                <span>{{ $registration->title ?? '—' }}</span>
-                                                <span class="title-icon" aria-hidden="true">▼</span>
+                                                <span class="program-title-text">{{ $registration->title ?? '—' }}</span>
+                                                <span class="title-icon" aria-hidden="true">
+                                                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                                        <path d="M5 7.5l5 5 5-5" />
+                                                    </svg>
+                                                </span>
                                             </button>
                                         @else
                                             {{ $registration->title ?? '—' }}
