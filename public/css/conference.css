@@ -13,6 +13,15 @@
 
 * { box-sizing: border-box; }
 
+html {
+    height: 100%;
+    background: radial-gradient(1200px 600px at 20% 10%, rgba(159, 231, 255, .18), transparent 60%),
+    radial-gradient(900px 500px at 90% 20%, rgba(246, 196, 83, .12), transparent 55%),
+    linear-gradient(180deg, rgba(11, 75, 103, .78), rgba(8, 56, 77, .84));
+    background-color: var(--bg2);
+    overflow-x: hidden;
+}
+
 body {
     margin: 0;
     color: var(--text);
@@ -25,6 +34,9 @@ body {
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
     background-attachment: scroll, scroll, scroll, fixed;
     min-height: 100vh;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
 }
 
 a {
