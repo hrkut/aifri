@@ -35,8 +35,6 @@ body {
     background-attachment: scroll, scroll, scroll, fixed;
     min-height: 100vh;
     overflow-x: hidden;
-    overscroll-behavior-y: none;
-    -webkit-overflow-scrolling: touch;
 }
 
 a {
