@@ -20,11 +20,15 @@ services:
         volumes:
             - '.:/var/www/html'
         networks:
-            - sail
+            sail:
+                aliases:
+                    - app
+                    - laravel
         depends_on:
             - mysql
     mysql:
         image: 'mysql:8.4'
+        container_name: aifri-mysql
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
@@ -39,15 +43,24 @@ services:
             - 'sail-mysql:/var/lib/mysql'
             - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
         networks:
-            - sail
+            sail:
+                aliases:
+                    - mysql
+                    - db
         healthcheck:
-            test:
-                - CMD
-                - mysqladmin
-                - ping
-                - '-p${DB_PASSWORD}'
+            test: "mysqladmin ping -p${DB_PASSWORD}"
             retries: 3
             timeout: 5s
+    adminer:
+        image: adminer:4
+        ports:
+            - '${ADMINER_PORT:-8080}:8080'
+        environment:
+            ADMINER_DEFAULT_SERVER: db
+        networks:
+            - sail
+        depends_on:
+            - mysql
 networks:
     sail:
         driver: bridge

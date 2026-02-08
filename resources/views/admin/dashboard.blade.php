@@ -111,7 +111,7 @@
                             <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->institution }}</td>
                             <td class="px-6 py-3 text-sm text-slate-200 whitespace-nowrap">{{ $registration->created_at?->format('d.m.Y H:i') }}</td>
                             <td class="px-6 py-3 text-center">
-                                <a href="{{ route('admin.registration.show', $registration->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors" title="Zobraziť detaily">
+                                <a href="{{ route('admin.registration.show', ['registration' => $registration->id, 'return' => 'dashboard']) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors" title="Zobraziť detaily">
                                     <svg class="w-4 h-4 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 0 016 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>

@@ -17,5 +17,8 @@
         "postcss": "^8.4.31",
         "tailwindcss": "^4.1.18",
         "vite": "^7.0.7"
+    },
+    "dependencies": {
+        "sortablejs": "^1.15.6"
     }
 }

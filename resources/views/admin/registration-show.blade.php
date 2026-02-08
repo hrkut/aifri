@@ -1,10 +1,19 @@
 @extends('layouts.admin')
 
 @section('content')
+@php
+    $return = request()->query('return');
+    $backUrl = match ($return) {
+        'dashboard' => route('admin.dashboard'),
+        'program' => route('admin.program'),
+        default => route('admin.program'),
+    };
+@endphp
+
 <div class="max-w-3xl mx-auto">
     <div class="mb-6 flex items-center justify-between">
         <h1 class="text-3xl font-semibold text-slate-100">Detaily registrácie</h1>
-        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors">
+        <a href="{{ $backUrl }}" class="inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>

@@ -3,7 +3,8 @@
         <div class="flex justify-between h-16">
             <div class="flex items-center gap-6">
                 <div class="hidden sm:flex items-center space-x-6">
-                    <a href="{{ route('admin.dashboard') }}" class="text-slate-200 hover:text-white text-sm {{ request()->routeIs('admin.*') ? 'font-semibold text-white' : '' }}">Registrácie</a>
+                    <a href="{{ route('admin.dashboard') }}" class="text-slate-200 hover:text-white text-sm {{ request()->routeIs('admin.dashboard') ? 'font-semibold text-white' : '' }}">Registrácie</a>
+                    <a href="{{ route('admin.program') }}" class="text-slate-200 hover:text-white text-sm {{ request()->routeIs('admin.program') ? 'font-semibold text-white' : '' }}">Program</a>
                 </div>
             </div>
 
@@ -49,7 +50,8 @@
 
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-slate-900/90 border-t border-slate-800">
         <div class="pt-2 pb-3 space-y-1">
-            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-slate-200 hover:text-white hover:bg-slate-800 {{ request()->routeIs('admin.*') ? 'font-semibold text-white' : '' }}">Registrácie</a>
+            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-slate-200 hover:text-white hover:bg-slate-800 {{ request()->routeIs('admin.dashboard') ? 'font-semibold text-white' : '' }}">Registrácie</a>
+            <a href="{{ route('admin.program') }}" class="block px-4 py-2 text-sm text-slate-200 hover:text-white hover:bg-slate-800 {{ request()->routeIs('admin.program') ? 'font-semibold text-white' : '' }}">Program</a>
         </div>
         <div class="pt-4 pb-1 border-t border-slate-800">
             @auth
