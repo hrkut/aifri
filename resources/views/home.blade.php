@@ -18,7 +18,7 @@
     </a>
 
     <header>
-        <div>
+        <div style="flex: 1; min-width: 0;">
             <div class="heroTitle">
                 <div class="heroText">
                     <div>
@@ -29,11 +29,12 @@
             </div>
         </div>
 
-        <div class="card loginCard" style="min-width:325px; max-width:360px;">
+        <div class="card loginCard" style="flex: 0 0 auto; min-width: 300px;">
             <h2>Prihlasovanie</h2>
             <p><a href="{{ route('registration') }}">Registrácia na konferenciu</a></p>
             <div class="pill">{{ $deadline }}</div>
             <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
+            <p><a href="{{ route('program') }}">Program konferencie</a></p>
             <p><a href="{{ route('committee') }}">Programový a organizačný výbor</a></p>
         </div>
     </header>

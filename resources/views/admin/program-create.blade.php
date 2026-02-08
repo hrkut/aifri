@@ -38,6 +38,16 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm text-slate-300 mb-1" for="title_before">Titul pred menom</label>
+                        <input id="title_before" name="title_before" type="text" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('title_before') }}" maxlength="50">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-1" for="title_after">Titul za menom</label>
+                        <input id="title_after" name="title_after" type="text" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('title_after') }}" maxlength="50">
+                    </div>
+
+                    <div>
                         <label class="block text-sm text-slate-300 mb-1" for="phone">Telefón</label>
                         <input id="phone" name="phone" type="text" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('phone') }}">
                     </div>
@@ -46,6 +56,21 @@
                         <label class="block text-sm text-slate-300 mb-1" for="institution">Inštitúcia *</label>
                         <input id="institution" name="institution" type="text" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('institution') }}" required>
                     </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm text-slate-300 mb-1">Forma účasti *</label>
+                        @php($fp = old('online_participation', '1'))
+                        <div class="flex flex-wrap gap-4 mt-2">
+                            <label class="inline-flex items-center gap-2 text-slate-200">
+                                <input type="radio" name="online_participation" value="0" class="text-emerald-600" {{ (string)$fp === '0' ? 'checked' : '' }}>
+                                <span>Prezenčne</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 text-slate-200">
+                                <input type="radio" name="online_participation" value="1" class="text-emerald-600" {{ (string)$fp === '1' ? 'checked' : '' }}>
+                                <span>Online</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -53,8 +78,8 @@
                 <h2 class="text-lg font-semibold text-slate-100 mb-4">Príspevok</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm text-slate-300 mb-1" for="time_start">Čas začiatku</label>
-                        <input id="time_start" name="time_start" type="time" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('time_start') }}">
+                        <label class="block text-sm text-slate-300 mb-1" for="time_start">Čas začiatku *</label>
+                        <input id="time_start" name="time_start" type="time" step="60" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('time_start') }}" required>
                     </div>
 
                     <div>

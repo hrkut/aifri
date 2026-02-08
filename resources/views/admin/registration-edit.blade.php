@@ -9,6 +9,8 @@
         default => route('admin.program'),
     };
 
+    $isPresentation = ($registration->participation_type ?? null) === 'presentation';
+
     $timeStartValue = old('time_start', $registration->time_start);
     if (is_string($timeStartValue) && $timeStartValue !== '') {
         try {
@@ -57,6 +59,16 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm text-slate-300 mb-1" for="title_before">Titul pred menom</label>
+                        <input id="title_before" name="title_before" type="text" maxlength="50" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('title_before', $registration->title_before) }}">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-1" for="title_after">Titul za menom</label>
+                        <input id="title_after" name="title_after" type="text" maxlength="50" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('title_after', $registration->title_after) }}">
+                    </div>
+
+                    <div>
                         <label class="block text-sm text-slate-300 mb-1" for="phone">Telefón</label>
                         <input id="phone" name="phone" type="text" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('phone', $registration->phone) }}">
                     </div>
@@ -65,6 +77,22 @@
                         <label class="block text-sm text-slate-300 mb-1" for="institution">Inštitúcia *</label>
                         <input id="institution" name="institution" type="text" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('institution', $registration->institution) }}" required>
                     </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm text-slate-300 mb-1">Forma účasti</label>
+                        @php($fp = (string) old('online_participation', ($registration->online_participation === null ? '0' : ($registration->online_participation ? '1' : '0'))))
+                        <div class="flex flex-wrap gap-4 mt-2">
+                            <label class="inline-flex items-center gap-2 text-slate-200">
+                                <input type="radio" name="online_participation" value="0" class="text-emerald-600" {{ $fp === '0' ? 'checked' : '' }}>
+                                <span>Prezenčne</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 text-slate-200">
+                                <input type="radio" name="online_participation" value="1" class="text-emerald-600" {{ $fp === '1' ? 'checked' : '' }}>
+                                <span>Online</span>
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Platí pre príspevky v programe (pre bežné registrácie je informačné).</p>
+                    </div>
                 </div>
             </section>
 
@@ -72,9 +100,9 @@
                 <h2 class="text-lg font-semibold text-slate-100 mb-4">Príspevok / program</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm text-slate-300 mb-1" for="time_start">Čas začiatku</label>
-                        <input id="time_start" name="time_start" type="time" step="60" inputmode="numeric" pattern="^([01]\d|2[0-3]):[0-5]\d$" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ $timeStartValue }}">
-                        <p class="text-xs text-slate-400 mt-1">Voliteľné. Formát HH:mm.</p>
+                        <label class="block text-sm text-slate-300 mb-1" for="time_start">Čas začiatku{{ $isPresentation ? ' *' : '' }}</label>
+                        <input id="time_start" name="time_start" type="time" step="60" inputmode="numeric" pattern="^([01]\d|2[0-3]):[0-5]\d$" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ $timeStartValue }}" {{ $isPresentation ? 'required' : '' }}>
+                        <p class="text-xs text-slate-400 mt-1">{{ $isPresentation ? 'Povinné pre príspevok v programe. Formát HH:mm.' : 'Voliteľné. Formát HH:mm.' }}</p>
                     </div>
 
                     <div>

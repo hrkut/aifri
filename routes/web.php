@@ -36,6 +36,17 @@ Route::get('/vybor', function () {
     return view('committee');
 })->name('committee');
 
+Route::get('/program', function () {
+    $registrations = \App\Models\Registration::query()
+        ->whereIn('participation_type', ['presentation', 'break'])
+        ->orderByRaw('time_start is null')
+        ->orderBy('time_start')
+        ->orderBy('id')
+        ->get();
+
+    return view('program', compact('registrations'));
+})->name('program');
+
 Route::post('/prihlasenie', function (Request $request) {
     $data = $request->validate([
         'title_before' => ['nullable', 'string', 'max:50'],
@@ -216,11 +227,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::post('/program', function (Request $request) {
         $data = $request->validate([
+            'title_before' => ['nullable', 'string', 'max:50'],
             'name' => ['required', 'string', 'max:255'],
+            'title_after' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:100'],
             'institution' => ['required', 'string', 'max:255'],
-            'time_start' => ['nullable', 'date_format:H:i'],
+            'online_participation' => ['required', 'in:0,1'],
+            'time_start' => ['required', 'date_format:H:i'],
             'title' => ['required', 'string', 'max:255'],
             'abstract' => ['nullable', 'string'],
             'keywords' => ['nullable', 'string', 'max:255'],
@@ -228,16 +242,116 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
+        $data['online_participation'] = (bool) ((int) $data['online_participation']);
+
         $data['participation_type'] = 'presentation';
-        $data['online_participation'] = true;
 
-        // Program order: append at the end (presentation + break)
-        $max = \App\Models\Registration::query()
+        // Allowed: matches existing program item start OR is strictly after last item end
+        $items = \App\Models\Registration::query()
             ->whereIn('participation_type', ['presentation', 'break'])
-            ->max('program_order');
-        $data['program_order'] = (int) ($max ?? 0) + 1;
+            ->whereNotNull('time_start')
+            ->orderByRaw('program_order is null')
+            ->orderBy('program_order')
+            ->orderBy('id')
+            ->get(['id', 'time_start', 'duration_minutes', 'program_order']);
 
-        \App\Models\Registration::create($data);
+        $allowedStarts = $items
+            ->pluck('time_start')
+            ->filter()
+            ->map(fn ($t) => \Illuminate\Support\Carbon::parse($t)->format('H:i'))
+            ->unique()
+            ->values()
+            ->all();
+
+        $start = (string) $data['time_start'];
+
+        $isSlotStart = in_array($start, $allowedStarts, true);
+
+        $isAfterLastEnd = false;
+        if ($items->isNotEmpty()) {
+            $last = $items->last();
+            $lastStart = $last->time_start ? \Illuminate\Support\Carbon::parse($last->time_start) : null;
+            $lastDur = (int) ($last->duration_minutes ?? 0);
+            if ($lastStart) {
+                $lastEnd = $lastStart->copy();
+                if ($lastDur > 0) {
+                    $lastEnd->addMinutes($lastDur);
+                }
+                $isAfterLastEnd = \Illuminate\Support\Carbon::parse($start)->greaterThan($lastEnd);
+            }
+        } else {
+            // If no items exist, anything is allowed
+            $isAfterLastEnd = true;
+        }
+
+        if (!$isSlotStart && !$isAfterLastEnd) {
+            return back()
+                ->withErrors(['time_start' => 'Čas začiatku príspevku musí byť zhodný so začiatkom niektorého príspevku alebo prestávky v programe, alebo musí byť po poslednom príspevku. Povolené časy: ' . implode(', ', $allowedStarts)])
+                ->withInput();
+        }
+
+        $data['participation_type'] = 'presentation';
+        // online_participation comes from the form (already cast to bool above)
+
+        // Assign duration if conference has default
+        $conference = \App\Models\Conference::query()->first();
+        if ($conference && empty($data['duration_minutes'])) {
+            $data['duration_minutes'] = (int) ($conference->presentation_minutes ?? 0);
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($data, $start, $items, $isSlotStart) {
+            // Determine insert position
+            if ($isSlotStart) {
+                // Insert before the first item that starts at $start
+                $target = $items->first(fn ($it) => $it->time_start && \Illuminate\Support\Carbon::parse($it->time_start)->format('H:i') === $start);
+                $insertPos = $target ? (int) ($target->program_order ?? 1) : ((int) ($items->max('program_order') ?? 0) + 1);
+            } else {
+                // After last item
+                $insertPos = (int) ($items->max('program_order') ?? 0) + 1;
+            }
+
+            // Make room
+            \App\Models\Registration::query()
+                ->whereIn('participation_type', ['presentation', 'break'])
+                ->whereNotNull('program_order')
+                ->where('program_order', '>=', $insertPos)
+                ->increment('program_order');
+
+            $data['program_order'] = $insertPos;
+            $data['time_start'] = $start;
+
+            \App\Models\Registration::create($data);
+
+            // Recalculate times from the beginning (same algorithm as reorder)
+            $sorted = \App\Models\Registration::query()
+                ->whereIn('participation_type', ['presentation', 'break'])
+                ->orderByRaw('program_order is null')
+                ->orderBy('program_order')
+                ->orderBy('id')
+                ->get(['id', 'duration_minutes']);
+
+            $conference = \App\Models\Conference::query()->first();
+            $programStart = trim((string) ($conference?->start_time ?? '09:00'));
+            if ($programStart === '') {
+                $programStart = '09:00';
+            }
+
+            try {
+                $cursor = \Illuminate\Support\Carbon::parse($programStart);
+            } catch (\Exception $e) {
+                $cursor = \Illuminate\Support\Carbon::createFromFormat('H:i', '09:00');
+            }
+
+            foreach ($sorted as $item) {
+                $t = $cursor->format('H:i');
+                \App\Models\Registration::where('id', $item->id)->update(['time_start' => $t]);
+
+                $dur = (int) ($item->duration_minutes ?? 0);
+                if ($dur > 0) {
+                    $cursor->addMinutes($dur);
+                }
+            }
+        });
 
         return redirect()->route('admin.program')->with('success', 'Príspevok bol pridaný.');
     })->name('program.store');
@@ -475,10 +589,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::put('/registration/{registration}', function (Request $request, \App\Models\Registration $registration) {
         $data = $request->validate([
+            'title_before' => ['nullable', 'string', 'max:50'],
             'name' => ['required', 'string', 'max:255'],
+            'title_after' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:100'],
             'institution' => ['required', 'string', 'max:255'],
+            'online_participation' => ['nullable', 'in:0,1'],
             'time_start' => ['nullable', 'date_format:H:i'],
             'title' => ['nullable', 'string', 'max:255'],
             'abstract' => ['nullable', 'string'],
@@ -486,6 +603,128 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             'block' => ['nullable', 'in:intro,teaching,practice,students'],
         ]);
 
+        if (array_key_exists('online_participation', $data)) {
+            $data['online_participation'] = (bool) ((int) $data['online_participation']);
+        }
+
+        // Extra rules only for program items
+        if ($registration->participation_type === 'presentation') {
+            $newStart = (string) ($data['time_start'] ?? '');
+            if ($newStart === '') {
+                return back()->withErrors(['time_start' => 'Čas začiatku je povinný.'])->withInput();
+            }
+
+            $items = \App\Models\Registration::query()
+                ->whereIn('participation_type', ['presentation', 'break'])
+                ->whereNotNull('time_start')
+                ->orderByRaw('program_order is null')
+                ->orderBy('program_order')
+                ->orderBy('id')
+                ->get(['id', 'time_start', 'duration_minutes', 'program_order']);
+
+            $allowedStarts = $items
+                ->pluck('time_start')
+                ->filter()
+                ->map(fn ($t) => \Illuminate\Support\Carbon::parse($t)->format('H:i'))
+                ->unique()
+                ->values()
+                ->all();
+
+            $isSlotStart = in_array($newStart, $allowedStarts, true);
+
+            $isAfterLastEnd = false;
+            if ($items->isNotEmpty()) {
+                $last = $items->last();
+                $lastStart = $last->time_start ? \Illuminate\Support\Carbon::parse($last->time_start) : null;
+                $lastDur = (int) ($last->duration_minutes ?? 0);
+                if ($lastStart) {
+                    $lastEnd = $lastStart->copy();
+                    if ($lastDur > 0) {
+                        $lastEnd->addMinutes($lastDur);
+                    }
+                    $isAfterLastEnd = \Illuminate\Support\Carbon::parse($newStart)->greaterThan($lastEnd);
+                }
+            } else {
+                $isAfterLastEnd = true;
+            }
+
+            if (!$isSlotStart && !$isAfterLastEnd) {
+                return back()
+                    ->withErrors(['time_start' => 'Čas začiatku príspevku musí byť zhodný so začiatkom niektorého príspevku alebo prestávky v programe, alebo musí byť po poslednom príspevku. Povolené časy: ' . implode(', ', $allowedStarts)])
+                    ->withInput();
+            }
+
+            // If slot start, reposition program_order to that slot
+            \Illuminate\Support\Facades\DB::transaction(function () use ($registration, $data, $items, $newStart, $isSlotStart) {
+                $registration->fill($data);
+
+                if ($isSlotStart) {
+                    $target = $items->first(fn ($it) => (int) $it->id !== (int) $registration->id && $it->time_start && \Illuminate\Support\Carbon::parse($it->time_start)->format('H:i') === $newStart);
+                    if ($target) {
+                        $oldOrder = (int) ($registration->program_order ?? 0);
+                        $newOrder = (int) ($target->program_order ?? $oldOrder);
+
+                        if ($oldOrder && $newOrder && $oldOrder !== $newOrder) {
+                            // remove from old position
+                            \App\Models\Registration::query()
+                                ->whereIn('participation_type', ['presentation', 'break'])
+                                ->whereNotNull('program_order')
+                                ->where('program_order', '>', $oldOrder)
+                                ->decrement('program_order');
+
+                            // make room
+                            \App\Models\Registration::query()
+                                ->whereIn('participation_type', ['presentation', 'break'])
+                                ->whereNotNull('program_order')
+                                ->where('program_order', '>=', $newOrder)
+                                ->increment('program_order');
+
+                            $registration->program_order = $newOrder;
+                        }
+                    }
+                } else {
+                    // after last => move to end
+                    $max = \App\Models\Registration::query()
+                        ->whereIn('participation_type', ['presentation', 'break'])
+                        ->max('program_order');
+                    $registration->program_order = (int) ($max ?? 0) + 1;
+                }
+
+                $registration->time_start = $newStart;
+                $registration->save();
+
+                // Recalculate whole program from start
+                $sorted = \App\Models\Registration::query()
+                    ->whereIn('participation_type', ['presentation', 'break'])
+                    ->orderByRaw('program_order is null')
+                    ->orderBy('program_order')
+                    ->orderBy('id')
+                    ->get(['id', 'duration_minutes']);
+
+                $conference = \App\Models\Conference::query()->first();
+                $programStart = trim((string) ($conference?->start_time ?? '09:00'));
+                if ($programStart === '') {
+                    $programStart = '09:00';
+                }
+
+                $cursor = \Illuminate\Support\Carbon::parse($programStart);
+                foreach ($sorted as $item) {
+                    $t = $cursor->format('H:i');
+                    \App\Models\Registration::where('id', $item->id)->update(['time_start' => $t]);
+
+                    $dur = (int) ($item->duration_minutes ?? 0);
+                    if ($dur > 0) {
+                        $cursor->addMinutes($dur);
+                    }
+                }
+            });
+
+            $return = (string) $request->query('return', 'program');
+            $redirectRoute = $return === 'dashboard' ? 'admin.dashboard' : 'admin.program';
+            return redirect()->route($redirectRoute)->with('success', 'Registrácia bola upravená.');
+        }
+
+        // Non-program items: keep existing behavior
         $registration->fill($data);
         $registration->save();
 

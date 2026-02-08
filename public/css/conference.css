@@ -675,6 +675,16 @@ footer {
     .infoCard {
         padding-right: 240px;
     }
+
+    header {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .loginCard {
+        width: 100%;
+        min-width: unset !important;
+    }
 }
 
 @media (max-width: 760px) {
@@ -684,5 +694,135 @@ footer {
 
     .infoCard {
         padding-right: 0;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .loginCard {
+        width: 100%;
+        min-width: unset !important;
+    }
+
+    h1 {
+        font-size: clamp(20px, 2.5vw, 32px);
+    }
+
+    .sub {
+        font-size: 18px;
+    }
+
+    .wrap {
+        padding: 16px 14px 32px;
+    }
+
+    .card {
+        padding: 16px 16px 14px;
+    }
+
+    h2 {
+        font-size: 16px;
+    }
+
+    h3 {
+        font-size: 14px;
+        margin: 14px 0 6px;
+    }
+
+    p {
+        font-size: 14px;
+    }
+
+    .loginCard a {
+        font-size: 14px;
+    }
+
+    ul {
+        margin: 6px 0;
+        padding-left: 18px;
+    }
+
+    ul li {
+        margin: 4px 0;
+    }
+}
+
+@media (max-width: 520px) {
+    header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 16px 14px;
+    }
+
+    h1 {
+        font-size: clamp(18px, 2.2vw, 28px);
+        line-height: 1.2;
+    }
+
+    .sub {
+        font-size: 16px;
+        margin-top: 4px;
+    }
+
+    .wrap {
+        padding: 12px 10px 24px;
+    }
+
+    .card {
+        padding: 14px 14px 12px;
+    }
+
+    .loginCard {
+        width: 100%;
+    }
+
+    h2 {
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+    h3 {
+        font-size: 13px;
+        margin: 12px 0 6px;
+    }
+
+    p {
+        font-size: 13px;
+        margin: 6px 0;
+    }
+
+    .loginCard a {
+        font-size: 13px;
+        display: block;
+        padding: 8px 0;
+    }
+
+    .pill {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    hr {
+        margin: 10px 0 !important;
+    }
+
+    ul {
+        margin: 6px 0;
+        padding-left: 16px;
+    }
+
+    ul li {
+        margin: 3px 0;
+        font-size: 13px;
+    }
+
+    .heroTitle {
+        gap: 8px;
+    }
+
+    .heroText {
+        gap: 8px;
     }
 }

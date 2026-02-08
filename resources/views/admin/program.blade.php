@@ -10,7 +10,10 @@
         <h1 class="text-3xl font-semibold text-slate-100">Program (aktívne príspevky)</h1>
         <div class="flex items-center gap-3">
             @php
-                $total = is_object($registrations) && method_exists($registrations, 'total') ? $registrations->total() : $registrations->count();
+                // Count only presentations (exclude breaks)
+                $total = $registrations
+                    ->filter(fn ($r) => ($r->participation_type ?? null) === 'presentation')
+                    ->count();
             @endphp
 
             <span class="text-sm text-slate-300">Počet príspevkov: <span class="font-semibold">{{ $total }}</span></span>
@@ -88,6 +91,7 @@
                         <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Meno</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Inštitúcia</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Názov príspevku</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Forma účasti</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Blok</th>
                         <th class="px-6 py-3"></th>
                     </tr>
@@ -126,7 +130,7 @@
                                         data-id="{{ $registration->id }}"
                                     >
                                 </td>
-                                <td colspan="5" class="px-6 py-3 text-sm text-slate-100 font-semibold">
+                                <td colspan="6" class="px-6 py-3 text-sm text-slate-100 font-semibold">
                                     {{ $registration->title ?? 'Prestávka' }}
                                     @if($registration->notes)
                                         <div class="mt-1 text-xs font-normal text-slate-300">{{ $registration->notes }}</div>
@@ -189,6 +193,9 @@
                                 <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->name }}</td>
                                 <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->institution }}</td>
                                 <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->title ?? '—' }}</td>
+                                <td class="px-6 py-3 text-sm text-slate-200">
+                                    {{ !($registration->online_participation ?? false) ? 'Prezenčne' : 'Online' }}
+                                </td>
                                 <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->block ?? '—' }}</td>
                                 <td class="px-6 py-3 text-right">
                                     <div class="inline-flex items-center gap-2">
@@ -234,7 +241,7 @@
                         @endif
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-6 text-center text-sm text-slate-500">
+                            <td colspan="9" class="px-6 py-6 text-center text-sm text-slate-500">
                                 Žiadne aktívne registrácie.
                             </td>
                         </tr>
