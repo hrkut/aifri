@@ -236,6 +236,17 @@
             Organizátori si vyhradzujú právo zmeny programu.
         </p>
 
+        <div style="margin-bottom: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a
+                href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjliNGIxN2MtZjA0OC00MjgyLWJmYjQtMjYzMzIwMDZjNGZm%40thread.v2/0?context=%7b%22Tid%22%3a%228324ff4b-14c8-4bf5-b07e-a0713179f37e%22%2c%22Oid%22%3a%224d479202-a42c-46e9-b2f3-e8b1c1583ae9%22%7d"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="display: inline-block; padding: 0.65rem 1rem; background: rgba(255, 184, 28, 0.16); color: #ffb81c; text-decoration: none; border-radius: 0.6rem; font-weight: 600; border: 1px solid rgba(255, 184, 28, 0.35);"
+            >
+                Otvoriť MS Teams míting
+            </a>
+        </div>
+
         @if($registrations->isEmpty())
             <p style="color: #cbd5e1; text-align: center; padding: 2rem;">Program zatiaľ nie je zverejnený.</p>
         @else

@@ -32,22 +32,33 @@
         <div class="card loginCard" style="flex: 0 0 auto; min-width: 300px;">
             <h2>Informácie</h2>
             <p><a href="{{ route('program') }}">Program konferencie</a></p>
-            {{-- <p><a href="{{ route('registration') }}">Registrácia na konferenciu</a></p>
-            <div class="pill">{{ $deadline }}</div>--}}
-            <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
-            <p><a href="{{ route('committee') }}">Programový a organizačný výbor</a></p>
-        </div>
-    </header>
+            {{-- <p><a href="{{ route('registration') }}">Registrácia na konferenciu</a></p> --}}
+            <p>
+                <a href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjliNGIxN2MtZjA0OC00MjgyLWJmYjQtMjYzMzIwMDZjNGZm%40thread.v2/0?context=%7b%22Tid%22%3a%228324ff4b-14c8-4bf5-b07e-a0713179f37e%22%2c%22Oid%22%3a%224d479202-a42c-46e9-b2f3-e8b1c1583ae9%22%7d"
+                   target="_blank" rel="noopener noreferrer">
+                    MS Teams míting
+                </a>
+            </p>
+    {{--<div class="pill">{{ $deadline }}</div>--}}
+    <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
+    <p><a href="{{ route('committee') }}">Programový a organizačný výbor</a></p>
+</div>
+</header>
 
-    <div class="stack">
-        <section class="card infoCard">
-            <h2>Rýchle info</h2>
-            <img class="infoIllustration" src="{{ asset('images/bulb.png') }}" alt="Ilustrácia: žiarovka (nápady a inovácie)" loading="lazy"/>
-            <p><b>Organizátor:</b> <a href="https://www.fri.uniza.sk" target="_blank">Fakulta riadenia a informatiky</a> Žilinská univerzita v Žiline</p>
-            <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
-            <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
-            <p><b>Dátum:</b> {{ $date }}</p>
+<div class="stack">
+<section class="card infoCard">
+    <h2>Rýchle info</h2>
+    <img class="infoIllustration" src="{{ asset('images/bulb.png') }}" alt="Ilustrácia: žiarovka (nápady a inovácie)" loading="lazy"/>
+    <p><b>Organizátor:</b> <a href="https://www.fri.uniza.sk" target="_blank">Fakulta riadenia a informatiky</a> Žilinská univerzita v Žiline</p>
+    <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
+    <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
+    <p><b>Dátum:</b> {{ $date }}</p>
     {{--<p><b>Deadline na registráciu:</b> {{ $deadline }}</p>--}}
+    <p>
+        <b>Online pripojenie (MS Teams):</b>
+        <a href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjliNGIxN2MtZjA0OC00MjgyLWJmYjQtMjYzMzIwMDZjNGZm%40thread.v2/0?context=%7b%22Tid%22%3a%228324ff4b-14c8-4bf5-b07e-a0713179f37e%22%2c%22Oid%22%3a%224d479202-a42c-46e9-b2f3-e8b1c1583ae9%22%7d"
+           target="_blank" rel="noopener noreferrer">Otvoriť míting</a>
+    </p>
     <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
 
 </section>
