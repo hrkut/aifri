@@ -5,8 +5,8 @@
     /** @var string $sort */
     /** @var string $direction */
     /** @var string $q */
-    /** @var bool $filterActive */
-    /** @var bool $filterInPerson */
+    /** @var string $participationTypeFilter */
+    /** @var string $onlineParticipationFilter */
 
     $nextDir = fn (string $col) => ($sort ?? '') === $col && ($direction ?? 'asc') === 'asc' ? 'desc' : 'asc';
 
@@ -33,23 +33,55 @@
             <input type="hidden" name="direction" value="{{ $direction ?? 'desc' }}">
 
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                <label class="inline-flex items-center gap-2 text-sm text-slate-200 select-none">
-                    <input type="checkbox" name="only_active" value="1" class="rounded border-slate-600 bg-slate-900" @checked(!empty($filterActive)) onchange="this.form.submit()">
-                    <span>Typ účasti: Aktívna</span>
+                <label class="text-sm text-slate-200 select-none flex items-center gap-2">
+                    <span class="whitespace-nowrap">Typ účasti</span>
+                    <select
+                        name="participation_type"
+                        class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        onchange="this.form.submit()"
+                    >
+                        <option value="" @selected(($participationTypeFilter ?? '') === '')>Všetky</option>
+                        <option value="active" @selected(($participationTypeFilter ?? '') === 'active')>Aktívna</option>
+                        <option value="passive" @selected(($participationTypeFilter ?? '') === 'passive')>Pasívna</option>
+                    </select>
                 </label>
 
-                <label class="inline-flex items-center gap-2 text-sm text-slate-200 select-none">
-                    <input type="checkbox" name="only_in_person" value="1" class="rounded border-slate-600 bg-slate-900" @checked(!empty($filterInPerson)) onchange="this.form.submit()">
-                    <span>Forma účasti: Prezenčne</span>
+                <label class="text-sm text-slate-200 select-none flex items-center gap-2">
+                    <span class="whitespace-nowrap">Forma účasti</span>
+                    <select
+                        name="online_participation"
+                        class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        onchange="this.form.submit()"
+                    >
+                        <option value="" @selected(($onlineParticipationFilter ?? '') === '')>Všetky</option>
+                        <option value="in_person" @selected(($onlineParticipationFilter ?? '') === 'in_person')>Prezenčne</option>
+                        <option value="online" @selected(($onlineParticipationFilter ?? '') === 'online')>Online</option>
+                    </select>
                 </label>
 
-                <input
-                    type="text"
-                    name="q"
-                    value="{{ $q ?? '' }}"
-                    placeholder="Hľadať (meno, e-mail, inštitúcia)"
-                    class="w-full sm:w-96 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                />
+
+                <div class="relative w-full sm:w-96">
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ $q ?? '' }}"
+                        placeholder="Hľadať (meno, e-mail, inštitúcia)"
+                        class="w-full px-3 py-2 pr-10 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    />
+
+                    <button
+                        type="button"
+                        class="absolute inset-y-0 right-2 flex items-center justify-center w-7 h-7 my-auto rounded-full border border-slate-600 bg-slate-800/60 text-slate-200 hover:bg-slate-700/70 hover:text-white transition-colors {{ empty($q) ? 'hidden' : '' }}"
+                        aria-label="Vymazať hľadanie"
+                        title="Vymazať"
+                        onclick="(function(btn){const form=btn.form; if(!form) return; const input=form.querySelector('input[name=\'q\']'); if(!input) return; input.value=''; form.submit();})(this)"
+                    >
+                        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 6L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M14 6L6 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
 
                 <button type="submit" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 font-medium">
                     Hľadať
@@ -62,10 +94,26 @@
                     Export
                 </a>
 
-                @if(!empty($q) || !empty($filterActive) || !empty($filterInPerson))
-                    <a href="{{ route('admin.dashboard', ['sort' => $sort ?? 'created_at', 'direction' => $direction ?? 'desc']) }}" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium">
-                        Vymazať
+                @php
+                    $attendanceEnabled = (($onlineParticipationFilter ?? '') === 'in_person');
+                @endphp
+
+                @if($attendanceEnabled)
+                    <a
+                        href="{{ route('admin.registrations.attendance_pdf', request()->except('page')) }}"
+                        class="px-4 py-2 rounded-lg bg-indigo-700 hover:bg-indigo-600 text-white font-medium"
+                        title="Prezenčná listina (PDF)"
+                    >
+                        Prezenčná listina (PDF)
                     </a>
+                @else
+                    <span
+                        class="px-4 py-2 rounded-lg bg-indigo-950/40 text-indigo-200/50 font-medium border border-indigo-900/40 cursor-not-allowed select-none"
+                        title="Prezenčná listina je dostupná len pri filtre Forma účasti: Prezenčne"
+                        aria-disabled="true"
+                    >
+                        Prezenčná listina (PDF)
+                    </span>
                 @endif
             </div>
         </form>
@@ -118,18 +166,22 @@
                                     </svg>
                                 </a>
                             </td>
+
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-6 text-center text-sm text-slate-500">Žiadne registrácie.</td>
+                            <td colspan="7" class="px-6 py-6 text-center text-sm text-slate-500">
+                                Žiadne registrácie.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="px-6 py-3 border-t border-slate-800 bg-slate-800">
-            {{ $registrations->withQueryString()->links() }}
-        </div>
+    </div>
+
+    <div class="mt-6">
+        {{ $registrations->links() }}
     </div>
 </div>
 @endsection

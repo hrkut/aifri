@@ -295,7 +295,6 @@ p {
 }
 
 .loginCard a::before {
-    content: "📋️";
     font-size: 18px;
     display: inline-block;
 }

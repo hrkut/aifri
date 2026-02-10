@@ -9,6 +9,8 @@ use App\Mail\NewRegistrationNotification;
 use App\Exports\RegistrationsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Conference;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Schema;
 
 Route::get('/', function () {
     $allowed = ['jpg','jpeg','png','gif','webp','svg'];
@@ -80,6 +82,43 @@ Route::post('/prihlasenie', function (Request $request) {
         ->with('success', 'Ďakujeme za prihlásenie! Vašu prihlášku sme zaregistrovali.');
 })->name('registration.submit');
 
+// ---- Question Routes ----
+Route::get('/otazka', function () {
+    return view('question');
+})->name('question');
+
+Route::post('/otazka', function (Request $request) {
+    $data = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['nullable', 'email', 'max:255'],
+        'question' => ['required', 'string', 'min:3', 'max:5000'],
+    ], [
+        'name.required' => 'Meno je povinné pole',
+        'email.email' => 'Zadajte platnú e-mailovú adresu',
+        'question.required' => 'Otázka je povinné pole',
+        'question.min' => 'Otázka musí obsahovať aspoň 3 znaky',
+        'question.max' => 'Otázka môže obsahovať maximálne 5000 znakov',
+    ]);
+
+    // Create table if not exists (fallback for migration issue)
+    if (!Schema::hasTable('questions')) {
+        Schema::create('questions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 255);
+            $table->string('email', 255)->nullable();
+            $table->text('question');
+            $table->boolean('answered')->default(false);
+            $table->timestamps();
+        });
+    }
+
+    \App\Models\Question::create($data);
+
+    return redirect()->route('question')
+        ->with('success', 'Vaša otázka bola úspešne odoslaná!')
+        ->withInput($request->only('name'));
+})->name('question.store');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
@@ -114,8 +153,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ];
 
         $q = trim((string) $request->query('q', ''));
-        $filterActive = $request->boolean('only_active');
-        $filterInPerson = $request->boolean('only_in_person');
+
+        // New select filters
+        $participationTypeFilter = (string) $request->query('participation_type', '');
+        $onlineParticipationFilter = (string) $request->query('online_participation', '');
+
+        // Backward compatibility for old checkbox URLs
+        if ($participationTypeFilter === '' && $request->boolean('only_active')) {
+            $participationTypeFilter = 'active';
+        }
+        if ($onlineParticipationFilter === '' && $request->boolean('only_in_person')) {
+            $onlineParticipationFilter = 'in_person';
+        }
 
         $sort = (string) $request->query('sort', 'created_at');
         $direction = strtolower((string) $request->query('direction', 'desc'));
@@ -139,13 +188,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             });
         }
 
-        // Checkbox filters
-        if ($filterActive) {
+        // Select filters
+        if ($participationTypeFilter === 'active') {
             // Active = presentation
             $registrationsQuery->where('participation_type', 'presentation');
+        } elseif ($participationTypeFilter === 'passive') {
+            // Passive = passive
+            $registrationsQuery->where('participation_type', 'passive');
         }
-        if ($filterInPerson) {
-            // In-person = not online
+
+        if ($onlineParticipationFilter === 'online') {
+            $registrationsQuery->where('online_participation', true);
+        } elseif ($onlineParticipationFilter === 'in_person') {
             $registrationsQuery->where('online_participation', false);
         }
 
@@ -154,7 +208,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.dashboard', compact('registrations', 'sort', 'direction', 'q', 'filterActive', 'filterInPerson'));
+        return view('admin.dashboard', compact(
+            'registrations',
+            'sort',
+            'direction',
+            'q',
+            'participationTypeFilter',
+            'onlineParticipationFilter'
+        ));
     })->name('dashboard');
 
     Route::get('/export', function (Request $request) {
@@ -168,8 +229,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ];
 
         $q = trim((string) $request->query('q', ''));
-        $filterActive = $request->boolean('only_active');
-        $filterInPerson = $request->boolean('only_in_person');
+
+        // New select filters
+        $participationTypeFilter = (string) $request->query('participation_type', '');
+        $onlineParticipationFilter = (string) $request->query('online_participation', '');
+
+        // Backward compatibility for old checkbox URLs
+        if ($participationTypeFilter === '' && $request->boolean('only_active')) {
+            $participationTypeFilter = 'active';
+        }
+        if ($onlineParticipationFilter === '' && $request->boolean('only_in_person')) {
+            $onlineParticipationFilter = 'in_person';
+        }
 
         $sort = (string) $request->query('sort', 'created_at');
         $direction = strtolower((string) $request->query('direction', 'desc'));
@@ -192,10 +263,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             });
         }
 
-        if ($filterActive) {
+        if ($participationTypeFilter === 'active') {
             $registrationsQuery->where('participation_type', 'presentation');
+        } elseif ($participationTypeFilter === 'passive') {
+            $registrationsQuery->where('participation_type', 'passive');
         }
-        if ($filterInPerson) {
+
+        if ($onlineParticipationFilter === 'online') {
+            $registrationsQuery->where('online_participation', true);
+        } elseif ($onlineParticipationFilter === 'in_person') {
             $registrationsQuery->where('online_participation', false);
         }
 
@@ -204,6 +280,108 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         $fileName = 'registrations_' . now()->format('Y-m-d_His') . '.xlsx';
         return Excel::download(new RegistrationsExport($registrationsQuery), $fileName);
     })->name('registrations.export');
+
+    Route::get('/attendance-pdf', function (Request $request) {
+        $q = trim((string) $request->query('q', ''));
+
+        // New select filters
+        $participationTypeFilter = (string) $request->query('participation_type', '');
+        $onlineParticipationFilter = (string) $request->query('online_participation', '');
+
+        // Backward compatibility for old checkbox URLs
+        if ($participationTypeFilter === '' && $request->boolean('only_active')) {
+            $participationTypeFilter = 'active';
+        }
+        if ($onlineParticipationFilter === '' && $request->boolean('only_in_person')) {
+            $onlineParticipationFilter = 'in_person';
+        }
+
+        $registrationsQuery = Registration::query();
+
+        if ($q !== '') {
+            $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
+            $registrationsQuery->where(function ($query) use ($like) {
+                $query->where('name', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhere('institution', 'like', $like);
+            });
+        }
+
+        if ($participationTypeFilter === 'active') {
+            $registrationsQuery->where('participation_type', 'presentation');
+        } elseif ($participationTypeFilter === 'passive') {
+            $registrationsQuery->where('participation_type', 'passive');
+        }
+
+        if ($onlineParticipationFilter === 'online') {
+            $registrationsQuery->where('online_participation', true);
+        } elseif ($onlineParticipationFilter === 'in_person') {
+            $registrationsQuery->where('online_participation', false);
+        }
+
+        $registrations = $registrationsQuery->get();
+
+        $extractSortKey = static function ($r): array {
+            $name = trim((string) ($r->name ?? ''));
+            $parts = preg_split('/\s+/u', $name) ?: [];
+            $parts = array_values(array_filter($parts, fn ($p) => $p !== ''));
+
+            $first = $parts[0] ?? '';
+            $last = $parts[1] ?? $first;
+
+            return [$last, $first, $name];
+        };
+
+        // Slovak locale-aware sorting (diacritics)
+        if (class_exists('Collator')) {
+            try {
+                $collator = new \Collator('sk_SK');
+                // Keep diacritics significant; primary strength can ignore accents, so use tertiary.
+                $collator->setStrength(\Collator::TERTIARY);
+
+                $arr = $registrations->all();
+                usort($arr, static function ($a, $b) use ($extractSortKey, $collator) {
+                    [$al, $af, $an] = $extractSortKey($a);
+                    [$bl, $bf, $bn] = $extractSortKey($b);
+
+                    $c = $collator->compare($al, $bl);
+                    if ($c !== 0) return $c;
+
+                    $c = $collator->compare($af, $bf);
+                    if ($c !== 0) return $c;
+
+                    return $collator->compare($an, $bn);
+                });
+                $registrations = collect($arr);
+            } catch (\Throwable $e) {
+                // Fallback below
+            }
+        }
+
+        // Fallback (best-effort) if intl is not available
+        if (!$registrations instanceof \Illuminate\Support\Collection) {
+            $registrations = collect($registrations);
+        }
+        if (!class_exists('Collator')) {
+            $registrations = $registrations
+                ->sortBy(function ($r) use ($extractSortKey) {
+                    [$last, $first, $name] = $extractSortKey($r);
+                    return mb_strtolower($last . '|' . $first . '|' . $name, 'UTF-8');
+                })
+                ->values();
+        }
+
+        $fileName = 'prezencna_listina_' . now()->format('Y-m-d_His') . '.pdf';
+
+        $pdf = Pdf::loadView('admin.attendance-pdf', compact(
+            'registrations',
+            'q',
+            'participationTypeFilter',
+            'onlineParticipationFilter'
+        ))->setPaper('a4', 'portrait');
+
+        return $pdf->download($fileName);
+    })->name('registrations.attendance_pdf');
 
     Route::get('/registration/{registration}', function (Registration $registration) {
         return view('admin.registration-show', compact('registration'));
@@ -981,6 +1159,42 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
         return response()->json(['ok' => true, 'times' => $updatedTimes]);
     })->name('program.duration.update');
+
+    // ---- Questions (Otázky) ----
+    Route::get('/questions', function (Request $request) {
+        // Ensure answered column exists
+        if (Schema::hasTable('questions') && !Schema::hasColumn('questions', 'answered')) {
+            Schema::table('questions', function (Blueprint $table) {
+                $table->boolean('answered')->default(false);
+            });
+        }
+
+        $q = trim((string) $request->query('q', ''));
+
+        $questionsQuery = \App\Models\Question::query();
+
+        // Search in name and question
+        if ($q !== '') {
+            $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
+            $questionsQuery->where(function ($query) use ($like) {
+                $query->where('name', 'like', $like)
+                    ->orWhere('question', 'like', $like);
+            });
+        }
+
+        $questions = $questionsQuery
+            ->orderBy('id', 'desc')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.questions', compact('questions'));
+    })->name('questions');
+
+    Route::post('/questions/{question}/answered', function (\App\Models\Question $question) {
+        $question->update(['answered' => true]);
+
+        return redirect()->back()->with('success', 'Otázka bola označená ako zodpovedaná.');
+    })->name('questions.mark_answered');
 });
 
 require __DIR__.'/auth.php';

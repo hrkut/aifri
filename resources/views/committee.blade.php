@@ -20,8 +20,7 @@
         </div>
         <div class="card loginCard" style="min-width:325px; max-width:360px;">
             <h2>Navigácia</h2>
-            <p><a href="{{ route('home') }}">Späť na úvodnú stránku</a></p>
-            <p><a href="{{ route('registration') }}">Registrácia</a></p>
+            <p><a href="{{ route('home') }}">🏠 Späť na úvodnú stránku</a></p>
         </div>
     </header>
     <div class="stack">
@@ -62,7 +61,7 @@
             <h2>Kontakt</h2>
             <p><b>E-mail:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
             <p><b>Web:</b> <a href="{{ route('home') }}">konferenciaAI.fri.uniza.sk</a></p>
-            <p><b>Adresa:</b> Fakulta riadenia a informatiky, Univerzitná 8215/1, 010 26 Žilina</p>
+            <p><b>Adresa:</b>Fakulta riadenia a informatiky, Veľký diel 3323, 010 26 Žilina</p>
         </section>
     </div>
 @endsection

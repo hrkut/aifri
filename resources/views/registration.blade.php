@@ -30,7 +30,7 @@
             <div class="meta">
                 <p><b>Organizátor:</b> <a href="https://www.fri.uniza.sk" target="_blank">Fakulta riadenia a informatiky</a> Žilinská univerzita v Žiline</p>
                 <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
-                <p><b>Adresa:</b> Budova FRI, Univerzitná 8215/1, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
+                <p><b>Adresa:</b> Fakulta riadenia a informatiky, Veľký diel 3323, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
                 <p><b>Dátum:</b> {{ $date }}</p>
                 <p><b>Deadline:</b> {{ $deadline }}</p>
             </div>
@@ -38,8 +38,8 @@
 
         <div class="card loginCard" style="min-width:325px; max-width:360px;">
             <h2>Navigácia</h2>
-            <p><a href="{{ route('home') }}">Späť na úvodnú stránku</a></p>
-            <p><a href="{{ route('committee') }}">Programový a organizačný výbor</a></p>
+            <p><a href="{{ route('home') }}">🏠 Späť na úvodnú stránku</a></p>
+            <p><a href="{{ route('committee') }}">👥 Programový a organizačný výbor</a></p>
         </div>
     </header>
 

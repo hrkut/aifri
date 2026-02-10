@@ -169,29 +169,56 @@
     }
 
     @media print {
-        /* Hide header/logo link */
-        .siteHeaderLink,
-        .siteHeader,
-        .friLogo {
-            display: none !important;
+        /* Print header: show logo div */
+        .printHeader {
+            display: block !important;
+            margin-bottom: 5mm;
+            page-break-inside: avoid;
+            text-align: center !important;
         }
 
-        /* Hide back button if present in layout */
-        a[href="{{ route('home') }}"] {
-            display: none !important;
+        .printHeaderLogo {
+            max-width: 480px !important;
+            height: auto;
+            display: block;
+            margin: 0 auto !important;
         }
 
-        /* Hide toggle arrows/icons */
-        .title-icon,
-        .program-toggle svg,
-        .program-toggle .title-icon {
-            display: none !important;
-        }
+        /* Hide screen header */
+        .siteHeaderLink { display: none !important; }
 
-        /* Ensure details are expanded sensibly in print */
-        .details-row[hidden] {
-            display: none !important;
-        }
+          /* Make text of talks black (keep break colors as-is) */
+         .program-table tbody tr:not(.break-row) td {
+             color: #000 !important;
+         }
+
+         .program-table tbody tr.details-row td,
+         .program-table tbody tr.details-row .detail-label,
+         .program-table tbody tr.details-row .detail-value {
+             color: #000 !important;
+         }
+
+         /* Hide the bottom back button (not the header logo wrapper) */
+         .back-home-link {
+             display: none !important;
+         }
+
+         /* Hide MS Teams meeting button */
+         a[href^="https://teams.microsoft.com/"] {
+             display: none !important;
+         }
+
+         /* Hide toggle arrows/icons */
+         .title-icon,
+         .program-toggle svg,
+         .program-toggle .title-icon {
+             display: none !important;
+         }
+
+         /* Ensure details are expanded sensibly in print */
+         .details-row[hidden] {
+             display: none !important;
+         }
     }
 </style>
 
@@ -229,11 +256,16 @@
     });
 </script>
 
-<div class="stack" style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
+<div class="stack" style="max-width: 90vw; margin: 2rem auto; padding: 0 1rem;">
     <div class="card" style="background: rgba(11, 75, 103, 0.35); padding: 2rem;">
+        <!-- Print-only header with FRI_logo2 -->
+        <div class="printHeader" style="display: none; margin-bottom: 1.5rem; text-align: center;">
+            <img src="{{ asset('images/FRI_logo2.png') }}" alt="FRI Logo" class="printHeaderLogo" style="width: 100%; max-width: 480px; height: auto;"/>
+        </div>
+
         <h1 style="color: #9fe7ff; margin-bottom: 1.5rem; margin-top: 0;">Program konferencie</h1>
         <p style="margin-top: -0.75rem; margin-bottom: 1.25rem; color: #cbd5e1; font-size: 0.95rem;">
-            Organizátori si vyhradzujú právo zmeny programu.
+            Organizátori si vyhradzujú právo na zmeny v programe.
         </p>
 
         <div style="margin-bottom: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
@@ -251,11 +283,12 @@
             <p style="color: #cbd5e1; text-align: center; padding: 2rem;">Program zatiaľ nie je zverejnený.</p>
         @else
             <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
-                <table class="program-table" style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
+                <table class="program-table" style="width: 100%; min-width: 100%; border-collapse: collapse; font-size: 0.95rem;">
                     <thead>
                         <tr style="background: rgba(159, 231, 255, 0.1); border-bottom: 2px solid rgba(159, 231, 255, 0.3);">
                             <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Čas</th>
                             <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Trvanie</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c; white-space: nowrap;">Forma</th>
                             <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Prednášajúci</th>
                             <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Inštitúcia</th>
                             <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Názov príspevku</th>
@@ -268,13 +301,14 @@
                                 $timeVal = $registration->time_start ? \Illuminate\Support\Carbon::parse($registration->time_start)->format('H:i') : '—';
                                 $durVal = (int) ($registration->duration_minutes ?? 0);
                                 $hasDetails = !$isBreak && ($registration->abstract || $registration->keywords);
+                                $formLabel = $registration->online_participation ? 'Online' : 'Prezenčne';
                             @endphp
 
                             @if($isBreak)
-                                <tr class="break-row" style="background: rgba(255, 184, 28, 0.1); border-top: 1px solid rgba(255, 184, 28, 0.2);">
-                                    <td style="padding: 0.75rem; color: #ffb81c; font-weight: 500;" data-label="Čas">{{ $timeVal }}</td>
-                                    <td style="padding: 0.75rem; color: #ffb81c;" data-label="Trvanie">{{ $durVal }} min</td>
-                                    <td colspan="3" style="padding: 0.75rem; color: #ffb81c; font-weight: 600;">
+                                <tr class="break-row" style="background: rgba(255, 166, 0, 0.18); border-top: 1px solid rgba(255, 166, 0, 0.40);">
+                                    <td style="padding: 0.75rem; color: #ff9d00; font-weight: 500; font-size: 1rem;" data-label="Čas">{{ $timeVal }}</td>
+                                    <td style="padding: 0.75rem; color: #ff9d00; font-weight: 500; font-size: 1rem;" data-label="Trvanie">{{ $durVal }} min</td>
+                                    <td colspan="4" style="padding: 0.75rem; color: #ff9d00; font-weight: 500; font-size: 1rem;">
                                         {{ $registration->title ?? 'Prestávka' }}
                                     </td>
                                 </tr>
@@ -282,6 +316,7 @@
                                 <tr style="border-top: 1px solid rgba(159, 231, 255, 0.1);">
                                     <td style="padding: 0.75rem; color: #cbd5e1; font-weight: 500;" data-label="Čas">{{ $timeVal }}</td>
                                     <td style="padding: 0.75rem; color: #cbd5e1;" data-label="Trvanie">{{ $durVal }} min</td>
+                                    <td style="padding: 0.75rem; color: #cbd5e1; white-space: nowrap;" data-label="Forma">{{ $formLabel }}</td>
                                     <td style="padding: 0.75rem; color: #f3f7fb;" data-label="Prednášajúci">
                                         {{ $registration->name }}
                                     </td>
@@ -299,11 +334,14 @@
                                         @else
                                             {{ $registration->title ?? '—' }}
                                         @endif
+                                        <div style="margin-top: 0.35rem;">
+                                            <a href="{{ route('question') }}" style="color: #9fe7ff; text-decoration: underline; font-size: 0.85rem;">Položiť otázku</a>
+                                        </div>
                                     </td>
                                 </tr>
                                 @if($hasDetails)
                                     <tr class="details-row" data-program-details="{{ $registration->id }}" hidden>
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             <div class="program-details-content">
                                                 @if($registration->abstract)
                                                     <span class="detail-label">Abstrakt:</span>
@@ -325,7 +363,7 @@
         @endif
 
         <div style="margin-top: 2rem; text-align: center;">
-            <a href="{{ route('home') }}" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(159, 231, 255, 0.2); color: #00e5cc; text-decoration: none; border-radius: 0.5rem; font-weight: 500; border: 1px solid rgba(159, 231, 255, 0.3); transition: all 0.2s ease;">
+            <a href="{{ route('home') }}" class="back-home-link" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(159, 231, 255, 0.2); color: #00e5cc; text-decoration: none; border-radius: 0.5rem; font-weight: 500; border: 1px solid rgba(159, 231, 255, 0.3); transition: all 0.2s ease;">
                 ← Späť na hlavnú stránku
             </a>
         </div>
