@@ -100,21 +100,11 @@
                 </div>
 
                 <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                    <button
-                        type="submit"
-                        style="padding: 0.75rem 1.5rem; background: rgba(159, 231, 255, 0.2); color: #00e5cc; border: 1px solid rgba(159, 231, 255, 0.3); border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
-                        onmouseover="this.style.background='rgba(159, 231, 255, 0.3)'"
-                        onmouseout="this.style.background='rgba(159, 231, 255, 0.2)'"
-                    >
-                        📨 Odoslať otázku
+                    <button type="submit" class="btn">
+                        Odoslať otázku
                     </button>
-                    <a
-                        href="{{ route('home') }}"
-                        style="padding: 0.75rem 1.5rem; background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 0.5rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; display: inline-block;"
-                        onmouseover="this.style.background='rgba(148, 163, 184, 0.25)'"
-                        onmouseout="this.style.background='rgba(148, 163, 184, 0.15)'"
-                    >
-                        ↩️ Zrušiť
+                    <a href="{{ route('home') }}" class="btn secondary">
+                        Zrušiť
                     </a>
                 </div>
             </form>
