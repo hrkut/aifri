@@ -49,9 +49,15 @@
             @endif
 
             @if (session('success'))
-                <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; color: #16a34a;">
+                <div id="question-success" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; color: #16a34a;">
                     Vaša otázka bola úspešne odoslaná. Ďakujeme vám za vašu otázku.
                 </div>
+                <script>
+                    setTimeout(() => {
+                        const el = document.getElementById('question-success');
+                        if (el) el.style.display = 'none';
+                    }, 5000);
+                </script>
             @endif
 
             <form method="POST" action="{{ route('question.store') }}" style="max-width: 600px;">
