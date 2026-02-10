@@ -28,8 +28,8 @@
 
         <div class="card loginCard" style="min-width:325px; max-width:360px;">
             <h2>Navigácia</h2>
-            <p><a href="{{ route('home') }}">Späť na úvodnú stránku</a></p>
-            <p><a href="{{ route('program') }}">Program konferencie</a></p>
+            <p><a href="{{ route('home') }}">🏠 Späť na úvodnú stránku</a></p>
+            <p><a href="{{ route('program') }}">📅 Program konferencie</a></p>
         </div>
     </header>
 
@@ -100,7 +100,7 @@
                         onmouseover="this.style.background='rgba(159, 231, 255, 0.3)'"
                         onmouseout="this.style.background='rgba(159, 231, 255, 0.2)'"
                     >
-                        Odoslať otázku
+                        📨 Odoslať otázku
                     </button>
                     <a
                         href="{{ route('home') }}"
@@ -108,7 +108,7 @@
                         onmouseover="this.style.background='rgba(148, 163, 184, 0.25)'"
                         onmouseout="this.style.background='rgba(148, 163, 184, 0.15)'"
                     >
-                        Zrušiť
+                        ↩️ Zrušiť
                     </a>
                 </div>
             </form>
