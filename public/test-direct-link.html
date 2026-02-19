@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Direct Link</title>
+    <style>
+        body { font-family: Arial; padding: 2rem; background: #222; color: #0f0; }
+        .info { background: #111; padding: 1rem; margin: 1rem 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Direct Link</h1>
+
+    <div class="info">
+        <h3>Klikni na tento link:</h3>
+        <p><a href="/zaznamy/record/test.mp4" style="color: #0f0; text-decoration: underline;">Test - Direct Record Link</a></p>
+        <p>Mal by si byť presmerovaný NA LOGIN alebo si dostať 404 (ak súbor neexistuje)</p>
+        <p>AK vidíš login, middleware NEFUNGUJE správne.</p>
+    </div>
+
+    <div class="info">
+        <h3>Session info:</h3>
+        <p>Session je TRUE na /debug/session, takže cookie je v prehliadači.</p>
+        <p>Problem je, že middleware sa nedostane k session.</p>
+    </div>
+</body>
+</html>
+

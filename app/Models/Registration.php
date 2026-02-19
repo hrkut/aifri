@@ -24,6 +24,8 @@ class Registration extends Model
         'keywords',
         'block',
         'notes',
+        'record',
+        'presentation',
     ];
 
     protected $casts = [

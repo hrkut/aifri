@@ -40,6 +40,7 @@
                 </a>
             </p>
             <p><a href="{{ route('question') }}">❓ Položiť otázku</a></p>
+            <p><a href="{{ route('recordings.login') }}">📺 Príspevky z konferencie</a></p>
     {{--<div class="pill">{{ $deadline }}</div>--}}
     <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
     <p><a href="{{ route('committee') }}">👥 Programový a organizačný výbor</a></p>

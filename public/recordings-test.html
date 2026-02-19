@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Recordings Middleware</title>
+    <style>
+        body { font-family: Arial; padding: 2rem; background: #f0f0f0; }
+        .test { background: white; padding: 1rem; margin: 1rem 0; border-radius: 4px; }
+        .pass { border-left: 4px solid green; }
+        .fail { border-left: 4px solid red; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Test Recordings Middleware</h1>
+
+    <div class="test fail">
+        <h3>Test 1: Prístup bez hesla na /zaznamy/presentation/test.pdf</h3>
+        <p>Očakávaný výsledok: Presmeruj na /zaznamy (prihlasovaciu stránku)</p>
+        <p>Skúsiť: <a href="/zaznamy/presentation/test.pdf">Klikni tu</a></p>
+        <p>Ak si vidíš prihlasovaciu stránku, middleware funguje. Ak vidíš 404, middleware nefunguje.</p>
+    </div>
+
+    <div class="test">
+        <h3>Test 2: Prihlasenie sa</h3>
+        <p>Skúsiť: <a href="/zaznamy">Klikni na prihlasovaciu stránku</a></p>
+        <p>Zadaj heslo: <code>konferenciaai</code></p>
+    </div>
+
+    <div class="test">
+        <h3>Test 3: Prístup po prihlásení</h3>
+        <p>Po prihlásení na /zaznamy a zadaní hesla, skúsiť prístupiť na:</p>
+        <p><a href="/zaznamy/list">Zoznam záznamov (/zaznamy/list)</a></p>
+    </div>
+</body>
+</html>
+

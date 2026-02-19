@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🔐 Test Recordings Session</title>
+    <style>
+        body { font-family: Arial; padding: 2rem; background: #f0f0f0; }
+        .test { background: white; padding: 1rem; margin: 1rem 0; border-radius: 4px; border-left: 4px solid blue; }
+        .info { background: #e3f2fd; padding: 1rem; border-radius: 4px; margin: 1rem 0; }
+        a { color: #003d7a; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Test Recordings Session Persistence</h1>
+
+    <div class="info">
+        <h3>Session Driver:</h3>
+        <p>Momentálne je nastavený <strong>file</strong> driver, takže session sú uložené v súboroch.</p>
+    </div>
+
+    <div class="test">
+        <h3>Krok 1: Prihlásenie sa</h3>
+        <ol>
+            <li>Klikni na <a href="/zaznamy">Prihlasovaciu stránku záznamov</a></li>
+            <li>Zadaj heslo: <code>konferenciaai</code></li>
+            <li>Klikni "Prístupiť k záznamom"</li>
+        </ol>
+    </div>
+
+    <div class="test">
+        <h3>Krok 2: Overenie Session Persistence</h3>
+        <p>Po prihlásení, skúsim si otvorit stránku v novej karte a pristúpim na:</p>
+        <p><a href="/zaznamy/list">Zoznam záznamov (/zaznamy/list)</a></p>
+        <p><strong>Očakávané:</strong> Nemala by si vidieť prihlasovaciu stránku znova, ale priamo zoznam záznamov</p>
+    </div>
+
+    <div class="test">
+        <h3>Krok 3: Priamy prístup na záznam bez hesla</h3>
+        <p>V novom okne (bez session cookie) skúsim pristúpiť na:</p>
+        <p><a href="/zaznamy/presentation/Zuzana%20Miklu%C5%A1%C3%A1kov%C3%A1,%20Mecasys.mp4" target="_blank">Priamy záznam</a></p>
+        <p><strong>Očakávané:</strong> Presmeruj na /zaznamy (prihlasovaciu stránku)</p>
+    </div>
+
+    <div class="test">
+        <h3>Krok 4: Po prihlásení - priamy prístup na záznam</h3>
+        <p>Po prihlásení v tom istom okne skúsim pristúpiť na:</p>
+        <p><a href="/zaznamy/presentation/Zuzana%20Miklu%C5%A1%C3%A1kov%C3%A1,%20Mecasys.mp4" target="_blank">Priamy záznam</a></p>
+        <p><strong>Očakávané:</strong> Ak súbor existuje, stiahnuť sa má. Ak nie, 404 error (ale bez presmerovania na login)</p>
+    </div>
+
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ddd; color: #666;">
+        <p>Ak všetky kroky fungujú, session persistence je OK a heslo sa pýta len raz. ✅</p>
+    </div>
+</body>
+</html>
+

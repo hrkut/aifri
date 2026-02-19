@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('questions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 255);
-            $table->string('email', 255)->nullable();
-            $table->text('question');
-            $table->boolean('answered')->default(false);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('questions')) {
+            Schema::create('questions', function (Blueprint $table) {
+                $table->id();
+                $table->string('name', 255);
+                $table->string('email', 255)->nullable();
+                $table->text('question');
+                $table->boolean('answered')->default(false);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

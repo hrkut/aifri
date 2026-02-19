@@ -1197,5 +1197,71 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     })->name('questions.mark_answered');
 });
 
+Route::get('/debug/session', function () {
+    return view('session-test');
+})->name('debug.session');
+
+// ---- Public Recordings (Príspevky z konferencie) ----
+Route::get('/zaznamy', function (Request $request) {
+    // Ak je user už prihlásený, presmeruj na zoznam
+    if ($request->session()->get('recordings_authenticated') === true) {
+        return redirect()->route('recordings.list');
+    }
+    return view('recordings.login');
+})->name('recordings.login');
+
+Route::post('/zaznamy', function (Request $request) {
+    $password = (string) $request->input('password', '');
+
+    if ($password === 'konferenciaai') {
+        // Ulož do session
+        $request->session()->flush(); // Vymaž stare session data
+        $request->session()->put('recordings_authenticated', true);
+        $request->session()->save(); // Ulož explicitne
+
+        return redirect()->route('recordings.list')
+            ->with('success', 'Úspešne ste sa prihlásili.');
+    }
+
+    return back()
+        ->withErrors(['password' => 'Nesprávne heslo.'])
+        ->withInput();
+})->name('recordings.authenticate');
+
+Route::middleware(['auth.recordings'])->prefix('/zaznamy')->group(function () {
+    Route::get('/list', function () {
+        $registrations = \App\Models\Registration::query()
+            ->where('participation_type', 'presentation')
+            ->whereNotNull('time_start')
+            ->orderBy('time_start')
+            ->orderBy('id')
+            ->get();
+
+        return view('recordings.list', compact('registrations'));
+    })->name('recordings.list');
+
+    Route::get('/record/{filename}', function ($filename) {
+        $filename = urldecode($filename);
+        $path = storage_path('app/private/zaznamy/' . $filename);
+
+        if (!file_exists($path)) {
+            abort(404, 'Záznam nebol nájdený.');
+        }
+
+        return response()->file($path);
+    })->name('recordings.download')->where('filename', '.*');
+
+    Route::get('/presentation/{filename}', function ($filename) {
+        $filename = urldecode($filename);
+        $path = storage_path('app/private/prezentacie/' . $filename);
+
+        if (!file_exists($path)) {
+            abort(404, 'Prezentácia nebola nájdená.');
+        }
+
+        return response()->file($path);
+    })->name('recordings.presentation')->where('filename', '.*');
+});
+
 require __DIR__.'/auth.php';
 
