@@ -63,26 +63,55 @@
         color: #f3f7fb;
     }
 
+    .recordings-icons-cell {
+        display: inline-flex;
+        gap: 0;
+        align-items: center;
+        justify-content: center;
+    }
+
     .icon-link {
-        display: inline;
-        margin: 0 0.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 -0.1rem;
         background: none;
-        color: #ffb81c;
+        color: #00e5cc;
         text-decoration: none;
-        font-size: 1.2rem;
         transition: all 0.2s ease;
         border: none;
         cursor: pointer;
-        padding: 0;
+        padding: 0.25rem 0.25rem;
+        border-radius: 4px;
+        position: relative;
+        line-height: 1;
+        white-space: nowrap;
     }
 
     .icon-link:hover {
-        transform: scale(1.2);
+        background: rgba(0, 229, 204, 0.15);
+        transform: scale(1.15);
     }
 
     .icon-link.disabled {
-        opacity: 0.3;
+        opacity: 0.25;
         cursor: not-allowed;
+        color: #cbd5e1;
+    }
+
+    .icon-link.disabled:hover {
+        background: none;
+        transform: none;
+    }
+
+    .recording-icon::before {
+        content: '🎬';
+        font-size: 1.1rem;
+    }
+
+    .presentation-icon::before {
+        content: '📑';
+        font-size: 1.1rem;
     }
 
     @media (max-width: 768px) {
@@ -126,6 +155,13 @@
             font-size: 0.85rem;
             margin-bottom: 0.25rem;
         }
+
+        .recordings-icons-cell {
+            display: inline-flex !important;
+            gap: 0;
+            align-items: center;
+            justify-content: center;
+        }
     }
 </style>
 
@@ -162,25 +198,25 @@
                                 <td data-label="Inštitúcia">{{ $registration->institution ?? '—' }}</td>
                                 <td data-label="Názov príspevku">{{ $registration->title ?? '(bez názvu)' }}</td>
                                 <td style="text-align: center;" data-label="Záznamy">
-                                    @if($registration->record)
-                                        <a href="{{ route('recordings.download', $registration->record) }}"
-                                           class="icon-link"
-                                           title="Stiahnuť záznam">
-                                            📹
-                                        </a>
-                                    @else
-                                        <span class="icon-link disabled" title="Záznam nie je k dispozícii">📹</span>
-                                    @endif
+                                    <div class="recordings-icons-cell">
+                                        @if($registration->record)
+                                            <a href="{{ route('recordings.download', $registration->record) }}"
+                                               class="icon-link recording-icon"
+                                               title="Stiahnuť video záznam">
+                                            </a>
+                                        @else
+                                            <span class="icon-link recording-icon disabled" title="Video záznam nie je k dispozícii"></span>
+                                        @endif
 
-                                    @if($registration->presentation)
-                                        <a href="{{ route('recordings.presentation', $registration->presentation) }}"
-                                           class="icon-link"
-                                           title="Stiahnuť prezentáciu">
-                                            📊
-                                        </a>
-                                    @else
-                                        <span class="icon-link disabled" title="Prezentácia nie je k dispozícii">📊</span>
-                                    @endif
+                                        @if($registration->presentation)
+                                            <a href="{{ route('recordings.presentation', $registration->presentation) }}"
+                                               class="icon-link presentation-icon"
+                                               title="Stiahnuť prezentáciu">
+                                            </a>
+                                        @else
+                                            <span class="icon-link presentation-icon disabled" title="Prezentácia nie je k dispozícii"></span>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
