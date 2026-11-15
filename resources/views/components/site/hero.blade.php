@@ -5,14 +5,27 @@
     $contributionDeadline = $conference->contribution_deadline && $conference->isContributionOpen()
         ? \App\Models\Conference::formatDate($conference->contributionDeadline())
         : null;
-    $showRegister = $conference->isRegistrationOpen() && ! request()->routeIs('registration');
+    $showRegister = $conference->isRegistrationOpen() && ! request()->routeIs('registration', 'en.registration');
 @endphp
 {{-- Page header: FRI logo, site navigation, then the title set directly on the circuit background --}}
-<a href="{{ route('home') }}" class="siteHeaderLink">
-    <div class="siteHeader">
-        <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
-    </div>
-</a>
+<div class="siteTop">
+    <a href="{{ lroute('home') }}" class="siteHeaderLink">
+        <div class="siteHeader">
+            <img src="{{ asset('images/FRI_logo.png') }}" alt="{{ __('Logo FRI') }}" class="friLogo" loading="lazy"/>
+        </div>
+    </a>
+
+    {{-- Language switcher: the same page in the other language --}}
+    <nav class="langSwitch" aria-label="{{ __('Jazyk') }}">
+        @foreach(['sk' => 'Slovenská verzia', 'en' => 'English version'] as $code => $label){{-- labels stay in their own language --}}
+            @if(app()->getLocale() === $code)
+                <span aria-current="true" lang="{{ $code }}">{{ strtoupper($code) }}</span>
+            @else
+                <a href="{{ locale_url($code) }}" hreflang="{{ $code }}" lang="{{ $code }}" title="{{ $label }}">{{ strtoupper($code) }}</a>
+            @endif
+        @endforeach
+    </nav>
+</div>
 
 <x-site.nav :conference="$conference" />
 
@@ -23,8 +36,8 @@
             <p class="sub">{{ $sub }}</p>
         @endif
         @if($stamp)
-            <div class="editionStamp" aria-label="{{ $conference->editionNumber() }}. ročník {{ $conference->year }}">
-                <span class="editionStampMain">{{ $conference->editionNumber() }}. ročník</span>
+            <div class="editionStamp" aria-label="{{ $conference->editionLabel() }} {{ $conference->year }}">
+                <span class="editionStampMain">{{ $conference->editionLabel() }}</span>
                 <span class="editionStampYear">{{ $conference->year }}</span>
             </div>
         @endif
@@ -32,34 +45,34 @@
 
     <dl class="heroFacts">
         <div>
-            <dt>Dátum konania</dt>
+            <dt>{{ __('Dátum konania') }}</dt>
             <dd>{{ $conference->dateLabel() }}</dd>
         </div>
         <div>
-            <dt>Miesto</dt>
-            <dd>FRI UNIZA, Žilina</dd>
+            <dt>{{ __('Miesto') }}</dt>
+            <dd>{{ __('FRI UNIZA, Žilina') }}</dd>
         </div>
         <div>
-            <dt>Forma</dt>
-            <dd>prezenčne aj online</dd>
+            <dt>{{ __('Forma') }}</dt>
+            <dd>{{ __('prezenčne aj online') }}</dd>
         </div>
     </dl>
 
     @if($showRegister || $conference->teams_url || $contributionDeadline || $deadline)
         <div class="heroActions">
             @if($showRegister)
-                <a href="{{ route('registration') }}" class="btn">📝 Registrovať sa</a>
+                <a href="{{ lroute('registration') }}" class="btn">📝 {{ __('Registrovať sa') }}</a>
             @endif
             @if($conference->teams_url)
-                <a href="{{ $conference->teams_url }}" class="btn secondary" target="_blank" rel="noopener noreferrer">🎧 Pripojiť sa na MS Teams</a>
+                <a href="{{ $conference->teams_url }}" class="btn secondary" target="_blank" rel="noopener noreferrer">🎧 {{ __('Pripojiť sa na MS Teams') }}</a>
             @endif
             @if($contributionDeadline || $deadline)
                 <ul class="heroDeadlines">
                     @if($contributionDeadline)
-                        <li>Príspevky do {{ $contributionDeadline }}</li>
+                        <li>{{ __('Príspevky do :date', ['date' => $contributionDeadline]) }}</li>
                     @endif
                     @if($deadline)
-                        <li>Registrácia do {{ $deadline }}</li>
+                        <li>{{ __('Registrácia do :date', ['date' => $deadline]) }}</li>
                     @endif
                 </ul>
             @endif

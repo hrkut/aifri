@@ -92,6 +92,11 @@
                     @endif
 
                     <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Jazyk registrácie</p>
+                        <span class="text-slate-200">{{ $registration->locale === 'en' ? 'angličtina (e-maily dostáva po anglicky)' : 'slovenčina' }}</span>
+                    </div>
+
+                    <div>
                         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Forma účasti</p>
                         @if($registration->online_participation)
                             <span class="inline-block px-3 py-1 bg-emerald-900 text-emerald-200 rounded-lg text-sm font-medium">Online</span>

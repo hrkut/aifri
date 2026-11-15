@@ -1,7 +1,7 @@
 @php($fullName = $registration->fullName())
 @php($isTalk = $registration->participation_type === 'presentation')
 @php($notification = \App\Models\Conference::formatDate($conference->notification_date))
-KONFERENCIA O UMELEJ INTELIGENCII VO VZDELÁVANÍ – {{ $conference->editionNumber() }}. ročník ({{ $conference->year }})
+KONFERENCIA O UMELEJ INTELIGENCII VO VZDELÁVANÍ – {{ $conference->editionLabel() }} ({{ $conference->year }})
 
 Registrácia potvrdená
 
@@ -46,7 +46,7 @@ Program konferencie: {{ route('program') }}
 
 Ak ste sa prihlásili omylom alebo sa nebudete môcť zúčastniť, dajte nám prosím vedieť odpoveďou na tento e-mail.
 
-Tešíme sa na Vás,
+Tešíme sa na vás,
 organizačný výbor konferencie
 
 {{ \App\Mail\EmailTheme::CONTACT_EMAIL }} · {{ url('/') }}

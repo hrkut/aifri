@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'auth.recordings' => \App\Http\Middleware\AuthenticateRecordings::class,
             'admin.conference' => \App\Http\Middleware\UseAdminConference::class,
+            'locale' => \App\Http\Middleware\SetLocale::class,
         ]);
 
         // The admin's selected edition must be known before route model binding,

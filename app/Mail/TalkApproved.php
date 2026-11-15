@@ -26,19 +26,26 @@ class TalkApproved extends Mailable
     {
         return new Envelope(
             replyTo: [new Address(EmailTheme::CONTACT_EMAIL, 'Konferencia o AI vo vzdelávaní')],
-            subject: 'Výsledok posúdenia príspevku – Konferencia o AI vo vzdelávaní ' . $this->conference->year,
+            subject: __('Výsledok posúdenia príspevku – Konferencia o AI vo vzdelávaní :year', ['year' => $this->conference->year]),
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.talk-approved',
-            text: 'emails.talk-approved-text',
+            // English template for participants who registered in English
+            view: $this->template('emails.talk-approved'),
+            text: $this->template('emails.talk-approved-text'),
             with: [
                 'registration' => $this->registration,
                 'conference' => $this->conference,
             ],
         );
+    }
+
+    /** emails.en.* when the mail is rendered in English, otherwise the Slovak template. */
+    private function template(string $view): string
+    {
+        return app()->getLocale() === 'en' ? str_replace('emails.', 'emails.en.', $view) : $view;
     }
 }

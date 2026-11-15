@@ -163,7 +163,12 @@
                 <tbody class="bg-slate-900 divide-y divide-slate-800">
                     @forelse($registrations as $registration)
                         <tr class="hover:bg-slate-800 transition-colors">
-                            <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->name }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-200">
+                                {{ $registration->name }}
+                                @if($registration->locale === 'en')
+                                    <span class="ml-1 rounded border border-sky-700 px-1 text-[10px] font-semibold text-sky-300" title="Registrácia v angličtine – e-maily dostáva po anglicky">EN</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->email }}</td>
                             <td class="px-4 py-3 text-sm text-slate-200 whitespace-nowrap">
                                 {{ $registration->participation_type === 'presentation' ? 'Aktívna' : 'Pasívna' }}

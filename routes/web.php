@@ -13,146 +13,15 @@ use App\Models\Conference;
 use App\Http\Controllers\Admin\ConferenceController;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-Route::get('/', function () {
-    $allowed = ['jpg','jpeg','png','gif','webp','svg'];
-    $images = [];
-    $imagesFs = public_path('images');
-    if (is_dir($imagesFs)) {
-        $files = scandir($imagesFs) ?: [];
-        foreach ($files as $f) {
-            if ($f === '.' || $f === '..') continue;
-            $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
-            if (in_array($ext, $allowed, true)) {
-                $images[] = asset('images/' . rawurlencode($f));
-            }
-        }
-        sort($images, SORT_NATURAL | SORT_FLAG_CASE);
-    }
-    return view('home', compact('images'));
- })->name('home');
-
-Route::get('/prihlasenie', function () {
-    return view('registration');
-})->name('registration');
-
-Route::get('/vybor', function () {
-    return view('committee');
-})->name('committee');
-
-Route::get('/program', function () {
-    // Only scheduled items: freshly submitted talks have no time until the organisers place them
-    $registrations = \App\Models\Registration::query()
-        ->inProgram()
-        ->whereNotNull('time_start')
-        ->orderBy('time_start')
-        ->orderBy('id')
-        ->get();
-
-    return view('program', compact('registrations'));
-})->name('program');
-
-Route::post('/prihlasenie', function (Request $request) {
-    $data = $request->validate([
-        'title_before' => ['nullable', 'string', 'max:50'],
-        'name' => ['required', 'string', 'max:255'],
-        'title_after' => ['nullable', 'string', 'max:50'],
-        'email' => ['required', 'email', 'max:255'],
-        'phone' => ['nullable', 'string', 'max:100'],
-        'institution' => ['required', 'string', 'max:255'],
-        'position' => ['nullable', 'string', 'max:255'],
-        'participation_type' => [
-            'required', 'in:passive,presentation',
-            function (string $attribute, mixed $value, \Closure $fail) {
-                $conference = Conference::current();
-                if ($value === 'presentation' && ! $conference->isContributionOpen()) {
-                    $until = Conference::formatDate($conference->contributionDeadline());
-                    $fail('Prihlasovanie príspevkov bolo uzatvorené' . ($until ? " ({$until})" : '') . '. Môžete sa prihlásiť ako pasívny účastník.');
-                }
-            },
-        ],
-        'online_participation' => ['sometimes', 'accepted'],
-        'title' => ['required_if:participation_type,presentation', 'nullable', 'string', 'max:255'],
-        'abstract' => [
-            'required_if:participation_type,presentation', 'nullable', 'string',
-            function (string $attribute, mixed $value, \Closure $fail) {
-                $words = count(preg_split('/\s+/u', trim((string) $value), -1, PREG_SPLIT_NO_EMPTY));
-                if ($words > Registration::ABSTRACT_MAX_WORDS) {
-                    $fail('Abstrakt prekračuje limit ' . Registration::ABSTRACT_MAX_WORDS . " slov (aktuálne: {$words} slov)");
-                }
-            },
-        ],
-        'keywords' => ['nullable', 'string', 'max:255'],
-        'block' => ['nullable', 'in:' . implode(',', array_keys(Registration::BLOCKS))],
-        'notes' => ['nullable', 'string', 'max:2000'],
-    ], [
-        'name.required' => 'Meno a priezvisko je povinné pole',
-        'email.required' => 'E-mail je povinné pole',
-        'email.email' => 'Zadajte platnú e-mailovú adresu',
-        'institution.required' => 'Inštitúcia / Organizácia je povinné pole',
-        'participation_type.required' => 'Vyberte typ účasti',
-        'participation_type.in' => 'Neplatný typ účasti',
-        'title.required_if' => 'Názov príspevku je povinný pre aktívnu účasť',
-        'abstract.required_if' => 'Abstrakt je povinný pre aktívnu účasť',
-        'block.in' => 'Vyberte platný blok',
-    ]);
-
-    $data['online_participation'] = $request->boolean('online_participation');
-
-    // Contribution details only belong to active participants (hidden fields may still be posted)
-    if ($data['participation_type'] !== 'presentation') {
-        $data['title'] = $data['abstract'] = $data['keywords'] = $data['block'] = null;
-    } else {
-        // Default length of a talk for this edition; it waits for review before entering the programme
-        $data['duration_minutes'] = (int) (Conference::current()->presentation_minutes ?: 15);
-        $data['review_status'] = Registration::REVIEW_PENDING;
-    }
-
-    $registration = Registration::create($data);
-
-    Mail::to('konferenciaAI@fri.uniza.sk')->send(new NewRegistrationNotification($registration));
-
-    // Confirmation to the participant; a mail failure must not lose the (already saved) registration.
-    try {
-        Mail::to($registration->email, $registration->name)
-            ->send(new RegistrationConfirmation($registration, Conference::current()));
-    } catch (\Throwable $e) {
-        report($e);
-    }
-
-    return redirect()->to(route('registration') . '#registration-form')
-        ->with('success', 'Ďakujeme za prihlásenie! Potvrdenie sme vám poslali na e-mail.');
-})->name('registration.submit');
-
-// ---- Question Routes ----
-Route::get('/otazka', function () {
-    return view('question');
-})->name('question');
-
-Route::post('/otazka', function (Request $request) {
-    $data = $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['nullable', 'email', 'max:255'],
-        'question' => ['required', 'string', 'min:3', 'max:5000'],
-    ], [
-        'name.required' => 'Meno je povinné pole',
-        'email.email' => 'Zadajte platnú e-mailovú adresu',
-        'question.required' => 'Otázka je povinné pole',
-        'question.min' => 'Otázka musí obsahovať aspoň 3 znaky',
-        'question.max' => 'Otázka môže obsahovať maximálne 5000 znakov',
-    ]);
-
-    \App\Models\Question::create($data);
-
-    return redirect()->route('question')
-        ->with('success', 'Vaša otázka bola úspešne odoslaná!')
-        ->withInput($request->only('name'));
-})->name('question.store');
+// ---- Public site: Slovak (default, no prefix) and English (/en) ----
+Route::middleware('locale:sk')->group(__DIR__ . '/public.php');
+Route::middleware('locale:en')->prefix('en')->name('en.')->group(__DIR__ . '/public.php');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function (Request $request) {
         $sortable = [
             'name' => 'name',
@@ -433,7 +302,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
     // ---- Review of submitted talks: the author is informed by e-mail ----
     $notifyAuthor = function (Registration $registration, \Illuminate\Mail\Mailable $mail): string {
         try {
-            Mail::to($registration->email, $registration->name)->send($mail);
+            Mail::to($registration->email, $registration->name)->locale($registration->locale ?: 'sk')->send($mail);
 
             return " E-mail autorovi ({$registration->email}) bol odoslaný.";
         } catch (\Throwable $e) {
@@ -1272,78 +1141,6 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
         return redirect()->back()->with('success', 'Otázka bola označená ako zodpovedaná.');
     })->name('questions.mark_answered');
-});
-
-// ---- Public Recordings (Záznamy z minulých ročníkov) ----
-Route::get('/zaznamy', function (Request $request) {
-    // Ak je user už prihlásený, presmeruj na zoznam
-    if ($request->session()->get('recordings_authenticated') === true) {
-        return redirect()->route('recordings.list');
-    }
-    return view('recordings.login');
-})->name('recordings.login');
-
-Route::post('/zaznamy', function (Request $request) {
-    $password = (string) $request->input('password', '');
-
-    $expected = (string) config('services.recordings.password');
-
-    if ($expected !== '' && hash_equals($expected, $password)) {
-        // Ulož do session
-        $request->session()->flush(); // Vymaž stare session data
-        $request->session()->put('recordings_authenticated', true);
-        $request->session()->save(); // Ulož explicitne
-
-        return redirect()->route('recordings.list')
-            ->with('success', 'Úspešne ste sa prihlásili.');
-    }
-
-    return back()
-        ->withErrors(['password' => 'Nesprávne heslo.'])
-        ->withInput();
-})->name('recordings.authenticate');
-
-Route::middleware(['auth.recordings'])->prefix('/zaznamy')->group(function () {
-    Route::get('/list', function () {
-        // All editions that already took place (incl. today), newest first, with their talks
-        $presentations = fn ($q) => $q->where('participation_type', 'presentation')->whereNotNull('time_start');
-
-        $editions = Conference::query()
-            ->whereDate('date', '<=', now()->toDateString())
-            ->whereHas('registrations', $presentations)
-            ->with(['registrations' => fn ($q) => $presentations($q)->orderBy('time_start')->orderBy('id')])
-            ->orderByDesc('year')
-            ->get();
-
-        return view('recordings.list', compact('editions'));
-    })->name('recordings.list');
-
-    /*
-     * Serve a recording / slides file. Only files that belong to a talk (stored in the
-     * registration's column) are served, and the resolved path must stay inside the
-     * directory - so "../" or any other file on the server can never be reached.
-     */
-    $serveTalkFile = function (string $directory, string $column, string $filename) {
-        $known = Registration::withoutGlobalScope('conference')
-            ->where('participation_type', 'presentation')
-            ->where($column, $filename)
-            ->exists();
-
-        $base = realpath(storage_path('app/private/' . $directory));
-        $path = $known && $base ? realpath($base . DIRECTORY_SEPARATOR . $filename) : false;
-
-        if ($path === false || ! str_starts_with($path, $base . DIRECTORY_SEPARATOR) || ! is_file($path)) {
-            abort(404, $directory === 'zaznamy' ? 'Záznam nebol nájdený.' : 'Prezentácia nebola nájdená.');
-        }
-
-        return response()->file($path);
-    };
-
-    Route::get('/record/{filename}', fn (string $filename) => $serveTalkFile('zaznamy', 'record', $filename))
-        ->name('recordings.download')->where('filename', '.*');
-
-    Route::get('/presentation/{filename}', fn (string $filename) => $serveTalkFile('prezentacie', 'presentation', $filename))
-        ->name('recordings.presentation')->where('filename', '.*');
 });
 
 require __DIR__.'/auth.php';

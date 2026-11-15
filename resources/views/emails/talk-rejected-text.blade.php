@@ -1,5 +1,5 @@
 @php($fullName = $registration->fullName())
-KONFERENCIA O UMELEJ INTELIGENCII VO VZDELÁVANÍ – {{ $conference->editionNumber() }}. ročník ({{ $conference->year }})
+KONFERENCIA O UMELEJ INTELIGENCII VO VZDELÁVANÍ – {{ $conference->editionLabel() }} ({{ $conference->year }})
 
 Príspevok neprijatý
 

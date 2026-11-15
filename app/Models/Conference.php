@@ -110,6 +110,20 @@ class Conference extends Model
         return static::query()->where('year', '<=', $this->year)->count();
     }
 
+    /** "2. ročník" / "2nd edition" in the current language. */
+    public function editionLabel(): string
+    {
+        $n = $this->editionNumber();
+
+        if (app()->getLocale() !== 'en') {
+            return "{$n}. ročník";
+        }
+
+        $suffix = in_array($n % 100, [11, 12, 13], true) ? 'th' : (['th', 'st', 'nd', 'rd'][$n % 10] ?? 'th');
+
+        return "{$n}{$suffix} edition";
+    }
+
     /** "H:i" start time, tolerant of the DB returning "H:i:s". */
     public function startTimeLabel(): string
     {
@@ -123,14 +137,26 @@ class Conference extends Model
     /** e.g. "2. 2. 2027" */
     public static function formatDate(?Carbon $date): ?string
     {
-        return $date?->format('j. n. Y');
+        if ($date === null) {
+            return null;
+        }
+
+        // "2. 2. 2027" in Slovak, "2 February 2027" in English
+        return app()->getLocale() === 'en'
+            ? $date->copy()->locale('en')->isoFormat('D MMMM YYYY')
+            : $date->format('j. n. Y');
     }
 
-    /** e.g. "2. 2. 2027 (utorok) od 9:00" */
+    /** e.g. "2. 2. 2027 (utorok) od 9:00" / "Tuesday, 2 February 2027, from 9:00" */
     public function dateLabel(): string
     {
         if (! $this->date) {
-            return 'termín bude upresnený';
+            return __('termín bude upresnený');
+        }
+
+        if (app()->getLocale() === 'en') {
+            return $this->date->copy()->locale('en')->isoFormat('dddd') . ', ' . self::formatDate($this->date)
+                . ', from ' . $this->startTimeLabel();
         }
 
         $day = $this->date->copy()->locale('sk')->isoFormat('dddd');

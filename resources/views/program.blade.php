@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Program konferencie')
-@section('meta_description', 'Program konferencie o umelej inteligencii vo vzdelávaní')
+@section('title', __('Program konferencie'))
+@section('meta_description', __('Program konferencie o umelej inteligencii vo vzdelávaní'))
 
 @section('content')
 
@@ -255,19 +255,19 @@
 </script>
 
 <x-site.hero :conference="$conference"
-             title="PROGRAM KONFERENCIE"
-             sub="Umelá inteligencia vo vzdelávaní" />
+             :title="__('PROGRAM KONFERENCIE')"
+             :sub="__('Umelá inteligencia vo vzdelávaní')" />
 
 <div class="stack">
     <div class="card">
         <!-- Print-only header with FRI_logo2 -->
         <div class="printHeader" style="display: none; margin-bottom: 1.5rem; text-align: center;">
-            <img src="{{ asset('images/FRI_logo2.png') }}" alt="FRI Logo" class="printHeaderLogo" style="width: 100%; max-width: 480px; height: auto;"/>
+            <img src="{{ asset('images/FRI_logo2.png') }}" alt="{{ __('FRI Logo') }}" class="printHeaderLogo" style="width: 100%; max-width: 480px; height: auto;"/>
         </div>
 
-        <h1 class="printOnly" style="color: #9fe7ff; margin-bottom: 1.5rem; margin-top: 0;">Program konferencie</h1>
+        <h1 class="printOnly" style="color: #9fe7ff; margin-bottom: 1.5rem; margin-top: 0;">{{ __('Program konferencie') }}</h1>
         <p style="margin-top: -0.75rem; margin-bottom: 1.25rem; color: #cbd5e1; font-size: 0.95rem;">
-            Organizátori si vyhradzujú právo na zmeny v programe.
+            {{ __('Organizátori si vyhradzujú právo na zmeny v programe.') }}
         </p>
 
         @if($conference->teams_url)
@@ -278,24 +278,24 @@
                 rel="noopener noreferrer"
                 style="display: inline-block; padding: 0.65rem 1rem; background: rgba(255, 184, 28, 0.16); color: #ffb81c; text-decoration: none; border-radius: 0.6rem; font-weight: 600; border: 1px solid rgba(255, 184, 28, 0.35);"
             >
-                Otvoriť MS Teams míting
+                {{ __('Otvoriť MS Teams míting') }}
             </a>
         </div>
         @endif
 
         @if($registrations->isEmpty())
-            <p style="color: #cbd5e1; text-align: center; padding: 2rem;">Program zatiaľ nie je zverejnený.</p>
+            <p style="color: #cbd5e1; text-align: center; padding: 2rem;">{{ __('Program zatiaľ nie je zverejnený.') }}</p>
         @else
             <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
                 <table class="program-table" style="width: 100%; min-width: 100%; border-collapse: collapse; font-size: 0.95rem;">
                     <thead>
                         <tr style="background: rgba(159, 231, 255, 0.1); border-bottom: 2px solid rgba(159, 231, 255, 0.3);">
-                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Čas</th>
-                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Trvanie</th>
-                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c; white-space: nowrap;">Forma</th>
-                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Prednášajúci</th>
-                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Inštitúcia</th>
-                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">Názov príspevku</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">{{ __('Čas') }}</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">{{ __('Trvanie') }}</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c; white-space: nowrap;">{{ __('Forma') }}</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">{{ __('Prednášajúci') }}</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">{{ __('Inštitúcia') }}</th>
+                            <th style="padding: 0.75rem; text-align: left; font-weight: 600; color: #ffb81c;">{{ __('Názov príspevku') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -305,27 +305,27 @@
                                 $timeVal = $registration->time_start ? \Illuminate\Support\Carbon::parse($registration->time_start)->format('H:i') : '—';
                                 $durVal = (int) ($registration->duration_minutes ?? 0);
                                 $hasDetails = !$isBreak && ($registration->abstract || $registration->keywords);
-                                $formLabel = $registration->online_participation ? 'Online' : 'Prezenčne';
+                                $formLabel = $registration->online_participation ? __('Online') : __('Prezenčne');
                             @endphp
 
                             @if($isBreak)
                                 <tr class="break-row" style="background: rgba(255, 166, 0, 0.18); border-top: 1px solid rgba(255, 166, 0, 0.40);">
-                                    <td style="padding: 0.75rem; color: #ff9d00; font-weight: 500; font-size: 1rem;" data-label="Čas">{{ $timeVal }}</td>
-                                    <td style="padding: 0.75rem; color: #ff9d00; font-weight: 500; font-size: 1rem;" data-label="Trvanie">{{ $durVal }} min</td>
+                                    <td style="padding: 0.75rem; color: #ff9d00; font-weight: 500; font-size: 1rem;" data-label="{{ __('Čas') }}">{{ $timeVal }}</td>
+                                    <td style="padding: 0.75rem; color: #ff9d00; font-weight: 500; font-size: 1rem;" data-label="{{ __('Trvanie') }}">{{ $durVal }} min</td>
                                     <td colspan="4" style="padding: 0.75rem; color: #ff9d00; font-weight: 500; font-size: 1rem;">
-                                        {{ $registration->title ?? 'Prestávka' }}
+                                        {{ $registration->title ? __($registration->title) : __('Prestávka') }}
                                     </td>
                                 </tr>
                             @else
                                 <tr style="border-top: 1px solid rgba(159, 231, 255, 0.1);">
-                                    <td style="padding: 0.75rem; color: #cbd5e1; font-weight: 500;" data-label="Čas">{{ $timeVal }}</td>
-                                    <td style="padding: 0.75rem; color: #cbd5e1;" data-label="Trvanie">{{ $durVal }} min</td>
-                                    <td style="padding: 0.75rem; color: #cbd5e1; white-space: nowrap;" data-label="Forma">{{ $formLabel }}</td>
-                                    <td style="padding: 0.75rem; color: #f3f7fb;" data-label="Prednášajúci">
+                                    <td style="padding: 0.75rem; color: #cbd5e1; font-weight: 500;" data-label="{{ __('Čas') }}">{{ $timeVal }}</td>
+                                    <td style="padding: 0.75rem; color: #cbd5e1;" data-label="{{ __('Trvanie') }}">{{ $durVal }} min</td>
+                                    <td style="padding: 0.75rem; color: #cbd5e1; white-space: nowrap;" data-label="{{ __('Forma') }}">{{ $formLabel }}</td>
+                                    <td style="padding: 0.75rem; color: #f3f7fb;" data-label="{{ __('Prednášajúci') }}">
                                         {{ $registration->name }}
                                     </td>
-                                    <td style="padding: 0.75rem; color: #cbd5e1;" data-label="Inštitúcia">{{ $registration->institution }}</td>
-                                    <td style="padding: 0.75rem; color: #f3f7fb;" data-label="Názov príspevku" @if($hasDetails)class="program-title-cell" @endif>
+                                    <td style="padding: 0.75rem; color: #cbd5e1;" data-label="{{ __('Inštitúcia') }}">{{ $registration->institution }}</td>
+                                    <td style="padding: 0.75rem; color: #f3f7fb;" data-label="{{ __('Názov príspevku') }}" @if($hasDetails)class="program-title-cell" @endif>
                                         @if($hasDetails)
                                             <button type="button" class="program-toggle" data-program-toggle="{{ $registration->id }}" aria-expanded="false">
                                                 <span class="program-title-text">{{ $registration->title ?? '—' }}</span>
@@ -339,7 +339,7 @@
                                             {{ $registration->title ?? '—' }}
                                         @endif
                                         <div style="margin-top: 0.35rem;">
-                                            <a href="{{ route('question') }}" style="color: #9fe7ff; text-decoration: underline; font-size: 0.85rem;">Položiť otázku</a>
+                                            <a href="{{ lroute('question') }}" style="color: #9fe7ff; text-decoration: underline; font-size: 0.85rem;">{{ __('Položiť otázku') }}</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -348,11 +348,11 @@
                                         <td colspan="6">
                                             <div class="program-details-content">
                                                 @if($registration->abstract)
-                                                    <span class="detail-label">Abstrakt:</span>
+                                                    <span class="detail-label">{{ __('Abstrakt:') }}</span>
                                                     <div class="detail-value">{{ $registration->abstract }}</div>
                                                 @endif
                                                 @if($registration->keywords)
-                                                    <span class="detail-label">Kľúčové slová:</span>
+                                                    <span class="detail-label">{{ __('Kľúčové slová:') }}</span>
                                                     <div class="detail-value">{{ $registration->keywords }}</div>
                                                 @endif
                                             </div>

@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Prihlásenie na konferenciu – Umelá inteligencia vo vzdelávaní')
-@section('meta_description', 'Prihláste sa na konferenciu o umelej inteligencii vo vzdelávaní')
+@section('title', __('Prihlásenie na konferenciu – Umelá inteligencia vo vzdelávaní'))
+@section('meta_description', __('Prihláste sa na konferenciu o umelej inteligencii vo vzdelávaní'))
 
 @php
     /** @var \App\Models\Conference $conference */
@@ -15,61 +15,61 @@
 
 @section('content')
     <x-site.hero :conference="$conference"
-                 title="PRIHLÁSENIE NA KONFERENCIU"
-                 sub="Umelá inteligencia vo vzdelávaní" />
+                 :title="__('PRIHLÁSENIE NA KONFERENCIU')"
+                 :sub="__('Umelá inteligencia vo vzdelávaní')" />
 
     <div class="stack">
         <x-site.info-card :conference="$conference" illustration="computer.png" illustrationAlt="Ilustrácia: počítač">
-            <p><b>Potvrdenie účasti:</b> e-mailom ihneď po prihlásení</p>
-            <p><b>Registračný poplatok:</b> konferencia je bezplatná</p>
+            <p><b>{{ __('Potvrdenie účasti:') }}</b> {{ __('e-mailom ihneď po prihlásení') }}</p>
+            <p><b>{{ __('Registračný poplatok:') }}</b> {{ __('konferencia je bezplatná') }}</p>
 
-            <h3>Dôležité termíny</h3>
+            <h3>{{ __('Dôležité termíny') }}</h3>
             <ul class="list">
                 @if($contributionDeadline)
-                <li>{{ $contributionDeadline }} – Deadline na príspevky (aktívna účasť)</li>
+                <li>{{ $contributionDeadline }} – {{ __('Deadline na príspevky (aktívna účasť)') }}</li>
                 @endif
                 @if($deadline)
-                <li>{{ $deadline }} – {{ $contributionDeadline ? 'Deadline na registráciu (pasívna účasť)' : 'Deadline na prihlášky' }}</li>
+                <li>{{ $deadline }} – {{ $contributionDeadline ? __('Deadline na registráciu (pasívna účasť)') : __('Deadline na prihlášky') }}</li>
                 @endif
                 @if($notification)
-                <li>{{ $notification }} – Notifikácia autorov</li>
+                <li>{{ $notification }} – {{ __('Notifikácia autorov') }}</li>
                 @endif
-                <li>{{ $date }} – Konferencia</li>
+                <li>{{ $date }} – {{ __('Konferencia') }}</li>
             </ul>
         </x-site.info-card>
 
         <section class="card">
-            <h2>Typy účasti</h2>
-            <p>Vyberte si formu vašej účasti na konferencii:</p>
+            <h2>{{ __('Typy účasti') }}</h2>
+            <p>{{ __('Vyberte si typ svojej účasti na konferencii:') }}</p>
 
             <div class="registrationTypes">
                 <div class="regType">
-                    <h3>Aktívna účasť s príspevkom</h3>
-                    <p>Pre autorov, ktorí chcú prezentovať svoje skúsenosti.</p>
+                    <h3>{{ __('Aktívna účasť s príspevkom') }}</h3>
+                    <p>{{ __('Pre autorov, ktorí chcú prezentovať svoje skúsenosti.') }}</p>
                     <ul class="list">
-                        <li>Príspevok (max. {{ $conference->presentation_minutes ?: 15 }} minút)</li>
-                        <li>Diskutujúci na panelovej diskusii (v prípade záujmu)</li>
+                        <li>{{ __('Príspevok (max. :minutes minút)', ['minutes' => $conference->presentation_minutes ?: 15]) }}</li>
+                        <li>{{ __('Diskutujúci na panelovej diskusii (v prípade záujmu)') }}</li>
                     </ul>
                     @if(! $contributionOpen)
-                        <p><b>Prihlasovanie príspevkov je uzatvorené.</b></p>
+                        <p><b>{{ __('Prihlasovanie príspevkov je uzatvorené.') }}</b></p>
                     @elseif($contributionDeadline)
-                        <p><b>Príspevky prijímame do {{ $contributionDeadline }}.</b></p>
+                        <p><b>{{ __('Príspevky prijímame do :date.', ['date' => $contributionDeadline]) }}</b></p>
                     @endif
                 </div>
 
                 <div class="regType">
-                    <h3>Pasívna účasť</h3>
-                    <p>Pre účastníkov, ktorí sa chcú zúčastniť ako poslucháči.</p>
+                    <h3>{{ __('Pasívna účasť') }}</h3>
+                    <p>{{ __('Pre účastníkov, ktorí sa chcú zúčastniť ako poslucháči.') }}</p>
                     <ul class="list">
-                        <li>Prístup na všetky prednášky (prezenčne aj online)</li>
-                        <li>Účasť na panelových diskusiách</li>
+                        <li>{{ __('Prístup na všetky prednášky (prezenčne aj online)') }}</li>
+                        <li>{{ __('Účasť na panelových diskusiách') }}</li>
                     </ul>
                 </div>
             </div>
         </section>
 
         <main class="card">
-            <h2 id="registration-form">Registračný formulár</h2>
+            <h2 id="registration-form">{{ __('Registračný formulár') }}</h2>
 
             @if(session('success'))
                 <div class="success-message">
@@ -79,7 +79,7 @@
 
             @if($errors->any())
                 <div class="error-box">
-                    <strong>Opravte prosím nasledujúce chyby:</strong>
+                    <strong>{{ __('Opravte prosím nasledujúce chyby:') }}</strong>
                     <ul>
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -88,22 +88,22 @@
                 </div>
             @endif
 
-            <form class="regForm" method="POST" action="{{ route('registration.submit') }}" novalidate>
+            <form class="regForm" method="POST" action="{{ lroute('registration.submit') }}" novalidate>
                 @csrf
 
                 <div class="formSection">
-                    <h3>Základné údaje</h3>
+                    <h3>{{ __('Základné údaje') }}</h3>
 
                     <div class="formGroup">
-                        <label for="title_before">Titul pred menom</label>
-                        <input type="text" id="title_before" name="title_before" value="{{ old('title_before') }}" placeholder="napr. Dr., Prof., Ing." class="@error('title_before') has-error @enderror">
+                        <label for="title_before">{{ __('Titul pred menom') }}</label>
+                        <input type="text" id="title_before" name="title_before" value="{{ old('title_before') }}" placeholder="{{ __('napr. Ing., Mgr., doc., prof.') }}" class="@error('title_before') has-error @enderror">
                         @error('title_before')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="formGroup">
-                        <label for="name">Meno a priezvisko *</label>
+                        <label for="name">{{ __('Meno a priezvisko') }} *</label>
                         <input type="text" id="name" name="name" value="{{ old('name') }}" class="@error('name') has-error @enderror">
                         @error('name')
                             <div class="error-message">{{ $message }}</div>
@@ -111,8 +111,8 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="title_after">Titul za menom</label>
-                        <input type="text" id="title_after" name="title_after" value="{{ old('title_after') }}" placeholder="napr. PhD., MBA" class="@error('title_after') has-error @enderror">
+                        <label for="title_after">{{ __('Titul za menom') }}</label>
+                        <input type="text" id="title_after" name="title_after" value="{{ old('title_after') }}" placeholder="{{ __('napr. PhD., MBA') }}" class="@error('title_after') has-error @enderror">
                         @error('title_after')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
@@ -127,7 +127,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="phone">Telefón</label>
+                        <label for="phone">{{ __('Telefón') }}</label>
                         <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" class="@error('phone') has-error @enderror">
                         @error('phone')
                             <div class="error-message">{{ $message }}</div>
@@ -135,7 +135,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="institution">Inštitúcia / Organizácia *</label>
+                        <label for="institution">{{ __('Inštitúcia / Organizácia') }} *</label>
                         <input type="text" id="institution" name="institution" value="{{ old('institution') }}"  class="@error('institution') has-error @enderror">
                         @error('institution')
                             <div class="error-message">{{ $message }}</div>
@@ -143,7 +143,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="position">Pozícia / Študijný program</label>
+                        <label for="position">{{ __('Pozícia / Študijný program') }}</label>
                         <input type="text" id="position" name="position" value="{{ old('position') }}" class="@error('position') has-error @enderror">
                         @error('position')
                             <div class="error-message">{{ $message }}</div>
@@ -152,19 +152,19 @@
                 </div>
 
                 <div class="formSection">
-                    <h3>Typ účasti *</h3>
+                    <h3>{{ __('Typ účasti') }} *</h3>
 
                     <div class="formGroup radioGroup">
                         <label @unless($contributionOpen) style="opacity: .55;" @endunless>
                             <input type="radio" name="participation_type" value="presentation" {{ $contributionOpen && old('participation_type', 'passive') === 'presentation' ? 'checked' : '' }} @disabled(! $contributionOpen)>
-                            Aktívna účasť – prednáška
+                            {{ __('Aktívna účasť – prednáška') }}
                             @unless($contributionOpen)
-                                (prihlasovanie príspevkov je uzatvorené)
+                                ({{ __('prihlasovanie príspevkov je uzatvorené') }})
                             @endunless
                         </label>
                         <label>
                             <input type="radio" name="participation_type" value="passive" {{ old('participation_type', 'passive') === 'passive' ? 'checked' : '' }}>
-                            Pasívna účasť (poslucháč)
+                            {{ __('Pasívna účasť (poslucháč)') }}
                         </label>
                     </div>
                     @error('participation_type')
@@ -173,24 +173,24 @@
                 </div>
 
                 <div class="formSection">
-                    <h3>Forma účasti</h3>
+                    <h3>{{ __('Forma účasti') }}</h3>
 
                     <div class="formGroup radioGroup">
                         <label>
                             <input type="checkbox" name="online_participation" value="1" {{ old('online_participation') ? 'checked' : '' }}>
-                            Online účasť
+                            {{ __('Online účasť') }}
                         </label>
                         <div style="margin-top:6px; color: rgba(255,255,255,.75); font-size: 0.95em;">
-                            Ak zaškrtnete, budeme s vami počítať ako s online účastníkom. Inak počítame s prezenčnou účasťou v Žiline.
+                            {{ __('Ak zaškrtnete, budeme s vami počítať ako s online účastníkom. Inak počítame s prezenčnou účasťou v Žiline.') }}
                         </div>
                     </div>
                 </div>
 
                 <div class="formSection contributionSection">
-                    <h3>Informácie o príspevku</h3>
+                    <h3>{{ __('Informácie o príspevku') }}</h3>
 
                     <div class="formGroup">
-                        <label for="title">Názov príspevku *</label>
+                        <label for="title">{{ __('Názov príspevku') }} *</label>
                         <input type="text" id="title" name="title" value="{{ old('title') }}" class="@error('title') has-error @enderror">
                         @error('title')
                             <div class="error-message">{{ $message }}</div>
@@ -198,7 +198,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="abstract">Abstrakt (max 300 slov) *</label>
+                        <label for="abstract">{{ __('Abstrakt (max. :words slov)', ['words' => \App\Models\Registration::ABSTRACT_MAX_WORDS]) }} *</label>
                         <textarea id="abstract" name="abstract" rows="6" class="@error('abstract') has-error @enderror">{{ old('abstract') }}</textarea>
                         @error('abstract')
                             <div class="error-message">{{ $message }}</div>
@@ -206,7 +206,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="keywords">Kľúčové slová (oddelené čiarkou)</label>
+                        <label for="keywords">{{ __('Kľúčové slová (oddelené čiarkou)') }}</label>
                         <input type="text" id="keywords" name="keywords" value="{{ old('keywords') }}" class="@error('keywords') has-error @enderror">
                         @error('keywords')
                             <div class="error-message">{{ $message }}</div>
@@ -214,11 +214,11 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="block">Preferovaný blok</label>
+                        <label for="block">{{ __('Preferovaný blok') }}</label>
                         <select id="block" name="block" class="@error('block') has-error @enderror">
-                            <option value="">-- Vyberte blok --</option>
+                            <option value="">{{ __('– Vyberte blok –') }}</option>
                             @foreach(\App\Models\Registration::BLOCKS as $key => $label)
-                                <option value="{{ $key }}" @selected(old('block') === $key)>{{ $label }}</option>
+                                <option value="{{ $key }}" @selected(old('block') === $key)>{{ __($label) }}</option>
                             @endforeach
                         </select>
                         @error('block')
@@ -228,10 +228,10 @@
                 </div>
 
                 <div class="formSection">
-                    <h3>Doplňujúce informácie</h3>
+                    <h3>{{ __('Doplňujúce informácie') }}</h3>
 
                     <div class="formGroup">
-                        <label for="notes">Poznámky</label>
+                        <label for="notes">{{ __('Poznámky') }}</label>
                         <textarea id="notes" name="notes" rows="3" class="@error('notes') has-error @enderror">{{ old('notes') }}</textarea>
                         @error('notes')
                             <div class="error-message">{{ $message }}</div>
@@ -240,8 +240,8 @@
                 </div>
 
                 <div class="formActions">
-                    <a href="{{ route('home') }}" class="btn secondary">Späť na hlavnú stránku</a>
-                    <button type="submit" class="btn">Odoslať prihlášku</button>
+                    <a href="{{ lroute('home') }}" class="btn secondary">{{ __('Späť na hlavnú stránku') }}</a>
+                    <button type="submit" class="btn">{{ __('Odoslať prihlášku') }}</button>
                 </div>
             </form>
         </main>
@@ -288,15 +288,15 @@
 
                 // Validate required fields
                 const requiredFields = [
-                    { id: 'name', label: 'Meno a priezvisko' },
+                    { id: 'name', label: @js(__('Meno a priezvisko')) },
                     { id: 'email', label: 'E-mail' },
-                    { id: 'institution', label: 'Inštitúcia / Organizácia' }
+                    { id: 'institution', label: @js(__('Inštitúcia / Organizácia')) }
                 ];
 
                 requiredFields.forEach(field => {
                     const input = document.getElementById(field.id);
                     if (!input.value.trim()) {
-                        showError(input, `${field.label} je povinné pole`);
+                        showError(input, @js(__(':field je povinné pole')).replace(':field', field.label));
                         hasErrors = true;
                     }
                 });
@@ -306,7 +306,7 @@
                 if (emailField.value.trim()) {
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!emailRegex.test(emailField.value)) {
-                        showError(emailField, 'Zadajte platnú e-mailovú adresu');
+                        showError(emailField, @js(__('Zadajte platnú e-mailovú adresu')));
                         hasErrors = true;
                     }
                 }
@@ -318,17 +318,17 @@
                     const abstractField = document.getElementById('abstract');
 
                     if (!titleField.value.trim()) {
-                        showError(titleField, 'Názov príspevku je povinný');
+                        showError(titleField, @js(__('Názov príspevku je povinný')));
                         hasErrors = true;
                     }
 
                     if (!abstractField.value.trim()) {
-                        showError(abstractField, 'Abstrakt je povinný');
+                        showError(abstractField, @js(__('Abstrakt je povinný')));
                         hasErrors = true;
                     } else {
                         const wordCount = abstractField.value.trim().split(/\s+/).length;
                         if (wordCount > {{ \App\Models\Registration::ABSTRACT_MAX_WORDS }}) {
-                            showError(abstractField, `Abstrakt prekračuje limit {{ \App\Models\Registration::ABSTRACT_MAX_WORDS }} slov (aktuálne: ${wordCount} slov)`);
+                            showError(abstractField, @js(__('Abstrakt prekračuje limit :max slov (aktuálne: :count slov)', ['max' => \App\Models\Registration::ABSTRACT_MAX_WORDS])).replace(':count', wordCount));
                             hasErrors = true;
                         }
                     }

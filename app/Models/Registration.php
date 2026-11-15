@@ -22,6 +22,7 @@ class Registration extends Model
         'position',
         'participation_type',
         'review_status',
+        'locale',
         'online_participation',
         'time_start',
         'duration_minutes',

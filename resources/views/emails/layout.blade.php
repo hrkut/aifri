@@ -5,7 +5,7 @@
     $contactEmail = \App\Mail\EmailTheme::CONTACT_EMAIL;
 @endphp
 <!DOCTYPE html>
-<html lang="sk">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,7 +25,7 @@
                     {{-- Logo --}}
                     <tr>
                         <td align="center" style="padding: 0 0 20px;">
-                            <img src="{{ asset('images/FRI_logo.png') }}" alt="Fakulta riadenia a informatiky UNIZA" width="260" style="display: block; width: 260px; max-width: 80%; height: auto; border: 0;">
+                            <img src="{{ asset('images/FRI_logo.png') }}" alt="{{ __('Fakulta riadenia a informatiky UNIZA') }}" width="260" style="display: block; width: 260px; max-width: 80%; height: auto; border: 0;">
                         </td>
                     </tr>
 
@@ -37,14 +37,14 @@
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td style="font-family: {!! $font !!}; color: {{ $c['text'] }}; font-size: 22px; line-height: 1.25; font-weight: 800; letter-spacing: .02em;">
-                                        KONFERENCIA O UMELEJ INTELIGENCII VO&nbsp;VZDELÁVANÍ
-                                        <div style="font-size: 15px; font-weight: 400; font-style: italic; color: {{ $c['muted'] }}; padding-top: 4px; letter-spacing: 0;">(Conference on AI in education)</div>
+                                        {!! __('KONFERENCIA O UMELEJ INTELIGENCII VO&nbsp;VZDELÁVANÍ') !!}
+                                        <div style="font-size: 15px; font-weight: 400; font-style: italic; color: {{ $c['muted'] }}; padding-top: 4px; letter-spacing: 0;">{{ __('(Conference on AI in education)') }}</div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="padding-top: 14px;">
                                         <span style="display: inline-block; padding: 4px 12px; border: 3px double {{ $c['accent'] }}; border-radius: 8px; color: {{ $c['accent'] }}; font-family: {!! $font !!}; font-size: 14px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;">
-                                            {{ $conference->editionNumber() }}. ročník · {{ $conference->year }}
+                                            {{ $conference->editionLabel() }} · {{ $conference->year }}
                                         </span>
                                     </td>
                                 </tr>
@@ -61,10 +61,10 @@
                     {{-- Footer --}}
                     <tr>
                         <td align="center" style="padding: 20px 12px 0; font-family: {!! $font !!}; font-size: 13px; line-height: 1.6; color: {{ $c['muted'] }};">
-                            Fakulta riadenia a informatiky, Žilinská univerzita v&nbsp;Žiline<br>
+                            {!! __('Fakulta riadenia a informatiky, Žilinská univerzita v&nbsp;Žiline') !!}<br>
                             <a href="mailto:{{ $contactEmail }}" style="color: {{ $c['link'] }}; text-decoration: none;">{{ $contactEmail }}</a>
                             &nbsp;·&nbsp;
-                            <a href="{{ route('home') }}" style="color: {{ $c['link'] }}; text-decoration: none;">{{ preg_replace('#^https?://#', '', rtrim(url('/'), '/')) }}</a>
+                            <a href="{{ lroute('home') }}" style="color: {{ $c['link'] }}; text-decoration: none;">{{ preg_replace('#^https?://#', '', rtrim(url('/'), '/')) }}</a>
                         </td>
                     </tr>
                 </table>

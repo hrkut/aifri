@@ -1,5 +1,5 @@
 @php($isTalk = $registration->participation_type === 'presentation')
-NOVÁ REGISTRÁCIA – Konferencia o AI vo vzdelávaní, {{ $conference->editionNumber() }}. ročník ({{ $conference->dateLabel() }})
+NOVÁ REGISTRÁCIA – Konferencia o AI vo vzdelávaní, {{ $conference->editionLabel() }} ({{ $conference->dateLabel() }})
 
 Typ: {{ $isTalk ? 'aktívna účasť s príspevkom' : 'pasívna účasť' }}
 Prihlášok v ročníku {{ $conference->year }}: {{ $totalRegistrations }}

@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Záznamy z minulých ročníkov')
-@section('meta_description', 'Záznamy z konferencie o umelej inteligencii vo vzdelávaní')
+@section('title', __('Záznamy z minulých ročníkov'))
+@section('meta_description', __('Záznamy z konferencie o umelej inteligencii vo vzdelávaní'))
 
 @section('content')
 
@@ -71,21 +71,21 @@
 </style>
 
 <x-site.hero :conference="$conference"
-             title="ZÁZNAMY Z MINULÝCH ROČNÍKOV"
-             sub="Videozáznamy a prezentácie príspevkov" />
+             :title="__('ZÁZNAMY Z MINULÝCH ROČNÍKOV')"
+             :sub="__('Videozáznamy a prezentácie príspevkov')" />
 
 <div class="stack">
     <div class="card">
-        <h2>🔐 Prístup k záznamom</h2>
+        <h2>{{ __('🔐 Prístup k záznamom') }}</h2>
         <p style="margin-bottom: 1.5rem;">
-            Zadajte heslo na prístup k záznamom a prezentáciám z minulých ročníkov konferencie:
+            {{ __('Zadajte heslo na prístup k záznamom a prezentáciám z minulých ročníkov konferencie:') }}
         </p>
 
-        <form method="POST" action="{{ route('recordings.authenticate') }}" novalidate style="max-width: 420px;">
+        <form method="POST" action="{{ lroute('recordings.authenticate') }}" novalidate style="max-width: 420px;">
             @csrf
 
             <div class="login-form-group">
-                <label for="password">Heslo *</label>
+                <label for="password">{{ __('Heslo *') }}</label>
                 <input
                     type="password"
                     id="password"
@@ -93,7 +93,7 @@
                     autocomplete="off"
                     required
                     autofocus
-                    placeholder="Zadajte heslo"
+                    placeholder="{{ __('Zadajte heslo') }}"
                     class="@error('password') is-invalid @enderror"
                 >
                 @error('password')
@@ -101,7 +101,7 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn-submit">Pristúpiť k záznamom</button>
+            <button type="submit" class="btn-submit">{{ __('Pristúpiť k záznamom') }}</button>
         </form>
 
     </div>

@@ -31,7 +31,7 @@
                 </li>
                 <li class="flex gap-2">
                     <span class="text-emerald-400" aria-hidden="true">✓</span>
-                    <span>Autorovi sa pošle e-mail o prijatí na {{ $registration->email }}.</span>
+                    <span>Autorovi sa pošle e-mail o prijatí na {{ $registration->email }}{{ $registration->locale === 'en' ? ' (po anglicky, autor sa registroval v angličtine)' : '' }}.</span>
                 </li>
             </ul>
         </x-admin.review-dialog>
@@ -61,6 +61,11 @@
             <p class="mt-2 text-xs text-slate-400">
                 Text sa pošle autorovi e-mailom na {{ $registration->email }}. Príspevok sa odstráni z programu, registrácia zostane uložená.
             </p>
+            @if($registration->locale === 'en')
+                <p class="mt-2 rounded-md border border-sky-800 bg-sky-950/50 px-3 py-2 text-xs text-sky-100">
+                    Autor sa registroval v angličtine a e-mail dostane po anglicky. <strong>Zdôvodnenie napíšte po anglicky.</strong>
+                </p>
+            @endif
         </x-admin.review-dialog>
     @endif
 @endif

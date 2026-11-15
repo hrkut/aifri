@@ -72,7 +72,7 @@
         Ak ste sa prihlásili omylom alebo sa nebudete môcť zúčastniť, dajte nám prosím vedieť odpoveďou na tento e-mail.
     </p>
     <p style="{!! $p !!} font-size: 15px; margin: 18px 0 0;">
-        Tešíme sa na Vás,<br>
+        Tešíme sa na vás,<br>
         <strong>organizačný výbor konferencie</strong>
     </p>
 @endsection

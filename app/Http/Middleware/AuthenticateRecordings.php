@@ -24,7 +24,7 @@ class AuthenticateRecordings
         );
 
         if (!$authenticated) {
-            return redirect()->route('recordings.login');
+            return redirect()->to(lroute('recordings.login'));
         }
 
         return $next($request);

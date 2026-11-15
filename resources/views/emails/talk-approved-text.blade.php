@@ -2,7 +2,7 @@
     $fullName = $registration->fullName();
     $minutes = (int) ($registration->duration_minutes ?: $conference->presentation_minutes ?: 15);
 @endphp
-KONFERENCIA O UMELEJ INTELIGENCII VO VZDELÁVANÍ – {{ $conference->editionNumber() }}. ročník ({{ $conference->year }})
+KONFERENCIA O UMELEJ INTELIGENCII VO VZDELÁVANÍ – {{ $conference->editionLabel() }} ({{ $conference->year }})
 
 Príspevok prijatý
 

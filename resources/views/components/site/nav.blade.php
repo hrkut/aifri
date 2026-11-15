@@ -13,15 +13,15 @@
 @endphp
 {{-- Site navigation: a sticky text bar on wide screens, a grid of all items on phones;
      the current page is highlighted --}}
-<nav class="siteNav" aria-label="Navigácia">
+<nav class="siteNav" aria-label="{{ __('Navigácia') }}">
     <ul>
         @foreach($items as [$route, $label, $short, $icon, $visible, $current])
             @if($visible)
                 <li>
-                    <a href="{{ route($route) }}" @if(request()->routeIs($current)) aria-current="page" @endif>
+                    <a href="{{ lroute($route) }}" @if(request()->routeIs($current, 'en.' . $current)) aria-current="page" @endif>
                         <span class="navIcon" aria-hidden="true">{{ $icon }}</span>
-                        <span class="navLabel">{{ $label }}</span>
-                        <span class="navLabelShort">{{ $short }}</span>
+                        <span class="navLabel">{{ __($label) }}</span>
+                        <span class="navLabelShort">{{ __($short) }}</span>
                     </a>
                 </li>
             @endif

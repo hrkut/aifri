@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Záznamy z minulých ročníkov')
-@section('meta_description', 'Záznamy z konferencie o umelej inteligencii vo vzdelávaní')
+@section('title', __('Záznamy z minulých ročníkov'))
+@section('meta_description', __('Záznamy z konferencie o umelej inteligencii vo vzdelávaní'))
 
 @section('content')
 
@@ -94,8 +94,9 @@
         color: #cbd5e1;
     }
 
-    .recordings-table td[data-label="Prednášajúci"],
-    .recordings-table td[data-label="Názov príspevku"] {
+    /* speaker and title columns (by position, the labels are translated) */
+    .recordings-table td:nth-child(2),
+    .recordings-table td:nth-child(4) {
         color: #f3f7fb;
     }
 
@@ -202,22 +203,22 @@
 </style>
 
 <x-site.hero :conference="$conference"
-             title="ZÁZNAMY Z MINULÝCH ROČNÍKOV"
-             sub="Videozáznamy a prezentácie príspevkov" />
+             :title="__('ZÁZNAMY Z MINULÝCH ROČNÍKOV')"
+             :sub="__('Videozáznamy a prezentácie príspevkov')" />
 
 <div class="stack">
     <div class="card">
         <p style="margin-top: 0; margin-bottom: 1.25rem; color: #cbd5e1; font-size: 0.95rem;">
-            Konferencia o AI vo vzdelávaní – videozáznamy a prezentácie príspevkov z ročníkov, ktoré sa už konali
+            {{ __('Konferencia o AI vo vzdelávaní – videozáznamy a prezentácie príspevkov z ročníkov, ktoré sa už konali') }}
         </p>
 
         @if($editions->isEmpty())
-            <p style="color: #cbd5e1; text-align: center; padding: 2rem;">Zatiaľ nie sú k dispozícii žiadne záznamy.</p>
+            <p style="color: #cbd5e1; text-align: center; padding: 2rem;">{{ __('Zatiaľ nie sú k dispozícii žiadne záznamy.') }}</p>
         @else
             @if($editions->count() > 1)
-                <nav aria-label="Ročníky" class="edition-nav">
+                <nav aria-label="{{ __('Ročníky') }}" class="edition-nav">
                     @foreach($editions as $edition)
-                        <a href="#rocnik-{{ $edition->year }}">{{ $edition->editionNumber() }}. ročník ({{ $edition->year }})</a>
+                        <a href="#rocnik-{{ $edition->year }}">{{ $edition->editionLabel() }} ({{ $edition->year }})</a>
                     @endforeach
                 </nav>
             @endif
@@ -225,7 +226,7 @@
             @foreach($editions as $edition)
                 <section id="rocnik-{{ $edition->year }}" class="edition-section">
                     <h2 class="edition-heading">
-                        {{ $edition->editionNumber() }}. ročník
+                        {{ $edition->editionLabel() }}
                         <span>{{ \App\Models\Conference::formatDate($edition->date) ?? $edition->year }}</span>
                     </h2>
 
@@ -233,11 +234,11 @@
                         <table class="recordings-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">Čas</th>
-                                    <th style="min-width: 200px;">Prednášajúci</th>
-                                    <th style="width: 150px;">Inštitúcia</th>
-                                    <th style="flex: 1; min-width: 250px;">Názov príspevku</th>
-                                    <th style="width: 100px; text-align: center;">Záznamy</th>
+                                    <th style="width: 80px;">{{ __('Čas') }}</th>
+                                    <th style="min-width: 200px;">{{ __('Prednášajúci') }}</th>
+                                    <th style="width: 150px;">{{ __('Inštitúcia') }}</th>
+                                    <th style="flex: 1; min-width: 250px;">{{ __('Názov príspevku') }}</th>
+                                    <th style="width: 100px; text-align: center;">{{ __('Záznamy') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -247,28 +248,28 @@
                                         $durVal = (int) ($registration->duration_minutes ?? 0);
                                     @endphp
                                     <tr>
-                                        <td style="font-weight: 500;" data-label="Čas">{{ $timeVal }}</td>
-                                        <td data-label="Prednášajúci">{{ $registration->name }}</td>
-                                        <td data-label="Inštitúcia">{{ $registration->institution ?? '—' }}</td>
-                                        <td data-label="Názov príspevku">{{ $registration->title ?? '(bez názvu)' }}</td>
-                                        <td style="text-align: center;" data-label="Záznamy">
+                                        <td style="font-weight: 500;" data-label="{{ __('Čas') }}">{{ $timeVal }}</td>
+                                        <td data-label="{{ __('Prednášajúci') }}">{{ $registration->name }}</td>
+                                        <td data-label="{{ __('Inštitúcia') }}">{{ $registration->institution ?? '—' }}</td>
+                                        <td data-label="{{ __('Názov príspevku') }}">{{ $registration->title ?? __('(bez názvu)') }}</td>
+                                        <td style="text-align: center;" data-label="{{ __('Záznamy') }}">
                                             <div class="recordings-icons-cell">
                                                 @if($registration->record)
-                                                    <a href="{{ route('recordings.download', $registration->record) }}"
+                                                    <a href="{{ lroute('recordings.download', $registration->record) }}"
                                                        class="icon-link recording-icon"
-                                                       title="Stiahnuť video záznam">
+                                                       title="{{ __('Stiahnuť videozáznam') }}">
                                                     </a>
                                                 @else
-                                                    <span class="icon-link recording-icon disabled" title="Video záznam nie je k dispozícii"></span>
+                                                    <span class="icon-link recording-icon disabled" title="{{ __('Videozáznam nie je k dispozícii') }}"></span>
                                                 @endif
 
                                                 @if($registration->presentation)
-                                                    <a href="{{ route('recordings.presentation', $registration->presentation) }}"
+                                                    <a href="{{ lroute('recordings.presentation', $registration->presentation) }}"
                                                        class="icon-link presentation-icon"
-                                                       title="Stiahnuť prezentáciu">
+                                                       title="{{ __('Stiahnuť prezentáciu') }}">
                                                     </a>
                                                 @else
-                                                    <span class="icon-link presentation-icon disabled" title="Prezentácia nie je k dispozícii"></span>
+                                                    <span class="icon-link presentation-icon disabled" title="{{ __('Prezentácia nie je k dispozícii') }}"></span>
                                                 @endif
                                             </div>
                                         </td>

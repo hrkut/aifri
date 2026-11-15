@@ -26,19 +26,26 @@ class RegistrationConfirmation extends Mailable
     {
         return new Envelope(
             replyTo: [new Address(EmailTheme::CONTACT_EMAIL, 'Konferencia o AI vo vzdelávaní')],
-            subject: 'Potvrdenie registrácie – Konferencia o AI vo vzdelávaní ' . $this->conference->year,
+            subject: __('Potvrdenie registrácie – Konferencia o AI vo vzdelávaní :year', ['year' => $this->conference->year]),
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.registration-confirmation',
-            text: 'emails.registration-confirmation-text',
+            // English template for participants who registered in English
+            view: $this->template('emails.registration-confirmation'),
+            text: $this->template('emails.registration-confirmation-text'),
             with: [
                 'registration' => $this->registration,
                 'conference' => $this->conference,
             ],
         );
+    }
+
+    /** emails.en.* when the mail is rendered in English, otherwise the Slovak template. */
+    private function template(string $view): string
+    {
+        return app()->getLocale() === 'en' ? str_replace('emails.', 'emails.en.', $view) : $view;
     }
 }
