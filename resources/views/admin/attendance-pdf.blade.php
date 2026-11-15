@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Prezenčná listina</title>
     <style>
-        @page { margin: 16mm 12mm; }
+        @page { margin: 16mm 12mm 18mm; }
 
         body {
             font-family: DejaVu Sans, Arial, sans-serif;
@@ -57,7 +57,19 @@
         .sign { width: 28%; }
 
         .muted { color: #475569; }
-        .sign-space { height: 18px; }
+        .sign-space { height: 22px; }
+
+        tr { page-break-inside: avoid; }
+        thead { display: table-header-group; } /* repeat on every page */
+
+        .footer {
+            position: fixed;
+            bottom: -10mm;
+            left: 0;
+            right: 0;
+            font-size: 9px;
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
@@ -69,10 +81,13 @@
         };
     @endphp
 
+    <div class="footer">
+        {{ $listTitle }} · Konferencia o umelej inteligencii vo vzdelávaní {{ $conference->year }}
+    </div>
+
     <h1>{{ $listTitle }}</h1>
     <p class="subtitle">
-        <strong>Konferencia o AI vo vzdelávaní</strong><br>
-        @php($conference = \App\Models\Conference::current())
+        <strong>Konferencia o umelej inteligencii vo vzdelávaní</strong> · {{ $conference->editionLabel() }}<br>
         {{ \App\Models\Conference::formatDate($conference->date) ?? $conference->year }}, Fakulta riadenia a informatiky, Žilinská univerzita v Žiline
     </p>
 
@@ -90,11 +105,7 @@
                 <tr>
                     <td class="num">{{ $i + 1 }}</td>
                     <td class="name">
-                        <div>
-                            {{ trim(implode(' ', array_filter([$r->title_before, $r->name]))) }}
-                            {{ $r->title_after ? (', ' . $r->title_after) : '' }}
-                        </div>
-                        <div class="muted" style="font-size: 10px; margin-top: 2px;">{{ $r->email }}</div>
+                        {{ $r->fullName() }}
                     </td>
                     <td class="inst">{{ $r->institution }}</td>
                     <td class="sign"><div class="sign-space"></div></td>
@@ -102,6 +113,9 @@
             @endforeach
         </tbody>
     </table>
+    @if($registrations->isEmpty())
+        <p class="muted">Zvolenému filtru nezodpovedá žiadny účastník.</p>
+    @endif
 </body>
 </html>
 

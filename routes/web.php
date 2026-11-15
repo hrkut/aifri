@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\NewRegistrationNotification;
 use App\Mail\RegistrationConfirmation;
 use App\Exports\RegistrationsExport;
+use App\Support\RegistrationFilters;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Conference;
 use App\Http\Controllers\Admin\ConferenceController;
@@ -23,281 +24,76 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function (Request $request) {
-        $sortable = [
-            'name' => 'name',
-            'email' => 'email',
-            // UI: "Typ účasti" (Aktívna/Pasívna)
-            'participation_type' => 'participation_type',
-            // UI: "Forma účasti" (Online/Prezenčne)
-            'online_participation' => 'online_participation',
-            'institution' => 'institution',
-            'created_at' => 'created_at',
-        ];
+        $filters = new RegistrationFilters($request);
+        [$sort, $direction] = RegistrationFilters::sort($request);
 
-        $q = trim((string) $request->query('q', ''));
-
-        // New select filters
-        $participationTypeFilter = (string) $request->query('participation_type', '');
-        $onlineParticipationFilter = (string) $request->query('online_participation', '');
-
-        // Backward compatibility for old checkbox URLs
-        if ($participationTypeFilter === '' && $request->boolean('only_active')) {
-            $participationTypeFilter = 'active';
-        }
-        if ($onlineParticipationFilter === '' && $request->boolean('only_in_person')) {
-            $onlineParticipationFilter = 'in_person';
-        }
-
-        $sort = (string) $request->query('sort', 'created_at');
-        $direction = strtolower((string) $request->query('direction', 'desc'));
-
-        if (!array_key_exists($sort, $sortable)) {
-            $sort = 'created_at';
-        }
-        if (!in_array($direction, ['asc', 'desc'], true)) {
-            $direction = 'desc';
-        }
-
-        // breaks are programme items, not participants
-        $registrationsQuery = Registration::query()->where('participation_type', '!=', 'break');
-
-        if ($q !== '') {
-            // Basic text search across name/email/institution
-            $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
-            $registrationsQuery->where(function ($query) use ($like) {
-                $query->where('name', 'like', $like)
-                    ->orWhere('email', 'like', $like)
-                    ->orWhere('institution', 'like', $like);
-            });
-        }
-
-        // Select filters
-        if ($participationTypeFilter === 'active') {
-            // Active = presentation
-            $registrationsQuery->where('participation_type', 'presentation');
-        } elseif ($participationTypeFilter === 'passive') {
-            // Passive = passive
-            $registrationsQuery->where('participation_type', 'passive');
-        }
-
-        if ($onlineParticipationFilter === 'online') {
-            $registrationsQuery->where('online_participation', true);
-        } elseif ($onlineParticipationFilter === 'in_person') {
-            $registrationsQuery->where('online_participation', false);
-        }
-
-        // Review state of talks (implies active participation)
-        $reviewFilter = (string) $request->query('review', '');
-        if (array_key_exists($reviewFilter, Registration::REVIEW_LABELS)) {
-            $registrationsQuery->where('participation_type', 'presentation');
-            $reviewFilter === Registration::REVIEW_PENDING
-                ? $registrationsQuery->where(fn ($q) => $q->whereNull('review_status')->orWhere('review_status', Registration::REVIEW_PENDING))
-                : $registrationsQuery->where('review_status', $reviewFilter);
-        } else {
-            $reviewFilter = '';
-        }
-
-        $registrations = $registrationsQuery
-            ->orderBy($sortable[$sort], $direction)
+        $registrations = $filters->query()
+            ->orderBy($sort, $direction)
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.dashboard', compact(
-            'registrations',
-            'sort',
-            'direction',
-            'q',
-            'participationTypeFilter',
-            'onlineParticipationFilter',
-            'reviewFilter'
-        ));
+        return view('admin.dashboard', [
+            'registrations' => $registrations,
+            'sort' => $sort,
+            'direction' => $direction,
+            'q' => $filters->q,
+            'participationTypeFilter' => $filters->participationType,
+            'onlineParticipationFilter' => $filters->onlineParticipation,
+            'reviewFilter' => $filters->review,
+        ]);
     })->name('dashboard');
 
     Route::get('/export', function (Request $request) {
-        $sortable = [
-            'name' => 'name',
-            'email' => 'email',
-            'participation_type' => 'participation_type',
-            'online_participation' => 'online_participation',
-            'institution' => 'institution',
-            'created_at' => 'created_at',
-        ];
+        [$sort, $direction] = RegistrationFilters::sort($request);
 
-        $q = trim((string) $request->query('q', ''));
-
-        // New select filters
-        $participationTypeFilter = (string) $request->query('participation_type', '');
-        $onlineParticipationFilter = (string) $request->query('online_participation', '');
-
-        // Backward compatibility for old checkbox URLs
-        if ($participationTypeFilter === '' && $request->boolean('only_active')) {
-            $participationTypeFilter = 'active';
-        }
-        if ($onlineParticipationFilter === '' && $request->boolean('only_in_person')) {
-            $onlineParticipationFilter = 'in_person';
-        }
-
-        $sort = (string) $request->query('sort', 'created_at');
-        $direction = strtolower((string) $request->query('direction', 'desc'));
-
-        if (!array_key_exists($sort, $sortable)) {
-            $sort = 'created_at';
-        }
-        if (!in_array($direction, ['asc', 'desc'], true)) {
-            $direction = 'desc';
-        }
-
-        // breaks are programme items, not participants
-        $registrationsQuery = Registration::query()->where('participation_type', '!=', 'break');
-
-        if ($q !== '') {
-            $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
-            $registrationsQuery->where(function ($query) use ($like) {
-                $query->where('name', 'like', $like)
-                    ->orWhere('email', 'like', $like)
-                    ->orWhere('institution', 'like', $like);
-            });
-        }
-
-        if ($participationTypeFilter === 'active') {
-            $registrationsQuery->where('participation_type', 'presentation');
-        } elseif ($participationTypeFilter === 'passive') {
-            $registrationsQuery->where('participation_type', 'passive');
-        }
-
-        if ($onlineParticipationFilter === 'online') {
-            $registrationsQuery->where('online_participation', true);
-        } elseif ($onlineParticipationFilter === 'in_person') {
-            $registrationsQuery->where('online_participation', false);
-        }
-
-        // Review state of talks (implies active participation)
-        $reviewFilter = (string) $request->query('review', '');
-        if (array_key_exists($reviewFilter, Registration::REVIEW_LABELS)) {
-            $registrationsQuery->where('participation_type', 'presentation');
-            $reviewFilter === Registration::REVIEW_PENDING
-                ? $registrationsQuery->where(fn ($q) => $q->whereNull('review_status')->orWhere('review_status', Registration::REVIEW_PENDING))
-                : $registrationsQuery->where('review_status', $reviewFilter);
-        } else {
-            $reviewFilter = '';
-        }
-
-        $registrationsQuery->orderBy($sortable[$sort], $direction);
+        // id as a tie-breaker keeps the export's chunked reading stable
+        $query = (new RegistrationFilters($request))->query()->orderBy($sort, $direction)->orderBy('id');
 
         $fileName = 'registrations_' . Conference::current()->year . '_' . local_now()->format('Y-m-d_His') . '.xlsx';
-        return Excel::download(new RegistrationsExport($registrationsQuery), $fileName);
+        return Excel::download(new RegistrationsExport($query), $fileName);
     })->name('registrations.export');
 
     Route::get('/attendance-pdf', function (Request $request) {
-        $q = trim((string) $request->query('q', ''));
+        $filters = new RegistrationFilters($request);
 
-        // New select filters
-        $participationTypeFilter = (string) $request->query('participation_type', '');
-        $onlineParticipationFilter = (string) $request->query('online_participation', '');
+        // Alphabetical by surname (the second word of the name; titles are separate fields),
+        // then first name, with Slovak collation (Č after C, Š after S, …)
+        $sortKey = static function (Registration $r): array {
+            $parts = preg_split('/\s+/u', trim((string) $r->name), -1, PREG_SPLIT_NO_EMPTY) ?: [''];
 
-        // Backward compatibility for old checkbox URLs
-        if ($participationTypeFilter === '' && $request->boolean('only_active')) {
-            $participationTypeFilter = 'active';
-        }
-        if ($onlineParticipationFilter === '' && $request->boolean('only_in_person')) {
-            $onlineParticipationFilter = 'in_person';
-        }
-
-        // breaks are programme items, not participants
-        $registrationsQuery = Registration::query()->where('participation_type', '!=', 'break');
-
-        if ($q !== '') {
-            $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
-            $registrationsQuery->where(function ($query) use ($like) {
-                $query->where('name', 'like', $like)
-                    ->orWhere('email', 'like', $like)
-                    ->orWhere('institution', 'like', $like);
-            });
-        }
-
-        if ($participationTypeFilter === 'active') {
-            $registrationsQuery->where('participation_type', 'presentation');
-        } elseif ($participationTypeFilter === 'passive') {
-            $registrationsQuery->where('participation_type', 'passive');
-        }
-
-        if ($onlineParticipationFilter === 'online') {
-            $registrationsQuery->where('online_participation', true);
-        } elseif ($onlineParticipationFilter === 'in_person') {
-            $registrationsQuery->where('online_participation', false);
-        }
-
-        // Review state of talks (implies active participation)
-        $reviewFilter = (string) $request->query('review', '');
-        if (array_key_exists($reviewFilter, Registration::REVIEW_LABELS)) {
-            $registrationsQuery->where('participation_type', 'presentation');
-            $reviewFilter === Registration::REVIEW_PENDING
-                ? $registrationsQuery->where(fn ($q) => $q->whereNull('review_status')->orWhere('review_status', Registration::REVIEW_PENDING))
-                : $registrationsQuery->where('review_status', $reviewFilter);
-        } else {
-            $reviewFilter = '';
-        }
-
-        $registrations = $registrationsQuery->get();
-
-        $extractSortKey = static function ($r): array {
-            $name = trim((string) ($r->name ?? ''));
-            $parts = preg_split('/\s+/u', $name) ?: [];
-            $parts = array_values(array_filter($parts, fn ($p) => $p !== ''));
-
-            $first = $parts[0] ?? '';
-            $last = $parts[1] ?? $first;
-
-            return [$last, $first, $name];
+            return [$parts[1] ?? $parts[0], $parts[0], (string) $r->name];
         };
+        $collator = class_exists(\Collator::class) ? new \Collator('sk_SK') : null;
+        $compare = static fn (string $a, string $b): int => $collator
+            ? $collator->compare($a, $b)
+            : strcmp(mb_strtolower($a, 'UTF-8'), mb_strtolower($b, 'UTF-8'));
 
-        // Slovak locale-aware sorting (diacritics)
-        if (class_exists('Collator')) {
-            try {
-                $collator = new \Collator('sk_SK');
-                // Keep diacritics significant; primary strength can ignore accents, so use tertiary.
-                $collator->setStrength(\Collator::TERTIARY);
+        $registrations = $filters->query()->get()
+            ->sort(function (Registration $a, Registration $b) use ($sortKey, $compare) {
+                foreach (array_map(null, $sortKey($a), $sortKey($b)) as [$x, $y]) {
+                    if (($c = $compare($x, $y)) !== 0) {
+                        return $c;
+                    }
+                }
 
-                $arr = $registrations->all();
-                usort($arr, static function ($a, $b) use ($extractSortKey, $collator) {
-                    [$al, $af, $an] = $extractSortKey($a);
-                    [$bl, $bf, $bn] = $extractSortKey($b);
+                return 0;
+            })
+            ->values();
 
-                    $c = $collator->compare($al, $bl);
-                    if ($c !== 0) return $c;
+        $conference = Conference::current();
+        $fileName = 'prezencna_listina_' . $conference->year . '_' . local_now()->format('Y-m-d_His') . '.pdf';
 
-                    $c = $collator->compare($af, $bf);
-                    if ($c !== 0) return $c;
+        $pdf = Pdf::loadView('admin.attendance-pdf', [
+            'registrations' => $registrations,
+            'conference' => $conference,
+            'participationTypeFilter' => $filters->participationType,
+        ])->setPaper('a4', 'portrait');
 
-                    return $collator->compare($an, $bn);
-                });
-                $registrations = collect($arr);
-            } catch (\Throwable $e) {
-                // Fallback below
-            }
-        }
-
-        // Fallback (best-effort) if intl is not available
-        if (!$registrations instanceof \Illuminate\Support\Collection) {
-            $registrations = collect($registrations);
-        }
-        if (!class_exists('Collator')) {
-            $registrations = $registrations
-                ->sortBy(function ($r) use ($extractSortKey) {
-                    [$last, $first, $name] = $extractSortKey($r);
-                    return mb_strtolower($last . '|' . $first . '|' . $name, 'UTF-8');
-                })
-                ->values();
-        }
-
-        $fileName = 'prezencna_listina_' . Conference::current()->year . '_' . local_now()->format('Y-m-d_His') . '.pdf';
-
-        $pdf = Pdf::loadView('admin.attendance-pdf', compact(
-            'registrations',
-            'q',
-            'participationTypeFilter',
-            'onlineParticipationFilter'
-        ))->setPaper('a4', 'portrait');
+        // "Strana X z Y" needs the page count, which CSS counters in dompdf do not know
+        $pdf->render();
+        $dompdf = $pdf->getDomPDF();
+        $dompdf->getCanvas()->page_text(520, 809, 'Strana {PAGE_NUM} z {PAGE_COUNT}',
+            $dompdf->getFontMetrics()->getFont('DejaVu Sans'), 6.75, [0.39, 0.45, 0.55]);
 
         return $pdf->download($fileName);
     })->name('registrations.attendance_pdf');
