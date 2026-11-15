@@ -10,8 +10,8 @@
         ? \App\Models\Conference::formatDate($conference->contributionDeadline())
         : null;
 @endphp
-{{-- "Rýchle info" card: the same key facts on every public page; page-specific lines go into the slot --}}
-<section class="card infoCard">
+{{-- "Rýchle info" panel: the same key facts on every public page; page-specific lines go into the slot --}}
+<aside class="infoPanel">
     <h2>Rýchle info</h2>
     <img class="infoIllustration" src="{{ asset('images/' . $illustration) }}" alt="{{ $illustrationAlt }}" loading="lazy"/>
     <p><b>Organizátor:</b> <a href="https://www.fri.uniza.sk" target="_blank">Fakulta riadenia a informatiky</a> Žilinská univerzita v Žiline</p>
@@ -31,4 +31,4 @@
     {{ $slot }}
 
     <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
-</section>
+</aside>

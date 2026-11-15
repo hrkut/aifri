@@ -903,29 +903,96 @@ footer {
 }
 
 /* ==========================================================================
-   Modernisation layer
-   Keeps the original palette, background and layout; refines surfaces,
-   spacing, typography and interaction. Everything below only overrides.
+   Design system "trace" (2027)
+   The site's circuit-board background becomes the visual language: traces
+   with nodes connect the programme, facts sit on trace rules. Palette, logo
+   and stamp are the original ones; one typeface (Archivo) carries the voice.
+   Everything below only overrides the base styles above.
    ========================================================================== */
 
+@font-face {
+    font-family: "Archivo";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    font-stretch: 62% 125%;
+    src: url("../fonts/archivo/archivo-latin-ext-wdth-normal.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Archivo";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    font-stretch: 62% 125%;
+    src: url("../fonts/archivo/archivo-latin-wdth-normal.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: "Archivo";
+    font-style: italic;
+    font-display: swap;
+    font-weight: 100 900;
+    font-stretch: 62% 125%;
+    src: url("../fonts/archivo/archivo-latin-ext-wdth-italic.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Archivo";
+    font-style: italic;
+    font-display: swap;
+    font-weight: 100 900;
+    font-stretch: 62% 125%;
+    src: url("../fonts/archivo/archivo-latin-wdth-italic.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
-    --radius: 20px;
-    --radius-sm: 12px;
-    --surface: linear-gradient(145deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .03));
-    --surface-solid: rgba(11, 75, 103, .42);
-    --border: rgba(159, 231, 255, .16);
-    --border-strong: rgba(159, 231, 255, .28);
-    --shadow: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 18px 40px -18px rgba(0, 0, 0, .55);
-    --shadow-lift: 0 1px 0 rgba(255, 255, 255, .08) inset, 0 24px 48px -20px rgba(0, 0, 0, .6);
+    /* palette */
+    --abyss: #062a3a;
+    --bg2: #08384d;
+    --bg: #0b4b67;
+    --accent: #ffb81c;
+    --accent2: #9fe7ff;
+    --text: #f3f7fb;
+    --muted: #bcd4de;
+    --trace: rgba(159, 231, 255, .55);
+    --trace-dim: rgba(159, 231, 255, .2);
     --link: #00e5cc;
     --link-hover: #5ffff0;
+
+    /* type scale (major third, 17px base) */
+    --fs-sm: 14px;
+    --fs-base: 17px;
+    --fs-md: 21px;
+    --fs-lg: 26px;
+
+    --max: 1120px;
     --ease: cubic-bezier(.2, .7, .2, 1);
+    font-family: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 body {
+    font-size: var(--fs-base);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+}
+
+p,
+ul,
+li {
+    font-size: var(--fs-base);
+    line-height: 1.6;
+}
+
+p b,
+li b {
+    color: var(--text);
+    font-weight: 650;
 }
 
 ::selection {
@@ -933,120 +1000,67 @@ body {
     color: #fff;
 }
 
-/* Visible keyboard focus everywhere */
 :focus-visible {
-    outline: 2px solid var(--accent2);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
-    border-radius: 6px;
-}
-
-/* --- Surfaces: frosted glass cards and header --------------------------- */
-header,
-.card {
-    background: var(--surface), var(--surface-solid);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    backdrop-filter: blur(14px) saturate(140%);
-}
-
-header {
-    padding: 28px 28px 24px;
-    align-items: stretch;
-}
-
-.card {
-    padding: 28px 28px 26px;
-}
-
-/* --- Typography ---------------------------------------------------------- */
-h1 {
-    font-weight: 800;
-    line-height: 1.12;
-    letter-spacing: .015em;
-    text-shadow: 0 2px 18px rgba(0, 0, 0, .25);
-}
-
-.sub {
-    font-size: clamp(16px, 2vw, 22px);
-    margin-top: 6px;
-}
-
-.card > h2 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-    font-size: 19px;
-    font-weight: 750;
-}
-
-/* small accent bar in front of card headings */
-.card > h2::before {
-    content: "";
-    flex: 0 0 4px;
-    height: 1.1em;
     border-radius: 4px;
-    background: linear-gradient(180deg, var(--accent), #ffd166);
-    box-shadow: 0 0 12px rgba(255, 184, 28, .45);
 }
 
-/* headings that are centred inline keep their alignment */
-.card > h2[style*="text-align: center"] {
-    justify-content: center;
+a {
+    color: var(--link);
+    text-underline-offset: 3px;
+    transition: color .2s var(--ease);
+}
+
+a:hover {
+    color: var(--link-hover);
+}
+
+h2 {
+    margin: 0 0 18px;
+    font-size: var(--fs-lg);
+    font-weight: 750;
+    font-stretch: 112%;
+    letter-spacing: 0;
+    line-height: 1.2;
+    color: var(--accent);
 }
 
 h3 {
-    letter-spacing: .01em;
-}
-
-p,
-ul {
-    line-height: 1.6;
-}
-
-/* labels in the info card read as a definition list */
-.infoCard p b {
-    color: var(--text);
+    margin: 0 0 6px;
+    font-size: var(--fs-md);
     font-weight: 650;
+    font-stretch: 104%;
+    line-height: 1.3;
+    color: var(--accent2);
 }
 
-/* --- Links ---------------------------------------------------------------- */
-.card a,
-.meta a {
-    color: var(--link);
-    text-decoration: underline;
-    text-decoration-color: transparent;
-    text-underline-offset: 3px;
-    transition: color .2s var(--ease), text-decoration-color .2s var(--ease);
+/* --- Logo ------------------------------------------------------------------- */
+.siteHeader {
+    margin-bottom: 20px;
 }
 
-.card a:hover,
-.meta a:hover {
-    color: var(--link-hover);
-    text-decoration-color: currentColor;
+.friLogo {
+    height: 96px;
+    opacity: 1;
 }
 
-/* --- Site navigation: sticky glass bar ------------------------------------ */
+/* --- Navigation: quiet text bar, current page underlined in amber ---------- */
 .siteNav {
     position: sticky;
-    top: 10px;
+    top: 0;
     z-index: 20;
-    margin: 0 0 18px;
-    padding: 6px;
-    border-radius: 16px;
-    background: linear-gradient(160deg, rgba(8, 56, 77, .88), rgba(6, 40, 56, .82));
-    border: 1px solid var(--border-strong);
-    box-shadow: var(--shadow-lift);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    backdrop-filter: blur(14px) saturate(140%);
+    margin: 0 0 56px;
+    border-bottom: 1px solid var(--trace-dim);
+    background: rgba(6, 42, 58, .72);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
 }
 
 .siteNav ul {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 0 4px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -1056,151 +1070,465 @@ ul {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 9px 14px;
-    border-radius: var(--radius-sm);
-    color: var(--text);
+    padding: 14px 12px 12px;
+    color: var(--muted);
     font-size: 15px;
     font-weight: 600;
     white-space: nowrap;
     text-decoration: none;
-    transition: background-color .2s var(--ease), color .2s var(--ease);
+    box-shadow: inset 0 -3px 0 transparent;
+    transition: color .2s var(--ease), box-shadow .2s var(--ease);
 }
 
 .siteNav a:hover {
-    background: rgba(159, 231, 255, .1);
-    color: #fff;
-    text-decoration: none;
+    color: var(--text);
+    box-shadow: inset 0 -3px 0 var(--trace-dim);
 }
 
 .siteNav a[aria-current="page"] {
-    background: linear-gradient(135deg, var(--accent), #ffd166);
-    color: #0b1824;
-    box-shadow: 0 8px 18px -10px rgba(255, 184, 28, .9);
+    color: var(--accent);
+    box-shadow: inset 0 -3px 0 var(--accent);
 }
 
-/* phones: one scrollable row instead of several wrapped rows */
-@media (max-width: 760px) {
-    .siteNav {
-        top: 6px;
-        border-radius: 14px;
-    }
-
-    .siteNav ul {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .siteNav ul::-webkit-scrollbar {
-        display: none;
-    }
-
-    .siteNav a {
-        font-size: 14px;
-        padding: 8px 12px;
-    }
-}
-
-/* --- Hero: title, key facts and actions ----------------------------------- */
+/* --- Hero: the title is the image -------------------------------------------- */
 header.hero {
     display: block;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .heroHeading {
+    position: relative;
     padding-bottom: 0;
 }
 
-.heroHeading:has(.editionStamp) {
-    padding-bottom: 28px;
-}
-
-.heroFacts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 20px 0 0;
-    padding: 0;
-    list-style: none;
-}
-
-.heroFacts li {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 7px 13px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .06);
-    border: 1px solid rgba(255, 255, 255, .12);
+.hero h1 {
+    max-width: 18ch;
+    margin: 0;
+    font-size: clamp(34px, 5.6vw, 64px);
+    font-weight: 850;
+    font-stretch: 122%;
+    line-height: .98;
+    letter-spacing: -.005em;
     color: var(--text);
-    font-size: 14px;
-    font-weight: 600;
+    text-wrap: balance;
+}
+
+.hero .sub {
+    margin: 14px 0 0;
+    font-size: var(--fs-md);
+    font-weight: 400;
+    font-stretch: 100%;
+    color: var(--accent2);
+}
+
+/* the stamp keeps its rubber-stamp look, placed over the end of the title */
+.editionStamp {
+    left: auto;
+    right: 4%;
+    bottom: 18%;
+    transform: rotate(-9deg);
+    transform-origin: center;
+    font-stretch: 110%;
+    background: rgba(6, 42, 58, .55);
+}
+
+/* key facts on a trace rule */
+.heroFacts {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, auto));
+    justify-content: start;
+    gap: 0;
+    margin: 40px 0 0;
+    padding: 18px 0 0;
+    border-top: 1px solid var(--trace);
+}
+
+/* node at the start of the trace */
+.heroFacts::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: 0 0 10px var(--accent2);
+}
+
+.heroFacts > div {
+    padding: 0 32px 0 0;
+    margin: 0 32px 0 0;
+    border-right: 1px solid var(--trace-dim);
+}
+
+.heroFacts > div:last-child {
+    border-right: 0;
+    margin-right: 0;
+}
+
+.heroFacts dt {
+    font-size: var(--fs-sm);
+    color: var(--muted);
+}
+
+.heroFacts dd {
+    margin: 2px 0 0;
+    font-size: var(--fs-md);
+    font-weight: 650;
+    color: var(--text);
 }
 
 .heroActions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
-    margin-top: 16px;
+    gap: 14px 22px;
+    margin-top: 28px;
 }
 
-.heroActions .btn {
+.heroDeadlines {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* amber node = a date that matters */
+.heroDeadlines li {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    text-decoration: none;
-}
-
-.heroActions .btn.secondary {
+    gap: 9px;
+    font-size: 15px;
+    font-weight: 600;
     color: var(--text);
 }
 
-.heroActions .pill {
-    margin: 0;
-}
-
-/* --- Deadline pills -------------------------------------------------------- */
-.pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: .01em;
-    background: linear-gradient(135deg, rgba(255, 184, 28, .22), rgba(255, 209, 102, .10));
-    border: 1px solid rgba(255, 184, 28, .45);
-    box-shadow: 0 6px 16px -10px rgba(255, 184, 28, .8);
-}
-
-.pill::before {
+.heroDeadlines li::before {
     content: "";
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--accent);
-    box-shadow: 0 0 0 3px rgba(255, 184, 28, .25);
+    box-shadow: 0 0 0 4px rgba(255, 184, 28, .18);
 }
 
-/* --- Participation type tiles --------------------------------------------- */
+/* --- Buttons -------------------------------------------------------------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 22px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #0b1824;
+    background: var(--accent);
+    box-shadow: 0 10px 24px -14px rgba(255, 184, 28, .9);
+    text-decoration: none;
+    transition: background-color .2s var(--ease), transform .2s var(--ease);
+}
+
+.btn:hover {
+    background: #ffc94d;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -14px rgba(255, 184, 28, .9);
+    color: #0b1824;
+    text-decoration: none;
+    filter: none;
+}
+
+.btn.secondary {
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--trace);
+    box-shadow: none;
+}
+
+.btn.secondary:hover {
+    color: var(--text);
+    background: rgba(159, 231, 255, .08);
+}
+
+/* --- Page structure ---------------------------------------------------------- */
+.stack {
+    margin-top: 56px;
+    gap: 28px;
+}
+
+/* content surfaces: solid, quiet, no glass */
+.card {
+    background: rgba(8, 56, 77, .86);
+    border: 1px solid var(--trace-dim);
+    border-radius: 14px;
+    padding: 32px;
+    box-shadow: 0 24px 48px -32px rgba(0, 0, 0, .8);
+}
+
+.card a {
+    font-weight: 600;
+}
+
+/* --- Home: programme as a circuit trace + facts panel ---------------------- */
+.homeGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 56px;
+    align-items: start;
+    margin-top: 72px;
+}
+
+.agenda {
+    position: relative;
+}
+
+/* the brain sits in the empty corner beside the closing panel discussion */
+.agendaIllustration {
+    position: absolute;
+    right: 0;
+    bottom: -8px;
+    width: 190px;
+    opacity: .32;
+    pointer-events: none;
+}
+
+.agendaList {
+    position: relative;
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* the trace */
+.agendaList::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    bottom: 40px;
+    left: 7px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--accent2), var(--trace-dim));
+    transform-origin: top;
+    animation: traceDraw 1.4s var(--ease) .2s both;
+}
+
+.agendaItem {
+    position: relative;
+    max-width: 62ch;
+    margin: 0 0 40px;
+    padding-left: 44px;
+}
+
+/* node on the trace + short branch to the heading */
+.agendaItem::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--accent2);
+    border-radius: 50%;
+    background: var(--abyss);
+    box-shadow: 0 0 0 4px rgba(159, 231, 255, .1);
+    animation: nodeOn .4s var(--ease) both;
+}
+
+.agendaItem::after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    left: 18px;
+    width: 16px;
+    height: 2px;
+    background: var(--trace);
+}
+
+.agendaItem:nth-child(1)::before { animation-delay: .35s; }
+.agendaItem:nth-child(2)::before { animation-delay: .65s; }
+.agendaItem:nth-child(3)::before { animation-delay: .95s; }
+.agendaItem:nth-child(4)::before { animation-delay: 1.25s; }
+
+.agendaItem p {
+    margin: 0 0 8px;
+}
+
+.agendaItem ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--muted);
+}
+
+.agendaItem li {
+    margin: 2px 0;
+}
+
+.agendaItem li::marker {
+    color: var(--trace);
+}
+
+/* the panel discussion closes the day: amber node */
+.agendaItem--panel::before {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 0 14px rgba(255, 184, 28, .6);
+}
+
+.agendaItem--panel blockquote {
+    margin: 4px 0 0;
+    font-size: var(--fs-md);
+    font-style: italic;
+    font-weight: 500;
+    color: var(--text);
+}
+
+@keyframes traceDraw {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+}
+
+@keyframes nodeOn {
+    from { opacity: 0; transform: scale(.4); }
+    to { opacity: 1; transform: none; }
+}
+
+/* --- "Rýchle info" panel -------------------------------------------------- */
+.infoPanel {
+    position: relative;
+    padding: 28px 28px 24px;
+    border: 1px solid var(--trace-dim);
+    border-top: 3px solid var(--accent);
+    border-radius: 6px;
+    background: rgba(6, 42, 58, .9);
+    box-shadow: 0 24px 48px -32px rgba(0, 0, 0, .8);
+}
+
+.infoPanel h2 {
+    font-size: var(--fs-md);
+    margin-bottom: 14px;
+}
+
+.infoPanel p {
+    margin: 0 0 12px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--muted);
+}
+
+.infoPanel p b {
+    display: block;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--accent2);
+}
+
+.infoPanel h3 {
+    margin: 18px 0 8px;
+    font-size: 17px;
+}
+
+.infoPanel ul {
+    margin: 0 0 14px;
+    padding-left: 18px;
+    font-size: 15px;
+}
+
+.infoPanel ul li {
+    font-size: 15px;
+}
+
+.infoPanel a[href*="maps.app.goo.gl"]::before {
+    content: "";
+}
+
+.infoIllustration {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    width: 64px;
+    opacity: .9;
+    transform: scaleX(-1);
+    filter: none;
+}
+
+/* on the home page the panel stays in view while reading the programme */
+.homeGrid .infoPanel {
+    position: sticky;
+    top: 72px;
+}
+
+/* a 64px illustration in a narrow panel reads as a stray icon */
+.homeGrid .infoIllustration {
+    display: none;
+}
+
+/* small illustrations inside the panel read as stray icons */
+.infoIllustration {
+    display: none;
+}
+
+/* full-width panel (other pages): facts laid out in three columns */
+.stack > .infoPanel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 32px;
+}
+
+.stack > .infoPanel > h2,
+.stack > .infoPanel > h3,
+.stack > .infoPanel > ul {
+    grid-column: 1 / -1;
+}
+
+/* sub-pages: smaller title, the home page keeps the big one */
+.hero h1 {
+    font-size: clamp(30px, 4.2vw, 48px);
+}
+
+.heroHeading:has(.editionStamp) h1 {
+    font-size: clamp(34px, 5.6vw, 64px);
+}
+
+/* --- Registration: participation types and form ------------------------------ */
+.registrationTypes {
+    gap: 20px;
+}
+
 .regType {
-    border-radius: 16px;
-    border-color: var(--border);
-    background: linear-gradient(160deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .02));
-    padding: 18px;
-    transition: transform .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease);
+    padding: 20px 22px;
+    border: 1px solid var(--trace-dim);
+    border-left: 3px solid var(--accent2);
+    border-radius: 6px;
+    background: rgba(6, 42, 58, .55);
 }
 
-.regType:hover {
-    transform: translateY(-2px);
-    border-color: rgba(255, 184, 28, .45);
-    box-shadow: 0 16px 32px -20px rgba(0, 0, 0, .6);
+.regType:first-child {
+    border-left-color: var(--accent);
 }
 
-/* --- Forms ------------------------------------------------------------------ */
+.regType h3 {
+    margin-bottom: 6px;
+}
+
 .formSection {
-    border-bottom-color: rgba(159, 231, 255, .1);
+    border-bottom-color: var(--trace-dim);
+}
+
+.formSection h3 {
+    font-size: var(--fs-md);
+}
+
+.formGroup label {
+    font-size: 15px;
 }
 
 .formGroup input[type="text"],
@@ -1209,128 +1537,200 @@ header.hero {
 .formGroup input[type="password"],
 .formGroup select,
 .formGroup textarea {
-    padding: 11px 14px;
-    border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, .06);
-    border: 1px solid rgba(255, 255, 255, .14);
-    transition: border-color .2s var(--ease), background-color .2s var(--ease), box-shadow .2s var(--ease);
-}
-
-.formGroup input:hover,
-.formGroup select:hover,
-.formGroup textarea:hover {
-    border-color: rgba(159, 231, 255, .3);
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(159, 231, 255, .22);
+    background: rgba(6, 42, 58, .7);
+    font-size: 16px;
+    transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
 }
 
 .formGroup input:focus,
 .formGroup select:focus,
 .formGroup textarea:focus {
-    background: rgba(255, 255, 255, .1);
+    background: rgba(6, 42, 58, .9);
     border-color: var(--accent2);
-    box-shadow: 0 0 0 4px rgba(159, 231, 255, .14);
+    box-shadow: 0 0 0 3px rgba(159, 231, 255, .18);
 }
 
 .formGroup input::placeholder,
 .formGroup textarea::placeholder {
-    color: rgba(243, 247, 251, .45);
+    color: rgba(188, 212, 222, .55);
 }
 
 .radioGroup label {
-    padding: 8px 12px;
-    margin: 0 0 6px;
-    border-radius: var(--radius-sm);
-    border: 1px solid transparent;
-    transition: background-color .2s var(--ease), border-color .2s var(--ease);
-}
-
-.radioGroup label:hover {
-    background: rgba(159, 231, 255, .06);
-    border-color: rgba(159, 231, 255, .14);
+    font-size: 16px;
 }
 
 .radioGroup input[type="radio"],
 .radioGroup input[type="checkbox"] {
-    accent-color: var(--accent);
     width: 18px;
     height: 18px;
+    accent-color: var(--accent);
 }
 
 .success-message,
 .error-box {
-    border-radius: var(--radius-sm);
+    border-radius: 8px;
 }
 
-/* --- Buttons ---------------------------------------------------------------- */
-.btn {
-    padding: 12px 20px;
-    border-radius: var(--radius-sm);
-    box-shadow: 0 12px 26px -12px rgba(255, 184, 28, .7);
-    transition: transform .2s var(--ease), box-shadow .2s var(--ease), filter .2s var(--ease);
+/* --- Responsive ------------------------------------------------------------- */
+@media (max-width: 1100px) {
+    .editionStamp {
+        right: 0;
+    }
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 30px -12px rgba(255, 184, 28, .8);
-    text-decoration: none;
-}
-
-.btn.secondary {
-    background: rgba(255, 255, 255, .04);
-    border: 1px solid rgba(255, 255, 255, .2);
-}
-
-.btn.secondary:hover {
-    background: rgba(255, 255, 255, .08);
-    box-shadow: none;
-}
-
-/* --- Logo ------------------------------------------------------------------- */
-.siteHeader {
-    margin-bottom: 18px;
-}
-
-.siteHeaderLink:hover {
-    opacity: 1;
-}
-
-.siteHeaderLink .friLogo {
-    transition: opacity .2s var(--ease), transform .3s var(--ease);
-}
-
-.siteHeaderLink:hover .friLogo {
-    opacity: 1;
-    transform: translateY(-1px);
-}
-
-/* --- Entrance animation (subtle, staggered) ------------------------------- */
-@keyframes riseIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: none; }
-}
-
-header,
-.stack > * {
-    animation: riseIn .5s var(--ease) both;
-}
-
-.stack > *:nth-child(1) { animation-delay: .06s; }
-.stack > *:nth-child(2) { animation-delay: .12s; }
-.stack > *:nth-child(3) { animation-delay: .18s; }
-.stack > *:nth-child(n+4) { animation-delay: .24s; }
-
-/* --- Small screens ------------------------------------------------------- */
-@media (max-width: 760px) {
-    header,
-    .card {
-        padding: 18px 18px 16px;
+@media (max-width: 960px) {
+    .homeGrid {
+        grid-template-columns: 1fr;
+        gap: 40px;
     }
 
-    .card > h2 {
+    .homeGrid .infoPanel {
+        position: relative;
+        top: auto;
+    }
+
+    .agendaIllustration {
+        display: none;
+    }
+}
+
+@media (max-width: 760px) {
+    .friLogo {
+        height: 52px;
+    }
+
+    .siteHeader {
+        margin-bottom: 12px;
+    }
+
+    .siteNav {
+        margin-bottom: 36px;
+    }
+
+    .siteNav ul {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        padding-right: 28px;
+    }
+
+    .siteNav ul::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* fade the right edge: there is more to scroll */
+    .siteNav::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 36px;
+        background: linear-gradient(90deg, rgba(6, 42, 58, 0), rgba(6, 42, 58, .95));
+        pointer-events: none;
+    }
+
+    .siteNav a {
+        font-size: 14px;
+        padding: 12px 10px 10px;
+    }
+
+    .hero h1 {
+        font-stretch: 112%;
+    }
+
+    .hero .sub {
+        font-size: 18px;
+    }
+
+    /* stamp below the subtitle instead of over the title */
+    .editionStamp {
+        position: static;
+        margin-top: 18px;
+        transform: rotate(-4deg);
+        transform-origin: left center;
+    }
+
+    .editionStampMain {
+        font-size: 20px;
+    }
+
+    .heroFacts {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 28px;
+    }
+
+    .heroFacts > div {
+        padding: 0;
+        margin: 0;
+        border-right: 0;
+    }
+
+    .heroFacts dd {
+        font-size: 18px;
+    }
+
+    .homeGrid,
+    .stack {
+        margin-top: 40px;
+    }
+
+    .card {
+        padding: 22px 18px;
+    }
+
+    .infoPanel,
+    .stack > .infoPanel {
+        padding: 22px 18px 18px;
+    }
+
+    .stack > .infoPanel {
+        grid-template-columns: 1fr;
+    }
+
+    .infoIllustration {
+        display: none;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    p,
+    ul,
+    li,
+    ul li {
         font-size: 16px;
     }
+
+    .infoPanel p,
+    .infoPanel ul li {
+        font-size: 15px;
+    }
+
+    .wrap {
+        padding: 16px 16px 40px;
+    }
+
+    .agendaItem {
+        padding-left: 36px;
+    }
+
+    .agendaItem::after {
+        width: 10px;
+    }
 }
 
-/* --- Respect reduced motion and devices without blur --------------------- */
+/* --- Motion and print ------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -1340,98 +1740,14 @@ header,
     }
 }
 
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    header,
-    .card {
-        background: rgba(11, 75, 103, .82);
-    }
-}
-
-/* --- Print: no effects ---------------------------------------------------- */
 @media print {
-    header,
-    .card {
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
+    .siteNav,
+    .hero::before {
+        display: none;
+    }
+
+    .card,
+    .infoPanel {
         box-shadow: none;
-        animation: none;
     }
-}
-
-/* --- Layout fixes found on screenshots ------------------------------------- */
-
-/* Hero: the stamp no longer needs a tall reserved gap below the subtitle */
-.heroHeading:has(.editionStamp) {
-    padding-bottom: 8px;
-}
-
-.editionStamp {
-    bottom: 4px;
-}
-
-.heroFacts {
-    margin-top: 18px;
-}
-
-/* Phones: the stamp sits below the subtitle instead of over the title */
-@media (max-width: 760px) {
-    .heroHeading:has(.editionStamp) {
-        padding-bottom: 0;
-    }
-
-    .editionStamp {
-        position: static;
-        margin-top: 14px;
-        transform: rotate(-4deg);
-        transform-origin: center;
-    }
-
-    .editionStampMain {
-        font-size: 20px;
-    }
-}
-
-/* Phones: navigation scrolls sideways; fade the right edge to show there is more */
-@media (max-width: 760px) {
-    .siteNav::after {
-        content: "";
-        position: absolute;
-        top: 1px;
-        right: 1px;
-        bottom: 1px;
-        width: 36px;
-        border-radius: 0 14px 14px 0;
-        background: linear-gradient(90deg, rgba(6, 40, 56, 0), rgba(6, 40, 56, .95));
-        pointer-events: none;
-    }
-
-    .siteNav ul {
-        padding-right: 28px;
-    }
-}
-
-/* Home "Obsah": brain illustration anchored to the bottom right of the card
-   instead of hanging below it */
-.block2 {
-    position: static;
-}
-
-.blockIllustration {
-    top: auto;
-    bottom: 24px;
-    right: 24px;
-    width: 340px;
-}
-
-@media (max-width: 1024px) {
-    .blockIllustration {
-        width: 280px;
-    }
-}
-
-/* <button class="btn"> does not inherit the page font by default */
-.btn {
-    font-family: inherit;
-    font-size: 15px;
-    line-height: 1.2;
 }

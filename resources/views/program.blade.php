@@ -270,10 +270,6 @@
             Organizátori si vyhradzujú právo na zmeny v programe.
         </p>
 
-        <p style="margin-top: -0.5rem; margin-bottom: 1.25rem; color: #cbd5e1; font-size: 0.95rem;">
-            {{ $conference->dateLabel() }}
-        </p>
-
         @if($conference->teams_url)
         <div style="margin-bottom: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <a

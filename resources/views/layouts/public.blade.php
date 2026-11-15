@@ -8,6 +8,7 @@
         @hasSection('meta_description')
             <meta name="description" content="@yield('meta_description')">
         @endif
+        <link rel="preload" href="{{ asset('fonts/archivo/archivo-latin-wdth-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
         <link rel="stylesheet" href="{{ asset('css/conference.css') }}">
     </head>
     <body>
