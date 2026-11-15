@@ -52,9 +52,9 @@
         }
 
         .num { width: 24px; text-align: right; color: #334155; }
-        .name { width: 30%; }
-        .inst { width: 40%; }
-        .sign { width: 30%; }
+        .name { width: 40%; }
+        .inst { width: 32%; }
+        .sign { width: 28%; }
 
         .muted { color: #475569; }
         .sign-space { height: 18px; }
@@ -80,7 +80,7 @@
         <thead>
             <tr>
                 <th class="num">#</th>
-                <th class="name">Meno</th>
+                <th class="name">Meno a priezvisko</th>
                 <th class="inst">Inštitúcia</th>
                 <th class="sign">Podpis</th>
             </tr>
