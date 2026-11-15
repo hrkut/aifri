@@ -67,6 +67,10 @@ return [
 
     'timezone' => 'UTC',
 
+    // Time zone of the conference: deadlines and displayed times use it, while
+    // timestamps stay stored in UTC (see local_now() / local_time()).
+    'local_timezone' => env('APP_LOCAL_TIMEZONE', 'Europe/Bratislava'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

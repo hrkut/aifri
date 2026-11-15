@@ -101,7 +101,7 @@ class Conference extends Model
      */
     public function isReadOnly(): bool
     {
-        return ! $this->is_active && $this->date !== null && $this->date->lt(today());
+        return ! $this->is_active && $this->date !== null && $this->date->toDateString() < local_now()->toDateString();
     }
 
     /** Ordinal of this edition (1 for the first year, 2 for the next one, …). */
@@ -189,6 +189,7 @@ class Conference extends Model
 
     private static function notPassed(?Carbon $until): bool
     {
-        return $until !== null && now()->startOfDay()->lte($until);
+        // compared as calendar dates in the conference's time zone (the deadline day is still open)
+        return $until !== null && local_now()->toDateString() <= $until->toDateString();
     }
 }

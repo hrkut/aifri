@@ -27,4 +27,4 @@ POZNÁMKY
 @endif
 
 Detail v administrácii: {{ route('admin.registration.show', ['registration' => $registration->id, 'return' => 'dashboard']) }}
-Prijaté: {{ optional($registration->created_at)->format('j. n. Y H:i') ?? '—' }}
+Prijaté: {{ local_time($registration->created_at)?->format('j. n. Y H:i') ?? '—' }}

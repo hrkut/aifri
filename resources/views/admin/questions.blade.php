@@ -81,7 +81,7 @@
                                     {{ $question->question }}
                                 </td>
                                 <td class="px-6 py-4 {{ $question->answered ? 'text-slate-500' : 'text-slate-400' }} whitespace-nowrap">
-                                    {{ $question->created_at->format('d.m.Y H:i') }}
+                                    {{ local_time($question->created_at)->format('j. n. Y H:i') }}
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     @if (!$question->answered)

@@ -184,7 +184,7 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
 
         $registrationsQuery->orderBy($sortable[$sort], $direction);
 
-        $fileName = 'registrations_' . Conference::current()->year . '_' . now()->format('Y-m-d_His') . '.xlsx';
+        $fileName = 'registrations_' . Conference::current()->year . '_' . local_now()->format('Y-m-d_His') . '.xlsx';
         return Excel::download(new RegistrationsExport($registrationsQuery), $fileName);
     })->name('registrations.export');
 
@@ -290,7 +290,7 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
                 ->values();
         }
 
-        $fileName = 'prezencna_listina_' . Conference::current()->year . '_' . now()->format('Y-m-d_His') . '.pdf';
+        $fileName = 'prezencna_listina_' . Conference::current()->year . '_' . local_now()->format('Y-m-d_His') . '.pdf';
 
         $pdf = Pdf::loadView('admin.attendance-pdf', compact(
             'registrations',

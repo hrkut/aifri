@@ -180,7 +180,7 @@
                                 {{ $registration->online_participation ? 'Online' : 'Prezenčne' }}
                             </td>
                             <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->institution }}</td>
-                            <td class="px-4 py-3 text-sm text-slate-200 whitespace-nowrap">{{ $registration->created_at?->format('d.m.Y H:i') }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-200 whitespace-nowrap">{{ local_time($registration->created_at)?->format('j. n. Y H:i') }}</td>
                             <td class="px-4 py-3 text-left">
                                 <div class="inline-flex items-center gap-2">
                                     <x-admin.icon-action tooltip="Zobraziť detaily" :href="route('admin.registration.show', ['registration' => $registration->id, 'return' => 'dashboard'])">

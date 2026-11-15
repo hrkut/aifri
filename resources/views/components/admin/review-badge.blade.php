@@ -11,7 +11,7 @@
 {{-- Review state of a talk; passive participants have none --}}
 @if($status)
     <span class="inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium {{ $styles[$status] }}"
-          @if($registration->reviewed_at) title="Posúdené {{ $registration->reviewed_at->format('j. n. Y H:i') }}" @endif>
+          @if($registration->reviewed_at) title="Posúdené {{ local_time($registration->reviewed_at)->format('j. n. Y H:i') }}" @endif>
         {{ $registration->reviewLabel() }}
     </span>
 @else

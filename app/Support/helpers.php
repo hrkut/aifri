@@ -46,3 +46,22 @@ if (! function_exists('locale_url')) {
         return route($target, $route->parameters()) . ($query ? '?' . $query : '');
     }
 }
+
+if (! function_exists('local_now')) {
+    /**
+     * Current time in the conference's time zone. Timestamps are stored in UTC
+     * (config app.timezone); dates that people see or that decide deadlines use this.
+     */
+    function local_now(): \Illuminate\Support\Carbon
+    {
+        return now(config('app.local_timezone'));
+    }
+}
+
+if (! function_exists('local_time')) {
+    /** A stored (UTC) timestamp converted to the conference's time zone for display. */
+    function local_time(?\DateTimeInterface $time): ?\Illuminate\Support\Carbon
+    {
+        return $time ? \Illuminate\Support\Carbon::instance($time)->setTimezone(config('app.local_timezone')) : null;
+    }
+}

@@ -56,7 +56,7 @@
     <x-email.button :href="route('admin.registration.show', ['registration' => $registration->id, 'return' => 'dashboard'])">Otvoriť v administrácii</x-email.button>
 
     <p style="{!! $p !!} font-size: 13px; color: {{ $c['muted'] }}; margin: 0;">
-        Prijaté {{ optional($registration->created_at)->format('j. n. Y \o H:i') ?? '—' }}.
+        Prijaté {{ local_time($registration->created_at)?->format('j. n. Y \o H:i') ?? '—' }}.
         Odpoveďou na tento e-mail napíšete priamo účastníkovi.
     </p>
 @endsection

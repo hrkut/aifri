@@ -76,7 +76,7 @@
                             <div class="flex items-center gap-3">
                                 <x-admin.review-badge :registration="$registration" />
                                 @if($registration->reviewed_at)
-                                    <span class="text-xs text-slate-400">posúdené {{ $registration->reviewed_at->format('j. n. Y H:i') }}</span>
+                                    <span class="text-xs text-slate-400">posúdené {{ local_time($registration->reviewed_at)->format('j. n. Y H:i') }}</span>
                                 @endif
                                 <span class="inline-flex items-center gap-2">
                                     @include('admin.partials.review-actions', ['registration' => $registration])
@@ -165,11 +165,11 @@
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Vytvorené</p>
-                        <p class="text-slate-200">{{ $registration->created_at->format('d.m.Y H:i:s') }}</p>
+                        <p class="text-slate-200">{{ local_time($registration->created_at)->format('j. n. Y H:i:s') }}</p>
                     </div>
                     <div>
                         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Posledná zmena</p>
-                        <p class="text-slate-200">{{ $registration->updated_at->format('d.m.Y H:i:s') }}</p>
+                        <p class="text-slate-200">{{ local_time($registration->updated_at)->format('j. n. Y H:i:s') }}</p>
                     </div>
                 </div>
             </section>

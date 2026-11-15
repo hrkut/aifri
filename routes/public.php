@@ -123,7 +123,13 @@ Route::post($path('/prihlasenie', '/registration'), function (Request $request) 
 
     $registration = Registration::create($data);
 
-    Mail::to('konferenciaAI@fri.uniza.sk')->locale('sk')->send(new NewRegistrationNotification($registration));
+    // A mail failure must not lose the (already saved) registration nor show an error page,
+    // otherwise people submit the form again and create duplicates.
+    try {
+        Mail::to('konferenciaAI@fri.uniza.sk')->locale('sk')->send(new NewRegistrationNotification($registration));
+    } catch (\Throwable $e) {
+        report($e);
+    }
 
     // Confirmation to the participant; a mail failure must not lose the (already saved) registration.
     try {
@@ -178,10 +184,10 @@ Route::post($path('/zaznamy', '/recordings'), function (Request $request) {
     $expected = (string) config('services.recordings.password');
 
     if ($expected !== '' && hash_equals($expected, $password)) {
-        // Ulož do session
-        $request->session()->flush(); // Vymaž stare session data
+        // new session id (against session fixation) without dropping the rest of the
+        // session, so an admin who is signed in stays signed in
+        $request->session()->regenerate();
         $request->session()->put('recordings_authenticated', true);
-        $request->session()->save(); // Ulož explicitne
 
         return redirect()->to(lroute('recordings.list'))
             ->with('success', __('Úspešne ste sa prihlásili.'));
@@ -198,7 +204,7 @@ Route::middleware(['auth.recordings'])->prefix($path('/zaznamy', '/recordings'))
         $presentations = fn ($q) => $q->where('participation_type', 'presentation')->whereNotNull('time_start');
 
         $editions = Conference::query()
-            ->whereDate('date', '<=', now()->toDateString())
+            ->whereDate('date', '<=', local_now()->toDateString())
             ->whereHas('registrations', $presentations)
             ->with(['registrations' => fn ($q) => $presentations($q)->orderBy('time_start')->orderBy('id')])
             ->orderByDesc('year')

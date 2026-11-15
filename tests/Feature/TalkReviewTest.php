@@ -215,7 +215,7 @@ it('does not list programme breaks as registrations', function () {
 
     \Maatwebsite\Excel\Facades\Excel::fake();
     $this->get(route('admin.registrations.export'));
-    \Maatwebsite\Excel\Facades\Excel::assertDownloaded('registrations_2027_' . now()->format('Y-m-d_His') . '.xlsx', function ($export) {
+    \Maatwebsite\Excel\Facades\Excel::assertDownloaded('registrations_2027_' . local_now()->format('Y-m-d_His') . '.xlsx', function ($export) {
         $emails = $export->query()->pluck('email')->all();
 
         return $emails === ['u@example.com'];

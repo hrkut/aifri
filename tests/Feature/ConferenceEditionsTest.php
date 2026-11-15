@@ -496,7 +496,30 @@ it('closes registration after the registration deadline', function () {
     expect(Registration::count())->toBe(0);
     Mail::assertNothingSent();
 
-    // the deadline day itself is still open
-    $this->travelTo('2027-01-31 23:00');
+    // the deadline day itself is still open – until midnight in Slovakia (UTC+1 in winter)
+    $this->travelTo('2027-01-31 22:00'); // 23:00 in Žilina
     $this->get(route('registration'))->assertSee('class="regForm"', false);
+    $this->travelTo('2027-01-31 23:30'); // 0:30 on 1 February in Žilina
+    $this->get(route('registration'))->assertDontSee('class="regForm"', false);
+});
+
+it('keeps an admin signed in after logging in to the recordings', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+
+    $this->actingAs($admin)->post(route('recordings.authenticate'), ['password' => 'test-recordings-password'])
+        ->assertRedirect(route('recordings.list'));
+
+    $this->assertAuthenticatedAs($admin);
+    $this->get(route('admin.dashboard'))->assertOk();
+    $this->get(route('recordings.list'))->assertOk();
+});
+
+it('saves the registration even when the organiser mail cannot be sent', function () {
+    Mail::shouldReceive('to')->andThrow(new RuntimeException('SMTP down'));
+
+    $this->post(route('registration.submit'), [
+        'name' => 'Ján', 'email' => 'jan@example.com', 'institution' => 'UNIZA', 'participation_type' => 'passive',
+    ])->assertRedirect()->assertSessionHas('success');
+
+    expect(Registration::where('email', 'jan@example.com')->exists())->toBeTrue();
 });
