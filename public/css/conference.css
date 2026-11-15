@@ -1041,7 +1041,7 @@ h3 {
 }
 
 .friLogo {
-    height: 96px;
+    height: 120px;
     opacity: 1;
 }
 
@@ -1088,6 +1088,11 @@ h3 {
 .siteNav a[aria-current="page"] {
     color: var(--accent);
     box-shadow: inset 0 -3px 0 var(--accent);
+}
+
+/* short labels are only for the phone grid */
+.navLabelShort {
+    display: none;
 }
 
 /* --- Hero: the title is the image -------------------------------------------- */
@@ -1599,44 +1604,64 @@ header.hero {
 
 @media (max-width: 760px) {
     .friLogo {
-        height: 52px;
+        height: 72px;
     }
 
     .siteHeader {
-        margin-bottom: 12px;
+        margin-bottom: 14px;
     }
 
+    /* phones: every item visible at once in a 3-column grid, icon above a short label;
+       not sticky, two rows would cover too much of the screen */
     .siteNav {
+        position: static;
         margin-bottom: 36px;
+        border: 1px solid var(--trace-dim);
+        border-radius: 10px;
+        overflow: hidden;
     }
 
     .siteNav ul {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-        padding-right: 28px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
     }
 
-    .siteNav ul::-webkit-scrollbar {
-        display: none;
+    .siteNav li + li {
+        border-left: 1px solid var(--trace-dim);
     }
 
-    /* fade the right edge: there is more to scroll */
-    .siteNav::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 36px;
-        background: linear-gradient(90deg, rgba(6, 42, 58, 0), rgba(6, 42, 58, .95));
-        pointer-events: none;
+    .siteNav li:nth-child(3n + 1) {
+        border-left: 0;
+    }
+
+    .siteNav li:nth-child(n + 4) {
+        border-top: 1px solid var(--trace-dim);
     }
 
     .siteNav a {
-        font-size: 14px;
-        padding: 12px 10px 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 2px;
+        min-height: 60px;
+        padding: 8px 4px 9px;
+        font-size: 13px;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .navIcon {
+        font-size: 19px;
+        line-height: 1;
+    }
+
+    .navLabel {
+        display: none;
+    }
+
+    .navLabelShort {
+        display: inline;
     }
 
     .hero h1 {
