@@ -78,8 +78,13 @@
     </style>
 </head>
 <body>
+    @php /** @var \App\Models\Conference $conference */ @endphp
     <h1>Program konferencie</h1>
-    <p class="note"><span class="accent">Poznámka:</span> Organizátori si vyhradzujú právo zmeny programu.</p>
+    <p class="muted" style="margin: 0 0 6px 0;">
+        Konferencia o umelej inteligencii vo vzdelávaní · {{ $conference->editionLabel() }} · {{ $conference->dateLabel() }}
+        · Fakulta riadenia a informatiky, Žilinská univerzita v Žiline
+    </p>
+    <p class="note"><span class="accent">Poznámka:</span> Organizátori si vyhradzujú právo na zmeny v programe.</p>
 
     <table>
         <thead>

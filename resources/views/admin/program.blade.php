@@ -21,6 +21,13 @@
 
             <span class="text-sm text-slate-300">Počet príspevkov: <span class="font-semibold">{{ $total }}</span></span>
 
+            <a href="{{ route('admin.program.pdf') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-700 hover:bg-indigo-600 text-white rounded-lg transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14"/>
+                </svg>
+                Stiahnuť PDF
+            </a>
+
             @unless($readOnly)
             <a href="{{ route('admin.program.duration') }}" class="inline-flex items-center px-4 py-2 bg-amber-700 hover:bg-amber-600 text-white rounded-lg transition-colors">
                 Nastaviť dĺžku príspevkov

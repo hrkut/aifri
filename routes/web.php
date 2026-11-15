@@ -360,6 +360,21 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
         return view('admin.program', compact('registrations'));
     })->name('program');
 
+    // Programme of the working edition as a PDF (also for archived editions: it changes nothing)
+    Route::get('/program/pdf', function () {
+        $conference = Conference::current();
+        $registrations = \App\Models\Registration::query()
+            ->inProgram()
+            ->orderByRaw('program_order is null')
+            ->orderBy('program_order')
+            ->orderBy('id')
+            ->get();
+
+        return Pdf::loadView('admin.program-pdf', compact('registrations', 'conference'))
+            ->setPaper('a4', 'landscape')
+            ->download('program_' . $conference->year . '.pdf');
+    })->name('program.pdf');
+
     // ---- Presentations (príspevky) CRUD (create/store) ----
     Route::get('/program/create', function () {
         return view('admin.program-create');

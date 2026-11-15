@@ -117,3 +117,21 @@ it('adds a talk only at a programme slot or exactly at its end', function () {
     expect(programState())->toBe(['A 09:00', 'Br 09:15', 'C 09:35', 'D 09:50', 'E 10:05', 'Nový 10:20'])
         ->and(Registration::where('title', 'Nový')->value('duration_minutes'))->toBe(15);
 });
+
+it('downloads the programme as a PDF', function () {
+    $this->get(route('admin.program'))->assertSee(route('admin.program.pdf'))->assertSee('Stiahnuť PDF');
+
+    $response = $this->get(route('admin.program.pdf'))->assertOk();
+
+    expect($response->headers->get('content-type'))->toBe('application/pdf')
+        ->and($response->headers->get('content-disposition'))->toContain('program_2027.pdf')
+        ->and(substr($response->getContent(), 0, 5))->toBe('%PDF-');
+});
+
+it('downloads the programme PDF of an archived edition too', function () {
+    $archive = Conference::where('year', 2026)->firstOrFail();
+    $this->post(route('admin.conferences.select', $archive));
+
+    $this->get(route('admin.program'))->assertSee('Stiahnuť PDF');
+    $this->get(route('admin.program.pdf'))->assertOk()->assertDownload('program_2026.pdf');
+});
