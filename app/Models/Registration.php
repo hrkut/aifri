@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToConference;
 use Illuminate\Database\Eloquent\Model;
 
 class Registration extends Model
 {
+    use BelongsToConference;
+
     protected $fillable = [
         'title_before',
         'name',

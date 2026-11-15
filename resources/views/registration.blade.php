@@ -5,8 +5,10 @@
 
 @php
     $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline';
-    $date = '11. 2. 2026 (streda) od 9:00';
-    $deadline = 'Už len online do 9. 2. 2026';
+    /** @var \App\Models\Conference $conference */
+    $date = $conference->dateLabel();
+    $deadline = \App\Models\Conference::formatDate($conference->registration_deadline);
+    $notification = \App\Models\Conference::formatDate($conference->notification_date);
 @endphp
 
 @section('content')
@@ -32,7 +34,9 @@
                 <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
                 <p><b>Adresa:</b> Fakulta riadenia a informatiky, Veľký diel 3323, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
                 <p><b>Dátum:</b> {{ $date }}</p>
+                @if($deadline)
                 <p><b>Deadline:</b> {{ $deadline }}</p>
+                @endif
             </div>
         </div>
 
@@ -215,15 +219,21 @@
 
         <aside class="card lightCard">
             <h2>Dôležité informácie</h2>
+            @if($deadline)
             <p><b>Deadline:</b> {{ $deadline }}</p>
+            @endif
             <p><b>Potvrdenie účasti:</b> Do 7 dní od prihlásenia</p>
             <p><b>Registračný poplatok:</b> Konferencia je bezplatná</p>
             <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
 
             <h3 style="margin-top:18px;">Dôležité termíny</h3>
             <ul class="list">
+                @if($deadline)
                 <li>{{ $deadline }} – Deadline na prihlášky</li>
-                <li>7. 2. 2026 – Notifikácia autorov</li>
+                @endif
+                @if($notification)
+                <li>{{ $notification }} – Notifikácia autorov</li>
+                @endif
                 <li>{{ $date }} – Konferencia</li>
             </ul>
         </aside>

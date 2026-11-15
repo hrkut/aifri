@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Conference;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Public pages show data (date, deadlines, Teams link) of the current edition.
+        View::composer(['home', 'registration', 'program'], function ($view) {
+            $view->with('conference', Conference::current());
+        });
     }
 }

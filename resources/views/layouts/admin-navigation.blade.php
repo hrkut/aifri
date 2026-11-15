@@ -1,3 +1,4 @@
+@php($workingConference = \App\Models\Conference::current())
 <nav x-data="{ open: false }" class="bg-slate-900/80 backdrop-blur border-b border-slate-800 text-slate-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -6,6 +7,8 @@
                     <a href="{{ route('admin.dashboard') }}" class="text-slate-200 hover:text-white text-sm {{ request()->routeIs('admin.dashboard') ? 'font-semibold text-white' : '' }}">Registrácie</a>
                     <a href="{{ route('admin.program') }}" class="text-slate-200 hover:text-white text-sm {{ request()->routeIs('admin.program') ? 'font-semibold text-white' : '' }}">Program</a>
                     <a href="{{ route('admin.questions') }}" class="text-slate-200 hover:text-white text-sm {{ request()->routeIs('admin.questions') ? 'font-semibold text-white' : '' }}">Otázky</a>
+                    <a href="{{ route('admin.conferences.index') }}" class="text-slate-200 hover:text-white text-sm {{ request()->routeIs('admin.conferences.*') ? 'font-semibold text-white' : '' }}">Ročníky</a>
+                    <a href="{{ route('admin.conferences.index') }}" title="Ročník, s ktorým pracujete" class="px-2 py-0.5 rounded-full text-xs border {{ $workingConference->is_active ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-amber-900/60 text-amber-200 border-amber-700' }}">{{ $workingConference->year }}</a>
                 </div>
             </div>
 
@@ -54,6 +57,7 @@
             <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-slate-200 hover:text-white hover:bg-slate-800 {{ request()->routeIs('admin.dashboard') ? 'font-semibold text-white' : '' }}">Registrácie</a>
             <a href="{{ route('admin.program') }}" class="block px-4 py-2 text-sm text-slate-200 hover:text-white hover:bg-slate-800 {{ request()->routeIs('admin.program') ? 'font-semibold text-white' : '' }}">Program</a>
             <a href="{{ route('admin.questions') }}" class="block px-4 py-2 text-sm text-slate-200 hover:text-white hover:bg-slate-800 {{ request()->routeIs('admin.questions') ? 'font-semibold text-white' : '' }}">Otázky</a>
+            <a href="{{ route('admin.conferences.index') }}" class="block px-4 py-2 text-sm text-slate-200 hover:text-white hover:bg-slate-800 {{ request()->routeIs('admin.conferences.*') ? 'font-semibold text-white' : '' }}">Ročníky ({{ $workingConference->year }})</a>
         </div>
         <div class="pt-4 pb-1 border-t border-slate-800">
             @auth

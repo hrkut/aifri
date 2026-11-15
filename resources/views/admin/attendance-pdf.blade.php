@@ -72,7 +72,8 @@
     <h1>{{ $listTitle }}</h1>
     <p class="subtitle">
         <strong>Konferencia o AI vo vzdelávaní</strong><br>
-        11.2.2026, Fakulta riadenia a informatiky, Žilinská univerzita v Žiline
+        @php($conference = \App\Models\Conference::current())
+        {{ \App\Models\Conference::formatDate($conference->date) ?? $conference->year }}, Fakulta riadenia a informatiky, Žilinská univerzita v Žiline
     </p>
 
     <table>

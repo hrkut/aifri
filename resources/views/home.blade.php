@@ -5,8 +5,10 @@
 
 @php
     $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline, Univerzitná 8215/1, 010 26 Žilina';
-    $date = '11. 2. 2026 (streda) od 9:00';
-    $deadline = 'Už len online do 9. 2. 2026';
+    /** @var \App\Models\Conference $conference */
+    $date = $conference->dateLabel();
+    $deadline = \App\Models\Conference::formatDate($conference->registration_deadline);
+    $notification = \App\Models\Conference::formatDate($conference->notification_date);
     $webUrl = 'https://konferenciaAI.fri.uniza.sk';
 @endphp
 
@@ -32,16 +34,22 @@
         <div class="card loginCard" style="flex: 0 0 auto; min-width: 300px;">
             <h2>Informácie</h2>
             <p><a href="{{ route('program') }}">📅 Program konferencie</a></p>
-            {{-- <p><a href="{{ route('registration') }}">Registrácia na konferenciu</a></p> --}}
+            @if($conference->isRegistrationOpen())
+            <p><a href="{{ route('registration') }}">📝 Registrácia na konferenciu</a></p>
+            @endif
+            @if($conference->teams_url)
             <p>
-                <a href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjliNGIxN2MtZjA0OC00MjgyLWJmYjQtMjYzMzIwMDZjNGZm%40thread.v2/0?context=%7b%22Tid%22%3a%228324ff4b-14c8-4bf5-b07e-a0713179f37e%22%2c%22Oid%22%3a%224d479202-a42c-46e9-b2f3-e8b1c1583ae9%22%7d"
+                <a href="{{ $conference->teams_url }}"
                    target="_blank" rel="noopener noreferrer">
                     🎧 Pripojiť sa na MS Teams
                 </a>
             </p>
+            @endif
             <p><a href="{{ route('question') }}">❓ Položiť otázku</a></p>
             <p><a href="{{ route('recordings.login') }}">📺 Príspevky z konferencie</a></p>
-    {{--<div class="pill">{{ $deadline }}</div>--}}
+    @if($conference->isRegistrationOpen() && $deadline)
+    <div class="pill">Registrácia do {{ $deadline }}</div>
+    @endif
     <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
     <p><a href="{{ route('committee') }}">👥 Programový a organizačný výbor</a></p>
 </div>
@@ -55,12 +63,16 @@
     <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
     <p><b>Adresa:</b> Fakulta riadenia a informatiky, Veľký diel 3323, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
     <p><b>Dátum:</b> {{ $date }}</p>
-    {{--<p><b>Deadline na registráciu:</b> {{ $deadline }}</p>--}}
+    @if($conference->isRegistrationOpen() && $deadline)
+    <p><b>Deadline na registráciu:</b> {{ $deadline }}</p>
+    @endif
+    @if($conference->teams_url)
     <p>
         <b>Online pripojenie (MS Teams):</b>
-        <a href="https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjliNGIxN2MtZjA0OC00MjgyLWJmYjQtMjYzMzIwMDZjNGZm%40thread.v2/0?context=%7b%22Tid%22%3a%228324ff4b-14c8-4bf5-b07e-a0713179f37e%22%2c%22Oid%22%3a%224d479202-a42c-46e9-b2f3-e8b1c1583ae9%22%7d"
+        <a href="{{ $conference->teams_url }}"
            target="_blank" rel="noopener noreferrer">Otvoriť míting</a>
     </p>
+    @endif
     <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
 
 </section>

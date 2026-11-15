@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'auth.recordings' => \App\Http\Middleware\AuthenticateRecordings::class,
+            'admin.conference' => \App\Http\Middleware\UseAdminConference::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

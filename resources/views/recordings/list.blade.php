@@ -169,8 +169,20 @@
     <div class="card" style="background: rgba(11, 75, 103, 0.35); padding: 2rem;">
         <h1 style="color: #9fe7ff; margin-bottom: 1.5rem; margin-top: 0;">Príspevky z konferencie</h1>
         <p style="margin-top: -0.75rem; margin-bottom: 1.25rem; color: #cbd5e1; font-size: 0.95rem;">
-            Konferencia o AI vo vzdelávaní – 11.2.2026
+            Konferencia o AI vo vzdelávaní – {{ \App\Models\Conference::formatDate($edition->date) ?? $edition->year }}
         </p>
+
+        @if($editions->count() > 1)
+            <nav aria-label="Ročníky" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+                @foreach($editions as $e)
+                    <a href="{{ route('recordings.list', ['rocnik' => $e->year]) }}"
+                       @if($e->id === $edition->id) aria-current="page" @endif
+                       style="padding: 0.4rem 0.9rem; border-radius: 0.6rem; text-decoration: none; font-weight: 600; border: 1px solid rgba(255, 184, 28, 0.35); {{ $e->id === $edition->id ? 'background: #ffb81c; color: #0b2b3a;' : 'background: rgba(255, 184, 28, 0.12); color: #ffb81c;' }}">
+                        Ročník {{ $e->year }}
+                    </a>
+                @endforeach
+            </nav>
+        @endif
 
         @if($registrations->isEmpty())
             <p style="color: #cbd5e1; text-align: center; padding: 2rem;">Zatiaľ nie sú k dispozícii žiadne záznamy.</p>

@@ -9,6 +9,7 @@ use App\Mail\NewRegistrationNotification;
 use App\Exports\RegistrationsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Conference;
+use App\Http\Controllers\Admin\ConferenceController;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Schema;
 
@@ -139,7 +140,7 @@ Route::get('/debug-auth', function () {
     ];
 })->middleware(['auth']);
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function (Request $request) {
         $sortable = [
             'name' => 'name',
@@ -277,7 +278,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
         $registrationsQuery->orderBy($sortable[$sort], $direction);
 
-        $fileName = 'registrations_' . now()->format('Y-m-d_His') . '.xlsx';
+        $fileName = 'registrations_' . Conference::current()->year . '_' . now()->format('Y-m-d_His') . '.xlsx';
         return Excel::download(new RegistrationsExport($registrationsQuery), $fileName);
     })->name('registrations.export');
 
@@ -371,7 +372,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
                 ->values();
         }
 
-        $fileName = 'prezencna_listina_' . now()->format('Y-m-d_His') . '.pdf';
+        $fileName = 'prezencna_listina_' . Conference::current()->year . '_' . now()->format('Y-m-d_His') . '.pdf';
 
         $pdf = Pdf::loadView('admin.attendance-pdf', compact(
             'registrations',
@@ -472,7 +473,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         // online_participation comes from the form (already cast to bool above)
 
         // Assign duration if conference has default
-        $conference = \App\Models\Conference::query()->first();
+        $conference = Conference::current();
         if ($conference && empty($data['duration_minutes'])) {
             $data['duration_minutes'] = (int) ($conference->presentation_minutes ?? 0);
         }
@@ -508,7 +509,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
                 ->orderBy('id')
                 ->get(['id', 'duration_minutes']);
 
-            $conference = \App\Models\Conference::query()->first();
+            $conference = Conference::current();
             $programStart = trim((string) ($conference?->start_time ?? '09:00'));
             if ($programStart === '') {
                 $programStart = '09:00';
@@ -536,14 +537,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // ---- Breaks (prestávky) CRUD ----
     Route::get('/breaks/create', function () {
-        $conference = \App\Models\Conference::query()->first();
-        if (!$conference) {
-            $conference = \App\Models\Conference::create([
-                'start_time' => '09:00',
-                'presentation_minutes' => 15,
-                'break_minutes' => 20,
-            ]);
-        }
+        $conference = Conference::current();
 
         return view('admin.break-create', compact('conference'));
     })->name('breaks.create');
@@ -879,7 +873,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
                     ->orderBy('id')
                     ->get(['id', 'duration_minutes']);
 
-                $conference = \App\Models\Conference::query()->first();
+                $conference = Conference::current();
                 $programStart = trim((string) ($conference?->start_time ?? '09:00'));
                 if ($programStart === '') {
                     $programStart = '09:00';
@@ -1012,7 +1006,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             ->get(['id', 'duration_minutes']);
 
         // 3) Štart od Conference.start_time
-        $conference = \App\Models\Conference::query()->first();
+        $conference = Conference::current();
         $start = trim((string) ($conference?->start_time ?? '09:00'));
         if ($start === '') {
             $start = '09:00';
@@ -1042,14 +1036,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     })->name('program.reorder');
 
     Route::get('/program/duration', function () {
-        $conference = \App\Models\Conference::query()->first();
-        if (!$conference) {
-            $conference = \App\Models\Conference::create([
-                'start_time' => '09:00',
-                'presentation_minutes' => 15,
-                'break_minutes' => 20,
-            ]);
-        }
+        $conference = Conference::current();
 
         return view('admin.program-duration', compact('conference'));
     })->name('program.duration');
@@ -1061,10 +1048,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             'break_minutes' => ['nullable', 'integer', 'min:0', 'max:480'],
         ]);
 
-        $conference = \App\Models\Conference::query()->first();
-        if (!$conference) {
-            $conference = new \App\Models\Conference();
-        }
+        $conference = Conference::current();
 
         $conference->start_time = (string) $payload['start_time'];
         $conference->presentation_minutes = (int) $payload['presentation_minutes'];
@@ -1160,6 +1144,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         return response()->json(['ok' => true, 'times' => $updatedTimes]);
     })->name('program.duration.update');
 
+    // ---- Conference editions (Ročníky) ----
+    Route::get('/rocniky', [ConferenceController::class, 'index'])->name('conferences.index');
+    Route::get('/rocniky/novy', [ConferenceController::class, 'create'])->name('conferences.create');
+    Route::post('/rocniky', [ConferenceController::class, 'store'])->name('conferences.store');
+    Route::get('/rocniky/{conference}/upravit', [ConferenceController::class, 'edit'])->name('conferences.edit');
+    Route::put('/rocniky/{conference}', [ConferenceController::class, 'update'])->name('conferences.update');
+    Route::post('/rocniky/{conference}/zverejnit', [ConferenceController::class, 'activate'])->name('conferences.activate');
+    Route::post('/rocniky/{conference}/vybrat', [ConferenceController::class, 'select'])->name('conferences.select');
+
     // ---- Questions (Otázky) ----
     Route::get('/questions', function (Request $request) {
         // Ensure answered column exists
@@ -1229,15 +1222,26 @@ Route::post('/zaznamy', function (Request $request) {
 })->name('recordings.authenticate');
 
 Route::middleware(['auth.recordings'])->prefix('/zaznamy')->group(function () {
-    Route::get('/list', function () {
-        $registrations = \App\Models\Registration::query()
+    Route::get('/list', function (Request $request) {
+        // Editions that have at least one scheduled presentation (newest first)
+        $editions = Conference::query()
+            ->whereHas('registrations', fn ($q) => $q->where('participation_type', 'presentation')->whereNotNull('time_start'))
+            ->orderByDesc('year')
+            ->get();
+
+        $edition = $editions->firstWhere('year', (int) $request->query('rocnik'))
+            ?? $editions->firstWhere('id', Conference::current()->id)
+            ?? $editions->first()
+            ?? Conference::current();
+
+        $registrations = $edition->registrations()
             ->where('participation_type', 'presentation')
             ->whereNotNull('time_start')
             ->orderBy('time_start')
             ->orderBy('id')
             ->get();
 
-        return view('recordings.list', compact('registrations'));
+        return view('recordings.list', compact('registrations', 'editions', 'edition'));
     })->name('recordings.list');
 
     Route::get('/record/{filename}', function ($filename) {
