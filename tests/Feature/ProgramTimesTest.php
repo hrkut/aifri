@@ -135,3 +135,9 @@ it('downloads the programme PDF of an archived edition too', function () {
     $this->get(route('admin.program'))->assertSee('Stiahnuť PDF');
     $this->get(route('admin.program.pdf'))->assertOk()->assertDownload('program_2026.pdf');
 });
+
+it('keeps programme PDFs small by embedding only the used glyphs', function () {
+    $pdf = $this->get(route('admin.program.pdf'))->getContent();
+
+    expect(strlen($pdf))->toBeLessThan(300 * 1024);
+});
