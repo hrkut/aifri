@@ -1318,27 +1318,32 @@ Route::middleware(['auth.recordings'])->prefix('/zaznamy')->group(function () {
         return view('recordings.list', compact('editions'));
     })->name('recordings.list');
 
-    Route::get('/record/{filename}', function ($filename) {
-        $filename = urldecode($filename);
-        $path = storage_path('app/private/zaznamy/' . $filename);
+    /*
+     * Serve a recording / slides file. Only files that belong to a talk (stored in the
+     * registration's column) are served, and the resolved path must stay inside the
+     * directory - so "../" or any other file on the server can never be reached.
+     */
+    $serveTalkFile = function (string $directory, string $column, string $filename) {
+        $known = Registration::withoutGlobalScope('conference')
+            ->where('participation_type', 'presentation')
+            ->where($column, $filename)
+            ->exists();
 
-        if (!file_exists($path)) {
-            abort(404, 'Záznam nebol nájdený.');
+        $base = realpath(storage_path('app/private/' . $directory));
+        $path = $known && $base ? realpath($base . DIRECTORY_SEPARATOR . $filename) : false;
+
+        if ($path === false || ! str_starts_with($path, $base . DIRECTORY_SEPARATOR) || ! is_file($path)) {
+            abort(404, $directory === 'zaznamy' ? 'Záznam nebol nájdený.' : 'Prezentácia nebola nájdená.');
         }
 
         return response()->file($path);
-    })->name('recordings.download')->where('filename', '.*');
+    };
 
-    Route::get('/presentation/{filename}', function ($filename) {
-        $filename = urldecode($filename);
-        $path = storage_path('app/private/prezentacie/' . $filename);
+    Route::get('/record/{filename}', fn (string $filename) => $serveTalkFile('zaznamy', 'record', $filename))
+        ->name('recordings.download')->where('filename', '.*');
 
-        if (!file_exists($path)) {
-            abort(404, 'Prezentácia nebola nájdená.');
-        }
-
-        return response()->file($path);
-    })->name('recordings.presentation')->where('filename', '.*');
+    Route::get('/presentation/{filename}', fn (string $filename) => $serveTalkFile('prezentacie', 'presentation', $filename))
+        ->name('recordings.presentation')->where('filename', '.*');
 });
 
 require __DIR__.'/auth.php';
