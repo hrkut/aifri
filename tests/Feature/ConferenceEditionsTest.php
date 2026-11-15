@@ -474,3 +474,29 @@ it('renders the shared navigation bar and hero on every public page', function (
     $this->get(route('home'))->assertSee('Registrovať sa');
     $this->get(route('registration'))->assertDontSee('Registrovať sa');
 });
+
+it('closes registration after the registration deadline', function () {
+    Mail::fake();
+    $this->travelTo('2027-02-01 12:00');
+    Conference::active()->update(['registration_deadline' => '2027-01-31', 'contribution_deadline' => '2027-01-20']);
+
+    $this->get(route('registration'))
+        ->assertOk()
+        ->assertSee('Registrácia na tento ročník konferencie je už uzatvorená.')
+        ->assertDontSee('class="regForm"', false);
+
+    $this->post(route('registration.submit'), [
+        'name' => 'Neskoro', 'email' => 'late@example.com', 'institution' => 'X', 'participation_type' => 'passive',
+    ])->assertRedirect()->assertSessionHasErrors('registration');
+
+    $this->post('/en/registration', [
+        'name' => 'Late', 'email' => 'late-en@example.com', 'institution' => 'X', 'participation_type' => 'passive',
+    ])->assertSessionHasErrors(['registration' => 'Registration for this edition of the conference is closed.']);
+
+    expect(Registration::count())->toBe(0);
+    Mail::assertNothingSent();
+
+    // the deadline day itself is still open
+    $this->travelTo('2027-01-31 23:00');
+    $this->get(route('registration'))->assertSee('class="regForm"', false);
+});

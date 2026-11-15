@@ -88,6 +88,11 @@
                 </div>
             @endif
 
+            @unless($conference->isRegistrationOpen())
+                {{-- after the deadline the form is replaced by a notice --}}
+                <p><b>{{ __('Registrácia na tento ročník konferencie je už uzatvorená.') }}</b></p>
+                <p>{{ __('Ak sa chcete konferencie zúčastniť, napíšte nám na :email.', ['email' => 'konferenciaAI@fri.uniza.sk']) }}</p>
+            @else
             <form class="regForm" method="POST" action="{{ lroute('registration.submit') }}" novalidate>
                 @csrf
 
@@ -244,6 +249,7 @@
                     <button type="submit" class="btn">{{ __('Odoslať prihlášku') }}</button>
                 </div>
             </form>
+            @endunless
         </main>
 
     </div>
@@ -257,6 +263,11 @@
                     heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             @endif
+
+            // Nothing else to do when registration is closed (no form on the page)
+            if (!document.querySelector('.regForm')) {
+                return;
+            }
 
             // Show the contribution fields only for active participation
             const contributionSection = document.querySelector('.contributionSection');

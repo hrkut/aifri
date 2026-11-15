@@ -58,6 +58,12 @@ Route::get('/program', function () {
 })->name('program');
 
 Route::post($path('/prihlasenie', '/registration'), function (Request $request) {
+    // After the registration deadline (or the conference day) nobody can register any more
+    if (! Conference::current()->isRegistrationOpen()) {
+        return redirect()->to(lroute('registration') . '#registration-form')
+            ->withErrors(['registration' => __('Registrácia na tento ročník konferencie je už uzatvorená.')]);
+    }
+
     $data = $request->validate([
         'title_before' => ['nullable', 'string', 'max:50'],
         'name' => ['required', 'string', 'max:255'],
