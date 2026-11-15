@@ -115,8 +115,8 @@ class ConferenceController extends Controller
 
         $data = $request->validate($rules, [
             'year.unique' => 'Tento ročník už existuje.',
-            'registration_deadline.before_or_equal' => 'Deadline registrácie musí byť najneskôr v deň konferencie.',
-            'contribution_deadline.before_or_equal' => 'Deadline príspevkov musí byť najneskôr v deň konferencie a nie neskôr ako deadline registrácie.',
+            'registration_deadline.before_or_equal' => 'Termín registrácie musí byť najneskôr v deň konferencie.',
+            'contribution_deadline.before_or_equal' => 'Termín na príspevky musí byť najneskôr v deň konferencie a nie neskôr ako termín registrácie.',
             'notification_date.before_or_equal' => 'Notifikácia autorov musí byť najneskôr v deň konferencie.',
         ]);
 

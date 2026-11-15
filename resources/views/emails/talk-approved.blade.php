@@ -35,7 +35,7 @@
             (<a href="{{ \App\Mail\EmailTheme::MAP_URL }}" style="color: {{ $c['link'] }}; text-decoration: underline;">mapa</a>)</div>
         <div><strong>Forma vašej účasti:</strong> {{ $registration->online_participation ? 'online' : 'prezenčne' }}</div>
         @if($conference->teams_url)
-            <div><strong>Online pripojenie:</strong> <a href="{{ $conference->teams_url }}" style="color: {{ $c['link'] }}; text-decoration: underline;">MS Teams míting</a></div>
+            <div><strong>Online pripojenie:</strong> <a href="{{ $conference->teams_url }}" style="color: {{ $c['link'] }}; text-decoration: underline;">stretnutie v MS Teams</a></div>
         @endif
     </x-email.panel>
 

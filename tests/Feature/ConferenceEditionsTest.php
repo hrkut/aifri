@@ -372,7 +372,7 @@ it('drops contribution fields for passive participants', function () {
 it('shows both participation types on the registration form', function () {
     $this->get(route('registration'))
         ->assertOk()
-        ->assertSee('Aktívna účasť – prednáška')
+        ->assertSee('Aktívna účasť s príspevkom')
         ->assertSee('Pasívna účasť (poslucháč)')
         ->assertSee('name="online_participation"', false)
         ->assertSee('Názov príspevku *');
@@ -389,8 +389,8 @@ it('closes active registration after the contribution deadline while passive sta
     $this->get(route('registration'))
         ->assertOk()
         ->assertSee('Prihlasovanie príspevkov je uzatvorené')
-        ->assertSee('15. 1. 2027 – Deadline na príspevky (aktívna účasť)')
-        ->assertSee('31. 1. 2027 – Deadline na registráciu (pasívna účasť)');
+        ->assertSee('15. 1. 2027 – termín na príspevky (aktívna účasť)')
+        ->assertSee('31. 1. 2027 – termín registrácie (pasívna účasť)');
 
     $this->post(route('registration.submit'), [
         'name' => 'Neskorý Autor', 'email' => 'late@example.com', 'institution' => 'X',
@@ -547,4 +547,29 @@ it('has no public sign-up for admin accounts', function () {
 
     expect(User::where('email', 'x@example.com')->exists())->toBeFalse()
         ->and(Route::has('register'))->toBeFalse();
+});
+
+it('uses one name for each thing across the site and the admin', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    Registration::create(['name' => 'A', 'email' => 'a@example.com', 'institution' => 'X', 'participation_type' => 'presentation', 'title' => 'T', 'review_status' => Registration::REVIEW_REJECTED]);
+
+    $pages = [
+        $this->get(route('home'))->getContent(),
+        $this->get(route('registration'))->getContent(),
+        $this->get(route('program'))->getContent(),
+        $this->actingAs($admin)->get(route('admin.dashboard'))->getContent(),
+        $this->get(route('admin.conferences.index'))->getContent(),
+        $this->get(route('admin.conferences.edit', Conference::active()))->getContent(),
+    ];
+
+    foreach ($pages as $html) {
+        $text = strip_tags($html);
+        expect($text)->not->toContain('Deadline')
+            ->not->toContain('prihlášk')
+            ->not->toContain('Zamietnut')
+            ->not->toContain('míting');
+    }
+
+    expect($pages[1])->toContain('REGISTRÁCIA NA KONFERENCIU')->toContain('Odoslať registráciu');
+    expect($pages[3])->toContain('Odmietnutý');
 });

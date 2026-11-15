@@ -2,7 +2,7 @@
 NOVÁ REGISTRÁCIA – Konferencia o AI vo vzdelávaní, {{ $conference->editionLabel() }} ({{ $conference->dateLabel() }})
 
 Typ: {{ $isTalk ? 'aktívna účasť s príspevkom' : 'pasívna účasť' }}
-Prihlášok v ročníku {{ $conference->year }}: {{ $totalRegistrations }}
+Registrácií v ročníku {{ $conference->year }}: {{ $totalRegistrations }}
 
 ÚČASTNÍK
 Meno: {{ $registration->fullName() }}

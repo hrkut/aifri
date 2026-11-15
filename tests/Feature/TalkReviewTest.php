@@ -179,7 +179,7 @@ it('renders the reject dialog with a required reason field', function () {
         ->assertSee('<dialog id="reject-dialog-' . $talk->id . '"', false)
         ->assertSee('name="review_comment"', false)
         ->assertSee('required minlength="10"', false)
-        ->assertSee('Zamietnuť a poslať e-mail');
+        ->assertSee('Odmietnuť a poslať e-mail');
 });
 
 it('keeps the registration when a mail cannot be sent', function () {

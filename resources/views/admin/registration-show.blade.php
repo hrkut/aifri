@@ -64,7 +64,7 @@
                     <div>
                         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Typ účasti</p>
                         @if($registration->participation_type === 'presentation')
-                            <span class="inline-block px-3 py-1 bg-blue-900 text-blue-200 rounded-lg text-sm font-medium">Aktívna účasť – prednáška</span>
+                            <span class="inline-block px-3 py-1 bg-blue-900 text-blue-200 rounded-lg text-sm font-medium">Aktívna účasť s príspevkom</span>
                         @else
                             <span class="inline-block px-3 py-1 bg-gray-700 text-gray-200 rounded-lg text-sm font-medium">Pasívna účasť (poslucháč)</span>
                         @endif

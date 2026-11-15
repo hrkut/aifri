@@ -20,7 +20,7 @@
     <p style="{!! $p !!} margin-bottom: 22px;">
         Na konferenciu {{ $conference->dateLabel() }} prišla nová registrácia
         – <strong>{{ $isTalk ? 'aktívna účasť s príspevkom' : 'pasívna účasť' }}</strong>.
-        Ročník {{ $conference->year }} má teraz <strong>{{ $totalRegistrations }}</strong> {{ $totalRegistrations === 1 ? 'prihlášku' : ($totalRegistrations < 5 ? 'prihlášky' : 'prihlášok') }}.
+        Ročník {{ $conference->year }} má teraz <strong>{{ $totalRegistrations }}</strong> {{ $totalRegistrations === 1 ? 'registráciu' : ($totalRegistrations < 5 ? 'registrácie' : 'registrácií') }}.
     </p>
 
     <x-email.panel title="Účastník" :highlight="true">
@@ -32,7 +32,7 @@
     </x-email.panel>
 
     <x-email.panel title="Účasť">
-        <div><strong>Typ:</strong> {{ $isTalk ? 'Aktívna – prednáška' : 'Pasívna (poslucháč)' }}</div>
+        <div><strong>Typ:</strong> {{ $isTalk ? 'Aktívna účasť s príspevkom' : 'Pasívna účasť (poslucháč)' }}</div>
         <div><strong>Forma:</strong> {{ $registration->online_participation ? 'Online' : 'Prezenčne' }}</div>
     </x-email.panel>
 

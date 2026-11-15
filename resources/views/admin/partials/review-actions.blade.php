@@ -47,9 +47,9 @@
             </svg>
         </x-admin.icon-action>
 
-        <x-admin.review-dialog :id="$rejectId" heading="Zamietnuť príspevok" color="red"
+        <x-admin.review-dialog :id="$rejectId" heading="Odmietnuť príspevok" color="red"
                                :action="route('admin.registration.reject', $registration)"
-                               submit-label="Zamietnuť a poslať e-mail">
+                               submit-label="Odmietnuť a poslať e-mail">
             <p class="mt-1 text-sm text-slate-300">„{{ $registration->title }}“ – {{ $registration->fullName() }}</p>
 
             <label for="{{ $rejectId }}-comment" class="mt-4 block text-sm font-medium text-slate-200">

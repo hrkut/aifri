@@ -49,7 +49,7 @@ class Registration extends Model
     public const REVIEW_LABELS = [
         self::REVIEW_PENDING => 'Čaká na posúdenie',
         self::REVIEW_APPROVED => 'Schválený',
-        self::REVIEW_REJECTED => 'Zamietnutý',
+        self::REVIEW_REJECTED => 'Odmietnutý',
     ];
 
     public function isTalk(): bool

@@ -5,7 +5,7 @@ Príspevok neprijatý
 
 Dobrý deň{{ $fullName !== '' ? ', ' . $fullName : '' }},
 
-ďakujeme, že ste prihlásili príspevok na Konferenciu o umelej inteligencii vo vzdelávaní. Programový výbor sa po posúdení rozhodol váš príspevok tentoraz nezaradiť do programu.
+ďakujeme, že ste poslali príspevok na Konferenciu o umelej inteligencii vo vzdelávaní. Programový výbor sa po posúdení rozhodol váš príspevok tentoraz nezaradiť do programu.
 
 VÁŠ PRÍSPEVOK
 {{ $registration->title }}

@@ -141,7 +141,7 @@ Route::post($path('/prihlasenie', '/registration'), function (Request $request) 
     }
 
     return redirect()->to(lroute('registration') . '#registration-form')
-        ->with('success', __('Ďakujeme za prihlásenie! Potvrdenie sme vám poslali na e-mail.'));
+        ->with('success', __('Ďakujeme za registráciu! Potvrdenie sme vám poslali na e-mail.'));
 })->name('registration.submit');
 
 // ---- Question Routes ----

@@ -18,7 +18,7 @@
 @section('content')
     <p style="{!! $p !!}">Dobrý deň{{ $fullName !== '' ? ', ' . $fullName : '' }},</p>
     <p style="{!! $p !!} margin-bottom: 22px;">
-        ďakujeme za prihlásenie na Konferenciu o umelej inteligencii vo vzdelávaní.
+        ďakujeme za registráciu na Konferenciu o umelej inteligencii vo vzdelávaní.
         @if($isTalk)
             Vašu registráciu ako <strong>aktívneho účastníka s&nbsp;príspevkom</strong> sme zaznamenali a&nbsp;týmto ju <strong>potvrdzujeme</strong>.
         @else
@@ -37,7 +37,7 @@
             (<a href="{{ \App\Mail\EmailTheme::MAP_URL }}" style="color: {{ $c['link'] }}; text-decoration: underline;">mapa</a>)</div>
         <div><strong>Forma:</strong> hybridná (prezenčne aj online)</div>
         @if($conference->teams_url)
-            <div><strong>Online pripojenie:</strong> <a href="{{ $conference->teams_url }}" style="color: {{ $c['link'] }}; text-decoration: underline;">MS Teams míting</a></div>
+            <div><strong>Online pripojenie:</strong> <a href="{{ $conference->teams_url }}" style="color: {{ $c['link'] }}; text-decoration: underline;">stretnutie v MS Teams</a></div>
         @else
             <div style="color: {{ $c['muted'] }};">Odkaz na online pripojenie (MS Teams) zverejníme pred konferenciou na webe.</div>
         @endif
@@ -69,7 +69,7 @@
     <x-email.button :href="route('program')">📅 Program konferencie</x-email.button>
 
     <p style="{!! $p !!} font-size: 15px; color: {{ $c['muted'] }};">
-        Ak ste sa prihlásili omylom alebo sa nebudete môcť zúčastniť, dajte nám prosím vedieť odpoveďou na tento e-mail.
+        Ak ste sa zaregistrovali omylom alebo sa nebudete môcť zúčastniť, dajte nám prosím vedieť odpoveďou na tento e-mail.
     </p>
     <p style="{!! $p !!} font-size: 15px; margin: 18px 0 0;">
         Tešíme sa na vás,<br>

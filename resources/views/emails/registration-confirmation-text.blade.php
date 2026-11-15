@@ -7,7 +7,7 @@ Registrácia potvrdená
 
 Dobrý deň{{ $fullName !== '' ? ', ' . $fullName : '' }},
 
-ďakujeme za prihlásenie na Konferenciu o umelej inteligencii vo vzdelávaní. Vašu registráciu ako {{ $isTalk ? 'aktívneho účastníka s príspevkom' : 'pasívneho účastníka' }} sme zaznamenali a týmto ju potvrdzujeme.
+ďakujeme za registráciu na Konferenciu o umelej inteligencii vo vzdelávaní. Vašu registráciu ako {{ $isTalk ? 'aktívneho účastníka s príspevkom' : 'pasívneho účastníka' }} sme zaznamenali a týmto ju potvrdzujeme.
 @if($isTalk)
 
 Príspevok teraz posúdi programový výbor. O výsledku a zaradení do programu vás budeme informovať e-mailom{{ $notification ? ' do ' . $notification : '' }}.
@@ -44,7 +44,7 @@ Forma účasti: {{ $registration->online_participation ? 'online' : 'prezenčne'
 
 Program konferencie: {{ route('program') }}
 
-Ak ste sa prihlásili omylom alebo sa nebudete môcť zúčastniť, dajte nám prosím vedieť odpoveďou na tento e-mail.
+Ak ste sa zaregistrovali omylom alebo sa nebudete môcť zúčastniť, dajte nám prosím vedieť odpoveďou na tento e-mail.
 
 Tešíme sa na vás,
 organizačný výbor konferencie

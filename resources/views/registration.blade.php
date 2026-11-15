@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', __('Prihlásenie na konferenciu – Umelá inteligencia vo vzdelávaní'))
+@section('title', __('Registrácia na konferenciu – Umelá inteligencia vo vzdelávaní'))
 @section('meta_description', __('Prihláste sa na konferenciu o umelej inteligencii vo vzdelávaní'))
 
 @php
@@ -15,21 +15,21 @@
 
 @section('content')
     <x-site.hero :conference="$conference"
-                 :title="__('PRIHLÁSENIE NA KONFERENCIU')"
+                 :title="__('REGISTRÁCIA NA KONFERENCIU')"
                  :sub="__('Umelá inteligencia vo vzdelávaní')" />
 
     <div class="stack">
         <x-site.info-card :conference="$conference" illustration="computer.png" illustrationAlt="Ilustrácia: počítač">
-            <p><b>{{ __('Potvrdenie účasti:') }}</b> {{ __('e-mailom ihneď po prihlásení') }}</p>
+            <p><b>{{ __('Potvrdenie účasti:') }}</b> {{ __('e-mailom ihneď po registrácii') }}</p>
             <p><b>{{ __('Registračný poplatok:') }}</b> {{ __('konferencia je bezplatná') }}</p>
 
             <h3>{{ __('Dôležité termíny') }}</h3>
             <ul class="list">
                 @if($contributionDeadline)
-                <li>{{ $contributionDeadline }} – {{ __('Deadline na príspevky (aktívna účasť)') }}</li>
+                <li>{{ $contributionDeadline }} – {{ __('termín na príspevky (aktívna účasť)') }}</li>
                 @endif
                 @if($deadline)
-                <li>{{ $deadline }} – {{ $contributionDeadline ? __('Deadline na registráciu (pasívna účasť)') : __('Deadline na prihlášky') }}</li>
+                <li>{{ $deadline }} – {{ $contributionDeadline ? __('termín registrácie (pasívna účasť)') : __('termín registrácie') }}</li>
                 @endif
                 @if($notification)
                 <li>{{ $notification }} – {{ __('Notifikácia autorov') }}</li>
@@ -162,7 +162,7 @@
                     <div class="formGroup radioGroup">
                         <label @unless($contributionOpen) style="opacity: .55;" @endunless>
                             <input type="radio" name="participation_type" value="presentation" {{ $contributionOpen && old('participation_type', 'passive') === 'presentation' ? 'checked' : '' }} @disabled(! $contributionOpen)>
-                            {{ __('Aktívna účasť – prednáška') }}
+                            {{ __('Aktívna účasť s príspevkom') }}
                             @unless($contributionOpen)
                                 ({{ __('prihlasovanie príspevkov je uzatvorené') }})
                             @endunless
@@ -246,7 +246,7 @@
 
                 <div class="formActions">
                     <a href="{{ lroute('home') }}" class="btn secondary">{{ __('Späť na hlavnú stránku') }}</a>
-                    <button type="submit" class="btn">{{ __('Odoslať prihlášku') }}</button>
+                    <button type="submit" class="btn">{{ __('Odoslať registráciu') }}</button>
                 </div>
             </form>
             @endunless

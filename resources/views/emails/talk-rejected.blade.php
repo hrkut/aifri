@@ -17,7 +17,7 @@
 @section('content')
     <p style="{!! $p !!}">Dobrý deň{{ $fullName !== '' ? ', ' . $fullName : '' }},</p>
     <p style="{!! $p !!} margin-bottom: 22px;">
-        ďakujeme, že ste prihlásili príspevok na Konferenciu o umelej inteligencii vo vzdelávaní.
+        ďakujeme, že ste poslali príspevok na Konferenciu o umelej inteligencii vo vzdelávaní.
         Programový výbor sa po posúdení rozhodol váš príspevok <strong>tentoraz nezaradiť do programu</strong>.
     </p>
 

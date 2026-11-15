@@ -278,7 +278,7 @@
                 rel="noopener noreferrer"
                 style="display: inline-block; padding: 0.65rem 1rem; background: rgba(255, 184, 28, 0.16); color: #ffb81c; text-decoration: none; border-radius: 0.6rem; font-weight: 600; border: 1px solid rgba(255, 184, 28, 0.35);"
             >
-                {{ __('Otvoriť MS Teams míting') }}
+                {{ __('Pripojiť sa na MS Teams') }}
             </a>
         </div>
         @endif

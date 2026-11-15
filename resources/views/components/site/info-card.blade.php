@@ -19,13 +19,13 @@
     <p><b>{{ __('Adresa:') }}</b> Veľký diel 3323, 010&nbsp;26 Žilina{{ app()->getLocale() === 'en' ? ', Slovakia' : '' }} (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">{{ __('Kde nás nájdete') }}</a>)</p>
     <p><b>{{ __('Dátum konania:') }}</b> {{ $conference->dateLabel() }}</p>
     @if($contributionDeadline)
-        <p><b>{{ __('Deadline na príspevky:') }}</b> {{ $contributionDeadline }}</p>
+        <p><b>{{ __('Termín na príspevky:') }}</b> {{ $contributionDeadline }}</p>
     @endif
     @if($deadline)
-        <p><b>{{ __('Deadline na registráciu:') }}</b> {{ $deadline }}</p>
+        <p><b>{{ __('Termín registrácie:') }}</b> {{ $deadline }}</p>
     @endif
     @if($conference->teams_url)
-        <p><b>{{ __('Online pripojenie (MS Teams):') }}</b> <a href="{{ $conference->teams_url }}" target="_blank" rel="noopener noreferrer">{{ __('Otvoriť míting') }}</a></p>
+        <p><b>{{ __('Online pripojenie (MS Teams):') }}</b> <a href="{{ $conference->teams_url }}" target="_blank" rel="noopener noreferrer">{{ __('Pripojiť sa') }}</a></p>
     @endif
 
     {{ $slot }}

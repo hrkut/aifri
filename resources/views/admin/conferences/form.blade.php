@@ -48,14 +48,14 @@
                         <input id="date" name="date" type="date" class="{{ $input }}" value="{{ $dateValue('date') }}" required>
                     </div>
                     <div>
-                        <label class="block text-sm text-slate-300 mb-1" for="registration_deadline">Deadline registrácie</label>
+                        <label class="block text-sm text-slate-300 mb-1" for="registration_deadline">Termín registrácie</label>
                         <input id="registration_deadline" name="registration_deadline" type="date" class="{{ $input }}" value="{{ $dateValue('registration_deadline') }}">
-                        <p class="mt-1 text-xs text-slate-500">Platí pre pasívnu účasť. Bez deadlinu je registrácia otvorená až do dňa konferencie.</p>
+                        <p class="mt-1 text-xs text-slate-500">Platí pre pasívnu účasť. Bez termínu je registrácia otvorená až do dňa konferencie.</p>
                     </div>
                     <div>
-                        <label class="block text-sm text-slate-300 mb-1" for="contribution_deadline">Deadline príspevkov (aktívna účasť)</label>
+                        <label class="block text-sm text-slate-300 mb-1" for="contribution_deadline">Termín na príspevky (aktívna účasť)</label>
                         <input id="contribution_deadline" name="contribution_deadline" type="date" class="{{ $input }}" value="{{ $dateValue('contribution_deadline') }}">
-                        <p class="mt-1 text-xs text-slate-500">Po tomto dni sa dá prihlásiť už len pasívne. Bez deadlinu platí deadline registrácie.</p>
+                        <p class="mt-1 text-xs text-slate-500">Po tomto dni sa dá zaregistrovať už len na pasívnu účasť. Bez termínu platí termín registrácie.</p>
                     </div>
                     <div>
                         <label class="block text-sm text-slate-300 mb-1" for="notification_date">Notifikácia autorov</label>
@@ -66,7 +66,7 @@
 
             <section>
                 <h2 class="text-lg font-semibold text-slate-100 mb-4">Online pripojenie</h2>
-                <label class="block text-sm text-slate-300 mb-1" for="teams_url">Odkaz na MS Teams míting</label>
+                <label class="block text-sm text-slate-300 mb-1" for="teams_url">Odkaz na stretnutie v MS Teams</label>
                 <input id="teams_url" name="teams_url" type="url" class="{{ $input }}" value="{{ old('teams_url', $conference->teams_url) }}" placeholder="https://teams.microsoft.com/l/meetup-join/...">
                 <p class="mt-1 text-xs text-slate-500">Kým nie je vyplnený, tlačidlá na pripojenie sa na webe nezobrazujú.</p>
             </section>

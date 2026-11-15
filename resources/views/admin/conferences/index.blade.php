@@ -25,9 +25,9 @@
                 <tr>
                     <th class="px-4 py-3">Ročník</th>
                     <th class="px-4 py-3">Dátum konania</th>
-                    <th class="px-4 py-3">Deadline príspevkov</th>
-                    <th class="px-4 py-3">Deadline registrácie</th>
-                    <th class="px-4 py-3 text-right">Prihlášky</th>
+                    <th class="px-4 py-3">Termín na príspevky</th>
+                    <th class="px-4 py-3">Termín registrácie</th>
+                    <th class="px-4 py-3 text-right">Registrácie</th>
                     <th class="px-4 py-3 text-right">Otázky</th>
                     <th class="px-4 py-3">Stav</th>
                     <th class="px-4 py-3 text-right">Akcie</th>

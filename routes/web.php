@@ -330,19 +330,19 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'review_comment' => ['required', 'string', 'min:10', 'max:2000'],
         ], [
-            'review_comment.required' => 'Zamietnutie potrebuje zdôvodnenie pre autora.',
+            'review_comment.required' => 'Odmietnutie potrebuje zdôvodnenie pre autora.',
             'review_comment.min' => 'Zdôvodnenie pre autora musí mať aspoň 10 znakov.',
             'review_comment.max' => 'Zdôvodnenie pre autora môže mať najviac 2000 znakov.',
         ]);
         if ($validator->fails()) {
-            return back()->with('error', "Príspevok „{$registration->title}“ nebol zamietnutý: " . $validator->errors()->first());
+            return back()->with('error', "Príspevok „{$registration->title}“ nebol odmietnutý: " . $validator->errors()->first());
         }
 
         $registration->reject((string) $request->input('review_comment'));
 
         $mailNote = $notifyAuthor($registration, new \App\Mail\TalkRejected($registration, Conference::current()));
 
-        return back()->with('success', "Príspevok „{$registration->title}“ bol zamietnutý a odstránený z programu." . $mailNote);
+        return back()->with('success', "Príspevok „{$registration->title}“ bol odmietnutý a odstránený z programu." . $mailNote);
     })->name('registration.reject');
 
     Route::get('/registration/{registration}', function (Registration $registration) {
