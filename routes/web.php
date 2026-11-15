@@ -650,69 +650,40 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
                 ->withInput();
         }
 
-        // Reposition order based on time among other items
+        // The chosen time is the start of a programme item: the break goes right before
+        // that item. Then the whole programme is renumbered and its times recalculated,
+        // so nothing overlaps and no gap is left at the break's old place.
         $others = \App\Models\Registration::query()
             ->inProgram()
             ->where('id', '!=', $break->id)
             ->orderByRaw('program_order is null')
             ->orderBy('program_order')
             ->orderBy('id')
-            ->get(['id', 'program_order', 'time_start']);
+            ->get(['id', 'program_order', 'time_start'])
+            ->values();
 
-        $insertPos = 1;
-        foreach ($others as $row) {
-            $t = $row->time_start ? \Illuminate\Support\Carbon::parse($row->time_start)->format('H:i') : null;
-            if ($t !== null && $t < $start) {
-                $insertPos = max($insertPos, ((int) ($row->program_order ?? 0)) + 1);
-            }
+        $target = $others->search(fn ($row) => $row->time_start
+            && \Illuminate\Support\Carbon::parse($row->time_start)->format('H:i') === $start);
+
+        if ($target === false) {
+            // the break keeps its own start time: it stays where it is
+            $target = $others->filter(fn ($row) => (int) $row->program_order < (int) $break->program_order)->count();
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($break, $data, $insertPos, $start, $breakMinutes) {
-            // Close gap at old position
-            if ($break->program_order !== null) {
-                \App\Models\Registration::query()
-                    ->inProgram()
-                    ->whereNotNull('program_order')
-                    ->where('program_order', '>', (int) $break->program_order)
-                    ->decrement('program_order');
-            }
+        \Illuminate\Support\Facades\DB::transaction(function () use ($break, $data, $breakMinutes, $others, $target) {
+            $order = $others->pluck('id')->all();
+            array_splice($order, $target, 0, [$break->id]);
 
-            // Make room at new position
-            \App\Models\Registration::query()
-                ->inProgram()
-                ->whereNotNull('program_order')
-                ->where('program_order', '>=', $insertPos)
-                ->increment('program_order');
+            foreach ($order as $index => $id) {
+                \App\Models\Registration::whereKey($id)->update(['program_order' => $index + 1]);
+            }
 
             $break->fill($data);
-            $break->program_order = $insertPos;
-            $break->time_start = $start;
             $break->duration_minutes = $breakMinutes;
+            $break->program_order = $target + 1;
             $break->save();
 
-            // Re-load program in new order
-            $programAfter = \App\Models\Registration::query()
-                ->inProgram()
-                ->orderByRaw('program_order is null')
-                ->orderBy('program_order')
-                ->orderBy('id')
-                ->get();
-
-            $idx = $programAfter->search(fn ($r) => (int) $r->id === (int) $break->id);
-            if ($idx === false) return;
-
-            $cursor = \Illuminate\Support\Carbon::parse($start)->addMinutes($breakMinutes);
-
-            for ($i = $idx + 1; $i < $programAfter->count(); $i++) {
-                $item = $programAfter[$i];
-                $item->time_start = $cursor->format('H:i');
-                $item->save();
-
-                $dur = (int) ($item->duration_minutes ?? 0);
-                if ($dur > 0) {
-                    $cursor->addMinutes($dur);
-                }
-            }
+            \App\Models\Registration::recalculateProgramTimes();
         });
 
         return redirect()->route('admin.program')->with('success', 'Prestávka bola upravená.');
@@ -1009,6 +980,7 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
             'start_time' => ['required', 'date_format:H:i'],
             'presentation_minutes' => ['required', 'integer', 'min:1', 'max:480'],
             'break_minutes' => ['nullable', 'integer', 'min:0', 'max:480'],
+            'apply_to_breaks' => ['sometimes', 'boolean'],
         ]);
 
         $conference = Conference::current();
@@ -1018,34 +990,20 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
         $conference->break_minutes = (int) ($payload['break_minutes'] ?? 0);
         $conference->save();
 
-        $items = \App\Models\Registration::query()
-            ->inProgram()
-            ->orderByRaw('program_order is null')
-            ->orderBy('program_order')
-            ->orderBy('id')
-            ->get();
+        \Illuminate\Support\Facades\DB::transaction(function () use ($conference, $request) {
+            // every talk of the edition gets the new length, also those still waiting for review
+            \App\Models\Registration::query()
+                ->where('participation_type', 'presentation')
+                ->update(['duration_minutes' => (int) $conference->presentation_minutes]);
 
-        $cursor = \Illuminate\Support\Carbon::parse((string) $conference->start_time);
-
-        \Illuminate\Support\Facades\DB::transaction(function () use ($items, $cursor, $conference) {
-            $current = $cursor->copy();
-
-            foreach ($items as $item) {
-                $item->time_start = $current->format('H:i');
-
-                if ($item->participation_type === 'presentation') {
-                    $item->duration_minutes = (int) $conference->presentation_minutes;
-                    $item->save();
-                    $current->addMinutes((int) $conference->presentation_minutes);
-                } else {
-                    $item->duration_minutes = (int) ($conference->break_minutes ?? 0);
-                    $item->save();
-
-                    if ($item->duration_minutes > 0) {
-                        $current->addMinutes($item->duration_minutes);
-                    }
-                }
+            // breaks keep their own length (e.g. a longer lunch) unless asked otherwise
+            if ($request->boolean('apply_to_breaks')) {
+                \App\Models\Registration::query()
+                    ->where('participation_type', 'break')
+                    ->update(['duration_minutes' => (int) $conference->break_minutes]);
             }
+
+            \App\Models\Registration::recalculateProgramTimes();
         });
 
         return redirect()->route('admin.program')->with('success', 'Časy programu boli prepočítané.');

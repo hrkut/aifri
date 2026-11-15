@@ -110,9 +110,13 @@
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-sm text-slate-300 mb-1" for="break_minutes">Dĺžka prestávky (min)</label>
+                        <label class="block text-sm text-slate-300 mb-1" for="break_minutes">Predvolená dĺžka prestávky (min)</label>
                         <input id="break_minutes" name="break_minutes" type="number" min="0" max="480" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2" value="{{ old('break_minutes', $conference?->break_minutes ?? 20) }}">
-                        <p class="text-xs text-slate-400 mt-1">Ak je 0, prestávky sa nebudú automaticky posúvať o dĺžku (zostanú iba ako položky v programe s časom začiatku).</p>
+                        <p class="text-xs text-slate-400 mt-1">Ponúkne sa pri pridávaní novej prestávky. Existujúce prestávky si nechajú svoju dĺžku (napr. dlhší obed).</p>
+                        <label class="mt-3 flex items-center gap-2 text-sm text-slate-300">
+                            <input type="checkbox" name="apply_to_breaks" value="1" class="rounded border-slate-600 bg-slate-800" @checked(old('apply_to_breaks'))>
+                            Nastaviť túto dĺžku aj všetkým existujúcim prestávkam
+                        </label>
                     </div>
                 </div>
             </section>
