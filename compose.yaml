@@ -69,6 +69,25 @@ services:
             - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
         networks:
             - sail
+    # Headless Chromium for screenshots; not started by "up", run on demand:
+    #   docker compose -p aifri run --rm browser --width=1280,390 / prihlasenie
+    # Reaches the app as http://laravel.test on the compose network (no host
+    # networking, which behaves differently on Docker Desktop / WSL2).
+    browser:
+        build:
+            context: ./docker/browser
+        image: 'aifri/browser'
+        profiles: ['tools']
+        user: '${WWWUSER:-1000}:${WWWGROUP:-1000}'
+        shm_size: '1gb'
+        environment:
+            BASE_URL: 'http://laravel.test'
+        volumes:
+            - './.screenshots:/shots'
+        networks:
+            - sail
+        depends_on:
+            - laravel.test
 networks:
     sail:
         driver: bridge
