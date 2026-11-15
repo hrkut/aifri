@@ -6,6 +6,7 @@ use App\Models\Registration;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NewRegistrationNotification;
+use App\Mail\RegistrationConfirmation;
 use App\Exports\RegistrationsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Conference;
@@ -77,6 +78,14 @@ Route::post('/prihlasenie', function (Request $request) {
     $registration = Registration::create($data);
 
     Mail::to('konferenciaAI@fri.uniza.sk')->send(new NewRegistrationNotification($registration));
+
+    // Confirmation to the participant; a mail failure must not lose the (already saved) registration.
+    try {
+        Mail::to($registration->email, $registration->name)
+            ->send(new RegistrationConfirmation($registration, Conference::current()));
+    } catch (\Throwable $e) {
+        report($e);
+    }
 
     return redirect()->to(route('registration') . '#registration-form')
         ->with('success', 'Ďakujeme za prihlásenie! Vašu prihlášku sme zaregistrovali.');

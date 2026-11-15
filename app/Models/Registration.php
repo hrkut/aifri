@@ -34,4 +34,12 @@ class Registration extends Model
     protected $casts = [
         'online_participation' => 'boolean',
     ];
+
+    /** Name with academic titles, e.g. "Ing. Jana Nováková, PhD." */
+    public function fullName(): string
+    {
+        $name = trim(implode(' ', array_filter([$this->title_before, $this->name])));
+
+        return $this->title_after ? $name . ', ' . $this->title_after : $name;
+    }
 }

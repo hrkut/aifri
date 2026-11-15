@@ -249,3 +249,40 @@ it('keeps unpublished future editions editable', function () {
     $this->actingAs($admin)->post(route('admin.conferences.select', $future));
     $this->get(route('admin.program.create'))->assertOk();
 });
+
+it('sends a themed confirmation to a passive participant', function () {
+    Mail::fake();
+    Conference::active()->update(['teams_url' => 'https://teams.microsoft.com/l/meetup-join/xyz']);
+
+    $this->post(route('registration.submit'), [
+        'title_before' => 'Ing.',
+        'name' => 'Jana Testová',
+        'title_after' => 'PhD.',
+        'email' => 'jana@example.com',
+        'institution' => 'UNIZA',
+    ])->assertRedirect();
+
+    Mail::assertSent(\App\Mail\RegistrationConfirmation::class, function ($mail) {
+        if (! $mail->hasTo('jana@example.com')) {
+            return false;
+        }
+
+        $mail->assertHasSubject('Potvrdenie registrácie – Konferencia o AI vo vzdelávaní 2027');
+        $mail->assertSeeInHtml('Ing. Jana Testová, PhD.');
+        $mail->assertSeeInHtml('2. 2. 2027 (utorok) od 9:00');
+        $mail->assertSeeInHtml('pasívneho účastníka');
+        $mail->assertSeeInHtml('meetup-join/xyz', false);
+        $mail->assertSeeInText('potvrdzujeme');
+
+        return true;
+    });
+    Mail::assertSent(\App\Mail\NewRegistrationNotification::class, function ($mail) {
+        $mail->assertSeeInHtml('Nová registrácia');
+        $mail->assertSeeInHtml('Ing. Jana Testová, PhD.');
+        $mail->assertSeeInHtml('2. ročník');
+        $mail->assertSeeInHtml('pasívna účasť');
+        $mail->assertSeeInText('jana@example.com');
+
+        return $mail->hasTo('konferenciaAI@fri.uniza.sk') && $mail->hasReplyTo('jana@example.com');
+    });
+});
