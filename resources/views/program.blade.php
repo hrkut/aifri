@@ -182,7 +182,7 @@
         }
 
         /* Hide screen header (logo, title, navigation) */
-        .siteHeaderLink, header { display: none !important; }
+        .siteHeaderLink, .siteNav, header { display: none !important; }
         .printOnly { display: block !important; }
 
           /* Make text of talks black (keep break colors as-is) */

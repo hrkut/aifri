@@ -455,3 +455,18 @@ it('no longer offers block 3 but still labels it for past talks', function () {
     $this->actingAs($admin)->post(route('admin.conferences.select', $archive));
     $this->get(route('admin.registration.show', $old))->assertSee('Blok 3 – AI očami študentov');
 });
+
+it('renders the shared navigation bar and hero on every public page', function () {
+    Conference::active()->update(['registration_deadline' => now()->addMonth()->toDateString()]);
+
+    foreach (['home', 'program', 'registration', 'question', 'committee', 'recordings.login'] as $route) {
+        $html = $this->get(route($route))->assertOk()->assertSee('class="siteNav"', false)->getContent();
+
+        // exactly one highlighted item, pointing to the current page
+        expect(substr_count($html, 'aria-current="page"'))->toBe(1);
+        expect($html)->toMatch('#<a href="' . preg_quote(route($route), '#') . '"\s+aria-current="page"#');
+    }
+
+    $this->get(route('home'))->assertSee('Registrovať sa');
+    $this->get(route('registration'))->assertDontSee('Registrovať sa');
+});
