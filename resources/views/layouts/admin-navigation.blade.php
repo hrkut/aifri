@@ -1,5 +1,5 @@
 @php($workingConference = \App\Models\Conference::current())
-<nav x-data="{ open: false }" class="bg-slate-900/80 backdrop-blur border-b border-slate-800 text-slate-100">
+<nav x-data="{ open: false }" class="relative z-50 bg-slate-900/80 backdrop-blur border-b border-slate-800 text-slate-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex items-center gap-6">
