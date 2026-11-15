@@ -207,6 +207,7 @@ it('shows archived editions read-only in admin', function () {
         'email' => 'old@example.com',
         'institution' => 'X',
         'participation_type' => 'presentation',
+        'review_status' => Registration::REVIEW_APPROVED,
         'time_start' => '09:00',
         'duration_minutes' => 15,
         'program_order' => 1,
@@ -323,9 +324,12 @@ it('registers an active participant with a contribution', function () {
     });
     Mail::assertSent(\App\Mail\NewRegistrationNotification::class, fn ($mail) => $mail->hasTo('konferenciaAI@fri.uniza.sk'));
 
-    // Not published in the public programme until the organisers schedule it
+    // Waits for review: not in the programme until the organisers approve it
+    expect($reg->reviewStatus())->toBe(Registration::REVIEW_PENDING);
     $this->get(route('program'))->assertDontSee('AI v laboratórnych cvičeniach');
-    $reg->update(['time_start' => '10:00']);
+
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin)->post(route('admin.registration.approve', $reg))->assertRedirect();
     $this->get(route('program'))->assertSee('AI v laboratórnych cvičeniach');
 });
 

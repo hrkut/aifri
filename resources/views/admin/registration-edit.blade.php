@@ -9,7 +9,8 @@
         default => route('admin.program'),
     };
 
-    $isPresentation = ($registration->participation_type ?? null) === 'presentation';
+    // only approved talks are placed in the programme and need a start time
+    $isPresentation = $registration->isTalk() && $registration->reviewStatus() === \App\Models\Registration::REVIEW_APPROVED;
 
     $timeStartValue = old('time_start', $registration->time_start);
     if (is_string($timeStartValue) && $timeStartValue !== '') {

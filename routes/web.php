@@ -42,7 +42,7 @@ Route::get('/vybor', function () {
 Route::get('/program', function () {
     // Only scheduled items: freshly submitted talks have no time until the organisers place them
     $registrations = \App\Models\Registration::query()
-        ->whereIn('participation_type', ['presentation', 'break'])
+        ->inProgram()
         ->whereNotNull('time_start')
         ->orderBy('time_start')
         ->orderBy('id')
@@ -102,8 +102,9 @@ Route::post('/prihlasenie', function (Request $request) {
     if ($data['participation_type'] !== 'presentation') {
         $data['title'] = $data['abstract'] = $data['keywords'] = $data['block'] = null;
     } else {
-        // Default length of a talk for this edition
+        // Default length of a talk for this edition; it waits for review before entering the programme
         $data['duration_minutes'] = (int) (Conference::current()->presentation_minutes ?: 15);
+        $data['review_status'] = Registration::REVIEW_PENDING;
     }
 
     $registration = Registration::create($data);
@@ -215,6 +216,17 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
             $registrationsQuery->where('online_participation', false);
         }
 
+        // Review state of talks (implies active participation)
+        $reviewFilter = (string) $request->query('review', '');
+        if (array_key_exists($reviewFilter, Registration::REVIEW_LABELS)) {
+            $registrationsQuery->where('participation_type', 'presentation');
+            $reviewFilter === Registration::REVIEW_PENDING
+                ? $registrationsQuery->where(fn ($q) => $q->whereNull('review_status')->orWhere('review_status', Registration::REVIEW_PENDING))
+                : $registrationsQuery->where('review_status', $reviewFilter);
+        } else {
+            $reviewFilter = '';
+        }
+
         $registrations = $registrationsQuery
             ->orderBy($sortable[$sort], $direction)
             ->paginate(10)
@@ -226,7 +238,8 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
             'direction',
             'q',
             'participationTypeFilter',
-            'onlineParticipationFilter'
+            'onlineParticipationFilter',
+            'reviewFilter'
         ));
     })->name('dashboard');
 
@@ -287,6 +300,17 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
             $registrationsQuery->where('online_participation', false);
         }
 
+        // Review state of talks (implies active participation)
+        $reviewFilter = (string) $request->query('review', '');
+        if (array_key_exists($reviewFilter, Registration::REVIEW_LABELS)) {
+            $registrationsQuery->where('participation_type', 'presentation');
+            $reviewFilter === Registration::REVIEW_PENDING
+                ? $registrationsQuery->where(fn ($q) => $q->whereNull('review_status')->orWhere('review_status', Registration::REVIEW_PENDING))
+                : $registrationsQuery->where('review_status', $reviewFilter);
+        } else {
+            $reviewFilter = '';
+        }
+
         $registrationsQuery->orderBy($sortable[$sort], $direction);
 
         $fileName = 'registrations_' . Conference::current()->year . '_' . now()->format('Y-m-d_His') . '.xlsx';
@@ -329,6 +353,17 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
             $registrationsQuery->where('online_participation', true);
         } elseif ($onlineParticipationFilter === 'in_person') {
             $registrationsQuery->where('online_participation', false);
+        }
+
+        // Review state of talks (implies active participation)
+        $reviewFilter = (string) $request->query('review', '');
+        if (array_key_exists($reviewFilter, Registration::REVIEW_LABELS)) {
+            $registrationsQuery->where('participation_type', 'presentation');
+            $reviewFilter === Registration::REVIEW_PENDING
+                ? $registrationsQuery->where(fn ($q) => $q->whereNull('review_status')->orWhere('review_status', Registration::REVIEW_PENDING))
+                : $registrationsQuery->where('review_status', $reviewFilter);
+        } else {
+            $reviewFilter = '';
         }
 
         $registrations = $registrationsQuery->get();
@@ -395,13 +430,56 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
         return $pdf->download($fileName);
     })->name('registrations.attendance_pdf');
 
+    // ---- Review of submitted talks: the author is informed by e-mail ----
+    $notifyAuthor = function (Registration $registration, \Illuminate\Mail\Mailable $mail): string {
+        try {
+            Mail::to($registration->email, $registration->name)->send($mail);
+
+            return " E-mail autorovi ({$registration->email}) bol odoslaný.";
+        } catch (\Throwable $e) {
+            report($e);
+
+            return ' E-mail autorovi sa nepodarilo odoslať, kontaktujte ho prosím priamo.';
+        }
+    };
+
+    Route::post('/registration/{registration}/approve', function (Registration $registration) use ($notifyAuthor) {
+        abort_unless($registration->isTalk(), 404);
+        $registration->approve();
+
+        $mailNote = $notifyAuthor($registration, new \App\Mail\TalkApproved($registration, Conference::current()));
+
+        return back()->with('success', "Príspevok „{$registration->title}“ bol schválený a pridaný na koniec programu." . $mailNote);
+    })->name('registration.approve');
+
+    Route::post('/registration/{registration}/reject', function (Request $request, Registration $registration) use ($notifyAuthor) {
+        abort_unless($registration->isTalk(), 404);
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'review_comment' => ['required', 'string', 'min:10', 'max:2000'],
+        ], [
+            'review_comment.required' => 'Zamietnutie potrebuje zdôvodnenie pre autora.',
+            'review_comment.min' => 'Zdôvodnenie pre autora musí mať aspoň 10 znakov.',
+            'review_comment.max' => 'Zdôvodnenie pre autora môže mať najviac 2000 znakov.',
+        ]);
+        if ($validator->fails()) {
+            return back()->with('error', "Príspevok „{$registration->title}“ nebol zamietnutý: " . $validator->errors()->first());
+        }
+
+        $registration->reject((string) $request->input('review_comment'));
+
+        $mailNote = $notifyAuthor($registration, new \App\Mail\TalkRejected($registration, Conference::current()));
+
+        return back()->with('success', "Príspevok „{$registration->title}“ bol zamietnutý a odstránený z programu." . $mailNote);
+    })->name('registration.reject');
+
     Route::get('/registration/{registration}', function (Registration $registration) {
         return view('admin.registration-show', compact('registration'));
     })->name('registration.show');
 
     Route::get('/program', function () {
         $registrations = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->orderByRaw('time_start is null')
             ->orderBy('time_start')
             ->orderBy('id')
@@ -438,7 +516,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
         // Allowed: matches existing program item start OR is strictly after last item end
         $items = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->whereNotNull('time_start')
             ->orderByRaw('program_order is null')
             ->orderBy('program_order')
@@ -481,6 +559,8 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
         }
 
         $data['participation_type'] = 'presentation';
+        // Talks added by the organisers are part of the programme right away
+        $data['review_status'] = Registration::REVIEW_APPROVED;
         // online_participation comes from the form (already cast to bool above)
 
         // Assign duration if conference has default
@@ -502,7 +582,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
             // Make room
             \App\Models\Registration::query()
-                ->whereIn('participation_type', ['presentation', 'break'])
+                ->inProgram()
                 ->whereNotNull('program_order')
                 ->where('program_order', '>=', $insertPos)
                 ->increment('program_order');
@@ -514,7 +594,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
             // Recalculate times from the beginning (same algorithm as reorder)
             $sorted = \App\Models\Registration::query()
-                ->whereIn('participation_type', ['presentation', 'break'])
+                ->inProgram()
                 ->orderByRaw('program_order is null')
                 ->orderBy('program_order')
                 ->orderBy('id')
@@ -565,7 +645,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
         $breakMinutes = (int) $data['duration_minutes'];
 
         $exists = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->whereNotNull('time_start')
             ->where('time_start', $start)
             ->exists();
@@ -573,7 +653,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
         if (!$exists) {
             // Provide allowed times to the user
             $allowed = \App\Models\Registration::query()
-                ->whereIn('participation_type', ['presentation', 'break'])
+                ->inProgram()
                 ->whereNotNull('time_start')
                 ->orderByRaw('program_order is null')
                 ->orderBy('program_order')
@@ -596,7 +676,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
         // Determine insert position by time
         $programBefore = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->orderByRaw('program_order is null')
             ->orderBy('program_order')
             ->orderBy('id')
@@ -612,7 +692,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($insertPos, $data, $start, $breakMinutes) {
             \App\Models\Registration::query()
-                ->whereIn('participation_type', ['presentation', 'break'])
+                ->inProgram()
                 ->whereNotNull('program_order')
                 ->where('program_order', '>=', $insertPos)
                 ->increment('program_order');
@@ -625,7 +705,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
             // Re-load program in new order
             $programAfter = \App\Models\Registration::query()
-                ->whereIn('participation_type', ['presentation', 'break'])
+                ->inProgram()
                 ->orderByRaw('program_order is null')
                 ->orderBy('program_order')
                 ->orderBy('id')
@@ -676,14 +756,14 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
         // Check if the time exists in ANY program item (including this break itself)
         $exists = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->whereNotNull('time_start')
             ->where('time_start', $start)
             ->exists();
 
         if (!$exists) {
             $allowed = \App\Models\Registration::query()
-                ->whereIn('participation_type', ['presentation', 'break'])
+                ->inProgram()
                 ->whereNotNull('time_start')
                 ->orderByRaw('program_order is null')
                 ->orderBy('program_order')
@@ -700,7 +780,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
         // Reposition order based on time among other items
         $others = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->where('id', '!=', $break->id)
             ->orderByRaw('program_order is null')
             ->orderBy('program_order')
@@ -719,7 +799,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
             // Close gap at old position
             if ($break->program_order !== null) {
                 \App\Models\Registration::query()
-                    ->whereIn('participation_type', ['presentation', 'break'])
+                    ->inProgram()
                     ->whereNotNull('program_order')
                     ->where('program_order', '>', (int) $break->program_order)
                     ->decrement('program_order');
@@ -727,7 +807,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
             // Make room at new position
             \App\Models\Registration::query()
-                ->whereIn('participation_type', ['presentation', 'break'])
+                ->inProgram()
                 ->whereNotNull('program_order')
                 ->where('program_order', '>=', $insertPos)
                 ->increment('program_order');
@@ -740,7 +820,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
             // Re-load program in new order
             $programAfter = \App\Models\Registration::query()
-                ->whereIn('participation_type', ['presentation', 'break'])
+                ->inProgram()
                 ->orderByRaw('program_order is null')
                 ->orderBy('program_order')
                 ->orderBy('id')
@@ -791,14 +871,14 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
         }
 
         // Extra rules only for program items
-        if ($registration->participation_type === 'presentation') {
+        if ($registration->participation_type === 'presentation' && $registration->reviewStatus() === Registration::REVIEW_APPROVED) {
             $newStart = (string) ($data['time_start'] ?? '');
             if ($newStart === '') {
                 return back()->withErrors(['time_start' => 'Čas začiatku je povinný.'])->withInput();
             }
 
             $items = \App\Models\Registration::query()
-                ->whereIn('participation_type', ['presentation', 'break'])
+                ->inProgram()
                 ->whereNotNull('time_start')
                 ->orderByRaw('program_order is null')
                 ->orderBy('program_order')
@@ -850,14 +930,14 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
                         if ($oldOrder && $newOrder && $oldOrder !== $newOrder) {
                             // remove from old position
                             \App\Models\Registration::query()
-                                ->whereIn('participation_type', ['presentation', 'break'])
+                                ->inProgram()
                                 ->whereNotNull('program_order')
                                 ->where('program_order', '>', $oldOrder)
                                 ->decrement('program_order');
 
                             // make room
                             \App\Models\Registration::query()
-                                ->whereIn('participation_type', ['presentation', 'break'])
+                                ->inProgram()
                                 ->whereNotNull('program_order')
                                 ->where('program_order', '>=', $newOrder)
                                 ->increment('program_order');
@@ -868,7 +948,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
                 } else {
                     // after last => move to end
                     $max = \App\Models\Registration::query()
-                        ->whereIn('participation_type', ['presentation', 'break'])
+                        ->inProgram()
                         ->max('program_order');
                     $registration->program_order = (int) ($max ?? 0) + 1;
                 }
@@ -878,7 +958,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
                 // Recalculate whole program from start
                 $sorted = \App\Models\Registration::query()
-                    ->whereIn('participation_type', ['presentation', 'break'])
+                    ->inProgram()
                     ->orderByRaw('program_order is null')
                     ->orderBy('program_order')
                     ->orderBy('id')
@@ -932,7 +1012,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
             // Close gap in program_order
             if ($deletedOrder !== null) {
                 \App\Models\Registration::query()
-                    ->whereIn('participation_type', ['presentation', 'break'])
+                    ->inProgram()
                     ->whereNotNull('program_order')
                     ->where('program_order', '>', (int) $deletedOrder)
                     ->decrement('program_order');
@@ -941,7 +1021,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
             // Recalculate times for all items after the deleted one
             if ($startFrom) {
                 $items = \App\Models\Registration::query()
-                    ->whereIn('participation_type', ['presentation', 'break'])
+                    ->inProgram()
                     ->orderByRaw('program_order is null')
                     ->orderBy('program_order')
                     ->orderBy('id')
@@ -987,7 +1067,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
         // Require that ids represent the FULL program list
         $allIds = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->orderByRaw('program_order is null')
             ->orderBy('program_order')
             ->orderBy('id')
@@ -1010,7 +1090,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
         // 2) Načítaj položky v novom poradí
         $items = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->orderByRaw('program_order is null')
             ->orderBy('program_order')
             ->orderBy('id')
@@ -1067,7 +1147,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
         $conference->save();
 
         $items = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->orderByRaw('program_order is null')
             ->orderBy('program_order')
             ->orderBy('id')
@@ -1115,7 +1195,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
         // Recalculate time_start for following items based on stored durations
         $items = \App\Models\Registration::query()
-            ->whereIn('participation_type', ['presentation', 'break'])
+            ->inProgram()
             ->orderByRaw('program_order is null')
             ->orderBy('program_order')
             ->orderBy('id')
