@@ -895,3 +895,38 @@ footer {
         border-width: 3px;
     }
 }
+
+/* Shared page header (components/site/hero + nav-card) */
+.heroMain {
+    flex: 1;
+    min-width: 0;
+}
+
+.card.loginCard {
+    flex: 0 0 320px;
+    max-width: 360px;
+}
+
+.loginCard hr {
+    margin: 1rem 0;
+    border: none;
+    border-top: 1px solid rgba(159, 231, 255, .25);
+}
+
+.loginCard .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.loginCard .pills .pill {
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .card.loginCard {
+        flex-basis: auto;
+        max-width: none;
+    }
+}

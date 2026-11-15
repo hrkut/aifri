@@ -4,7 +4,6 @@
 @section('meta_description', 'Prihláste sa na konferenciu o umelej inteligencii vo vzdelávaní')
 
 @php
-    $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline';
     /** @var \App\Models\Conference $conference */
     $date = $conference->dateLabel();
     $deadline = \App\Models\Conference::formatDate($conference->registration_deadline);
@@ -15,46 +14,31 @@
 @endphp
 
 @section('content')
-    <a href="{{ route('home') }}" class="siteHeaderLink">
-        <div class="siteHeader">
-            <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
-        </div>
-    </a>
-
-    <header>
-        <div>
-            <div class="heroTitle">
-                <div class="heroText">
-                    <div>
-                        <h1>PRIHLÁSENIE NA KONFERENCIU</h1>
-                        <p class="sub">Umelá inteligencia vo vzdelávaní</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="meta">
-                <p><b>Organizátor:</b> <a href="https://www.fri.uniza.sk" target="_blank">Fakulta riadenia a informatiky</a> Žilinská univerzita v Žiline</p>
-                <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
-                <p><b>Adresa:</b> Veľký diel 3323, 010&nbsp;26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
-                <p><b>Dátum konania:</b> {{ $date }}</p>
-                @if($contributionDeadline)
-                <p><b>Deadline príspevkov:</b> {{ $contributionDeadline }}</p>
-                @endif
-                @if($deadline)
-                <p><b>{{ $contributionDeadline ? 'Deadline registrácie:' : 'Deadline:' }}</b> {{ $deadline }}</p>
-                @endif
-            </div>
-        </div>
-
-        <div class="card loginCard" style="min-width:325px; max-width:360px;">
-            <h2>Navigácia</h2>
-            <p><a href="{{ route('home') }}">🏠 Späť na úvodnú stránku</a></p>
-            <p><a href="{{ route('committee') }}">👥 Programový a organizačný výbor</a></p>
-        </div>
-    </header>
+    <x-site.hero :conference="$conference"
+                 title="PRIHLÁSENIE NA KONFERENCIU"
+                 sub="Umelá inteligencia vo vzdelávaní" />
 
     <div class="stack">
-        <section class="card lightCard">
+        <x-site.info-card :conference="$conference" illustration="computer.png" illustrationAlt="Ilustrácia: počítač">
+            <p><b>Potvrdenie účasti:</b> e-mailom ihneď po prihlásení</p>
+            <p><b>Registračný poplatok:</b> konferencia je bezplatná</p>
+
+            <h3>Dôležité termíny</h3>
+            <ul class="list">
+                @if($contributionDeadline)
+                <li>{{ $contributionDeadline }} – Deadline na príspevky (aktívna účasť)</li>
+                @endif
+                @if($deadline)
+                <li>{{ $deadline }} – {{ $contributionDeadline ? 'Deadline na registráciu (pasívna účasť)' : 'Deadline na prihlášky' }}</li>
+                @endif
+                @if($notification)
+                <li>{{ $notification }} – Notifikácia autorov</li>
+                @endif
+                <li>{{ $date }} – Konferencia</li>
+            </ul>
+        </x-site.info-card>
+
+        <section class="card">
             <h2>Typy účasti</h2>
             <p>Vyberte si formu vašej účasti na konferencii:</p>
 
@@ -84,7 +68,7 @@
             </div>
         </section>
 
-        <main class="card lightCard">
+        <main class="card">
             <h2 id="registration-form">Registračný formulár</h2>
 
             @if(session('success'))
@@ -263,32 +247,6 @@
             </form>
         </main>
 
-        <aside class="card lightCard">
-            <h2>Dôležité informácie</h2>
-            @if($contributionDeadline)
-            <p><b>Deadline príspevkov:</b> {{ $contributionDeadline }}</p>
-            @endif
-            @if($deadline)
-            <p><b>{{ $contributionDeadline ? 'Deadline registrácie:' : 'Deadline:' }}</b> {{ $deadline }}</p>
-            @endif
-            <p><b>Potvrdenie účasti:</b> Do 7 dní od prihlásenia</p>
-            <p><b>Registračný poplatok:</b> Konferencia je bezplatná</p>
-            <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
-
-            <h3 style="margin-top:18px;">Dôležité termíny</h3>
-            <ul class="list">
-                @if($contributionDeadline)
-                <li>{{ $contributionDeadline }} – Deadline na príspevky (aktívna účasť)</li>
-                @endif
-                @if($deadline)
-                <li>{{ $deadline }} – {{ $contributionDeadline ? 'Deadline na registráciu (pasívna účasť)' : 'Deadline na prihlášky' }}</li>
-                @endif
-                @if($notification)
-                <li>{{ $notification }} – Notifikácia autorov</li>
-                @endif
-                <li>{{ $date }} – Konferencia</li>
-            </ul>
-        </aside>
     </div>
 
     <script>

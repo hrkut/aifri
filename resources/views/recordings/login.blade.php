@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Príspevky z konferencie')
+@section('title', 'Záznamy z minulých ročníkov')
 @section('meta_description', 'Záznamy z konferencie o umelej inteligencii vo vzdelávaní')
 
 @section('content')
@@ -77,9 +77,9 @@
 
 <div class="stack" style="max-width: 90vw; margin: 2rem auto; padding: 0 1rem;">
     <div class="card" style="background: rgba(11, 75, 103, 0.35); padding: 2rem; max-width: 500px; margin: 2rem auto;">
-        <h1 style="color: #9fe7ff; margin-top: 0; margin-bottom: 0.5rem; text-align: center;">🔐 Príspevky z konferencie</h1>
+        <h1 style="color: #9fe7ff; margin-top: 0; margin-bottom: 0.5rem; text-align: center;">🔐 Záznamy z minulých ročníkov</h1>
         <p style="color: #cbd5e1; text-align: center; margin-bottom: 1.5rem; font-size: 0.95rem;">
-            Zadajte heslo na prístup k záznamom z konferencie:
+            Zadajte heslo na prístup k záznamom a prezentáciám z minulých ročníkov konferencie:
         </p>
 
         <form method="POST" action="{{ route('recordings.authenticate') }}" novalidate>

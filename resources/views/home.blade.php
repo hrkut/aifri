@@ -4,91 +4,16 @@
 @section('meta_description', 'Konferencia o umelej inteligencii vo vzdelávaní — AI in education')
 
 @php
-    $place = 'Fakulta riadenia a informatiky, Žilinská univerzita v Žiline, Univerzitná 8215/1, 010 26 Žilina';
     /** @var \App\Models\Conference $conference */
-    $date = $conference->dateLabel();
-    $deadline = \App\Models\Conference::formatDate($conference->registration_deadline);
-    $contributionDeadline = $conference->contribution_deadline && $conference->isContributionOpen()
-        ? \App\Models\Conference::formatDate($conference->contributionDeadline())
-        : null;
-    $notification = \App\Models\Conference::formatDate($conference->notification_date);
-    $webUrl = 'https://konferenciaAI.fri.uniza.sk';
 @endphp
 
 @section('content')
-    <a href="{{ route('home') }}" class="siteHeaderLink">
-        <div class="siteHeader">
-            <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
-        </div>
-    </a>
-
-    <header>
-        <div style="flex: 1; min-width: 0;">
-            <div class="heroTitle">
-                <div class="heroText">
-                    <div class="heroHeading">
-                        <h1>KONFERENCIA O UMELEJ INTELIGENCII<br>VO VZDELÁVANÍ</h1>
-                        <p class="sub">(Conference on AI in education)</p>
-                        <div class="editionStamp" aria-label="{{ $conference->editionNumber() }}. ročník {{ $conference->year }}">
-                            <span class="editionStampMain">{{ $conference->editionNumber() }}. ročník</span>
-                            <span class="editionStampYear">{{ $conference->year }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card loginCard" style="flex: 0 0 auto; min-width: 300px;">
-            <h2>Informácie</h2>
-            <p><a href="{{ route('program') }}">📅 Program konferencie</a></p>
-            @if($conference->isRegistrationOpen())
-            <p><a href="{{ route('registration') }}">📝 Registrácia na konferenciu</a></p>
-            @endif
-            @if($conference->teams_url)
-            <p>
-                <a href="{{ $conference->teams_url }}"
-                   target="_blank" rel="noopener noreferrer">
-                    🎧 Pripojiť sa na MS Teams
-                </a>
-            </p>
-            @endif
-            <p><a href="{{ route('question') }}">❓ Položiť otázku</a></p>
-            <p><a href="{{ route('recordings.login') }}">📺 Príspevky z konferencie</a></p>
-    @if($contributionDeadline)
-    <div class="pill">Príspevky do {{ $contributionDeadline }}</div>
-    @endif
-    @if($conference->isRegistrationOpen() && $deadline)
-    <div class="pill">Registrácia do {{ $deadline }}</div>
-    @endif
-    <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e0e0e0;">
-    <p><a href="{{ route('committee') }}">👥 Programový a organizačný výbor</a></p>
-</div>
-</header>
+    <x-site.hero :conference="$conference" :stamp="true"
+                 title="KONFERENCIA O UMELEJ INTELIGENCII<br>VO VZDELÁVANÍ"
+                 sub="(Conference on AI in education)" />
 
 <div class="stack">
-<section class="card infoCard">
-    <h2>Rýchle info</h2>
-    <img class="infoIllustration" src="{{ asset('images/bulb.png') }}" alt="Ilustrácia: žiarovka (nápady a inovácie)" loading="lazy"/>
-    <p><b>Organizátor:</b> <a href="https://www.fri.uniza.sk" target="_blank">Fakulta riadenia a informatiky</a> Žilinská univerzita v Žiline</p>
-    <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
-    <p><b>Adresa:</b> Fakulta riadenia a informatiky, Veľký diel 3323, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
-    <p><b>Dátum konania:</b> {{ $date }}</p>
-    @if($contributionDeadline)
-    <p><b>Deadline na príspevky:</b> {{ $contributionDeadline }}</p>
-    @endif
-    @if($conference->isRegistrationOpen() && $deadline)
-    <p><b>Deadline na registráciu:</b> {{ $deadline }}</p>
-    @endif
-    @if($conference->teams_url)
-    <p>
-        <b>Online pripojenie (MS Teams):</b>
-        <a href="{{ $conference->teams_url }}"
-           target="_blank" rel="noopener noreferrer">Otvoriť míting</a>
-    </p>
-    @endif
-    <p><b>Kontakt:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
-
-</section>
+<x-site.info-card :conference="$conference" />
 
 <main class="card">
     <h2>Obsah</h2>

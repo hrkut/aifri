@@ -1194,7 +1194,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
     })->name('questions.mark_answered');
 });
 
-// ---- Public Recordings (Príspevky z konferencie) ----
+// ---- Public Recordings (Záznamy z minulých ročníkov) ----
 Route::get('/zaznamy', function (Request $request) {
     // Ak je user už prihlásený, presmeruj na zoznam
     if ($request->session()->get('recordings_authenticated') === true) {

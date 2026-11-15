@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Príspevky z konferencie')
+@section('title', 'Záznamy z minulých ročníkov')
 @section('meta_description', 'Záznamy z konferencie o umelej inteligencii vo vzdelávaní')
 
 @section('content')
@@ -208,9 +208,9 @@
 
 <div class="stack" style="max-width: 90vw; margin: 2rem auto; padding: 0 1rem;">
     <div class="card" style="background: rgba(11, 75, 103, 0.35); padding: 2rem;">
-        <h1 style="color: #9fe7ff; margin-bottom: 1.5rem; margin-top: 0;">Príspevky z konferencie</h1>
+        <h1 style="color: #9fe7ff; margin-bottom: 1.5rem; margin-top: 0;">Záznamy z minulých ročníkov</h1>
         <p style="margin-top: -0.75rem; margin-bottom: 1.25rem; color: #cbd5e1; font-size: 0.95rem;">
-            Konferencia o AI vo vzdelávaní – záznamy a prezentácie zo všetkých ročníkov
+            Konferencia o AI vo vzdelávaní – videozáznamy a prezentácie príspevkov z ročníkov, ktoré sa už konali
         </p>
 
         @if($editions->isEmpty())
