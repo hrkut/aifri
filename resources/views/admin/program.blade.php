@@ -1,6 +1,9 @@
 @extends('layouts.admin')
 
 @section('content')
+@php
+    $readOnly = \App\Models\Conference::current()->isReadOnly();
+@endphp
 <div
     class="mx-auto w-[90vw] max-w-none"
     x-data="{ confirmOpen: false, confirmFormId: null }"
@@ -18,6 +21,7 @@
 
             <span class="text-sm text-slate-300">Počet príspevkov: <span class="font-semibold">{{ $total }}</span></span>
 
+            @unless($readOnly)
             <a href="{{ route('admin.program.duration') }}" class="inline-flex items-center px-4 py-2 bg-amber-700 hover:bg-amber-600 text-white rounded-lg transition-colors">
                 Nastaviť dĺžku príspevkov
             </a>
@@ -27,6 +31,7 @@
             <a href="{{ route('admin.breaks.create') }}" class="inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-lg transition-colors">
                 Pridať prestávku
             </a>
+            @endunless
         </div>
     </div>
 
@@ -98,7 +103,7 @@
                 </thead>
                 <tbody
                     class="divide-y divide-slate-800"
-                    data-program-sortable="true"
+                    data-program-sortable="{{ $readOnly ? 'false' : 'true' }}"
                     data-reorder-url="{{ route('admin.program.reorder') }}"
                 >
                     @forelse($registrations as $registration)
@@ -110,16 +115,21 @@
                         @if($isBreak)
                             <tr class="bg-slate-800/40 hover:bg-slate-800 transition-colors" data-id="{{ $registration->id }}">
                                 <td class="px-3 py-3 text-sm text-slate-300">
+                                    @unless($readOnly)
                                     <button type="button" data-drag-handle="true" class="cursor-move" title="Presunúť">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h.01M8 12h.01M8 18h.01M16 6h.01M16 12h.01M16 18h.01" />
                                         </svg>
                                     </button>
+                                    @endunless
                                 </td>
                                 <td class="px-6 py-3 text-sm text-slate-200 font-mono whitespace-nowrap">
                                     <span data-program-time-input data-id="{{ $registration->id }}">{{ $timeVal ?: '—' }}</span>
                                 </td>
                                 <td class="px-6 py-3 text-sm text-slate-200 font-mono whitespace-nowrap">
+                                    @if($readOnly)
+                                        {{ $durVal }}
+                                    @else
                                     <input
                                         type="number"
                                         min="0"
@@ -129,6 +139,7 @@
                                         data-program-duration-input
                                         data-id="{{ $registration->id }}"
                                     >
+                                    @endif
                                 </td>
                                 <td colspan="6" class="px-6 py-3 text-sm text-slate-100 font-semibold">
                                     {{ $registration->title ?? 'Prestávka' }}
@@ -138,6 +149,7 @@
                                 </td>
                                 <td class="px-6 py-3 text-right">
                                     <div class="inline-flex items-center gap-2">
+                                        @unless($readOnly)
                                         <a
                                             href="{{ route('admin.breaks.edit', ['break' => $registration->id]) }}"
                                             class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-700 hover:bg-blue-600 transition-colors"
@@ -163,22 +175,28 @@
                                                 </svg>
                                             </button>
                                         </form>
+                                        @endunless
                                     </div>
                                 </td>
                             </tr>
                         @else
                             <tr class="hover:bg-slate-800 transition-colors" data-id="{{ $registration->id }}">
                                 <td class="px-3 py-3 text-sm text-slate-300">
+                                    @unless($readOnly)
                                     <button type="button" data-drag-handle="true" class="cursor-move" title="Presunúť">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h.01M8 12h.01M8 18h.01M16 6h.01M16 12h.01M16 18h.01" />
                                         </svg>
                                     </button>
+                                    @endunless
                                 </td>
                                 <td class="px-6 py-3 text-sm text-slate-200 font-mono whitespace-nowrap">
                                     <span data-program-time-input data-id="{{ $registration->id }}">{{ $timeVal ?: '—' }}</span>
                                 </td>
                                 <td class="px-6 py-3 text-sm text-slate-200 font-mono whitespace-nowrap">
+                                    @if($readOnly)
+                                        {{ $durVal }}
+                                    @else
                                     <input
                                         type="number"
                                         min="0"
@@ -188,6 +206,7 @@
                                         data-program-duration-input
                                         data-id="{{ $registration->id }}"
                                     >
+                                    @endif
                                 </td>
                                 <td class="px-6 py-3 text-sm text-slate-200 font-mono">{{ $registration->id }}</td>
                                 <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->name }}</td>
@@ -199,6 +218,7 @@
                                 <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->block ?? '—' }}</td>
                                 <td class="px-6 py-3 text-right">
                                     <div class="inline-flex items-center gap-2">
+                                        @unless($readOnly)
                                         <a
                                             href="{{ route('admin.registration.edit', ['registration' => $registration->id, 'return' => 'program']) }}"
                                             class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-700 hover:bg-blue-600 transition-colors"
@@ -210,6 +230,7 @@
                                             </svg>
                                         </a>
 
+                                        @endunless
                                         <a
                                             href="{{ route('admin.registration.show', ['registration' => $registration->id, 'return' => 'program']) }}"
                                             class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors"
@@ -221,6 +242,7 @@
                                             </svg>
                                         </a>
 
+                                        @unless($readOnly)
                                         <form method="POST" action="{{ route('admin.program.destroy', $registration) }}" id="{{ $deleteFormId }}" class="inline">
                                             @csrf
                                             @method('DELETE')
@@ -235,6 +257,7 @@
                                                 </svg>
                                             </button>
                                         </form>
+                                        @endunless
                                     </div>
                                 </td>
                             </tr>

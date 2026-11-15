@@ -45,6 +45,9 @@
                                 @if ($c->is_active)
                                     <span class="px-2 py-0.5 rounded-full text-xs bg-emerald-900/60 text-emerald-200 border border-emerald-800">Zverejnený</span>
                                 @endif
+                                @if ($c->isReadOnly())
+                                    <span class="px-2 py-0.5 rounded-full text-xs bg-slate-800 text-slate-300 border border-slate-700">Archív</span>
+                                @endif
                                 @if ($c->id === $working->id)
                                     <span class="px-2 py-0.5 rounded-full text-xs bg-sky-900/60 text-sky-200 border border-sky-800">Pracujete s ním</span>
                                 @endif
@@ -55,7 +58,7 @@
                                 @if ($c->id !== $working->id)
                                     <form method="POST" action="{{ route('admin.conferences.select', $c) }}">
                                         @csrf
-                                        <button type="submit" class="px-3 py-1.5 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-100 whitespace-nowrap">Pracovať s ním</button>
+                                        <button type="submit" class="px-3 py-1.5 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-100 whitespace-nowrap">{{ $c->isReadOnly() ? 'Prezerať' : 'Pracovať s ním' }}</button>
                                     </form>
                                 @endif
                                 <a href="{{ route('admin.conferences.edit', $c) }}" class="px-3 py-1.5 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-100">Upraviť</a>

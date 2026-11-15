@@ -84,7 +84,9 @@ class ConferenceController extends Controller
         }
 
         return redirect()->route('admin.dashboard')
-            ->with('success', "Pracujete s ročníkom {$conference->year}.");
+            ->with('success', $conference->isReadOnly()
+                ? "Prezeráte archívny ročník {$conference->year}."
+                : "Pracujete s ročníkom {$conference->year}.");
     }
 
     private function validated(Request $request, ?Conference $conference): array

@@ -75,7 +75,7 @@ it('lets an admin switch the working edition without changing the public site', 
 
     $this->actingAs($admin)->get(route('admin.dashboard'))
         ->assertSee('Archívny Účastník')
-        ->assertSee('ktorý nie je zverejnený na webe');
+        ->assertSee('len na čítanie');
 
     $this->get(route('home'))->assertSee('2. 2. 2027 (utorok) od 9:00');
 });
@@ -196,4 +196,56 @@ it('renders the admin editions pages', function () {
     $this->actingAs($admin)->get(route('admin.conferences.edit', $c))->assertOk()->assertSee('value="2027-02-02"', false);
     $this->actingAs($admin)->get(route('admin.program'))->assertOk();
     $this->actingAs($admin)->get(route('admin.questions'))->assertOk();
+});
+
+it('shows archived editions read-only in admin', function () {
+    $archive = Conference::where('year', 2026)->firstOrFail();
+    $talk = archivedRegistration([
+        'conference_id' => $archive->id,
+        'name' => 'Archívny Prednášajúci',
+        'email' => 'old@example.com',
+        'institution' => 'X',
+        'participation_type' => 'presentation',
+        'time_start' => '09:00',
+        'duration_minutes' => 15,
+        'program_order' => 1,
+    ]);
+
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin)->post(route('admin.conferences.select', $archive));
+
+    // Browsing works
+    $this->get(route('admin.dashboard'))->assertOk()->assertSee('Archívny Prednášajúci')->assertSee('len na čítanie');
+    $this->get(route('admin.registration.show', $talk))->assertOk();
+    $this->get(route('admin.program'))
+        ->assertOk()
+        ->assertSee('Archívny Prednášajúci')
+        ->assertSee('data-program-sortable="false"', false)
+        ->assertDontSee(route('admin.program.create'))
+        ->assertDontSee(route('admin.registration.edit', ['registration' => $talk->id, 'return' => 'program']))
+        ->assertDontSee(route('admin.program.destroy', $talk))
+        ->assertDontSee('data-program-duration-input', false);
+
+    // Changes are blocked server-side
+    $this->get(route('admin.registration.edit', $talk))->assertRedirect(route('admin.dashboard'));
+    $this->get(route('admin.program.create'))->assertRedirect(route('admin.dashboard'));
+    $this->delete(route('admin.program.destroy', $talk))->assertRedirect(route('admin.dashboard'))->assertSessionHas('error');
+    $this->postJson(route('admin.program.reorder'), ['ids' => [$talk->id]])->assertForbidden();
+    $this->postJson(route('admin.program.duration.update', $talk), ['duration_minutes' => 30])->assertForbidden();
+
+    expect(Registration::withoutGlobalScope('conference')->find($talk->id)->duration_minutes)->toBe(15);
+
+    // Switching back to the active edition is still possible
+    $this->post(route('admin.conferences.select', Conference::active()))->assertRedirect(route('admin.dashboard'));
+    $this->get(route('admin.program'))->assertSee(route('admin.program.create'));
+});
+
+it('keeps unpublished future editions editable', function () {
+    $future = Conference::create(['year' => 2028, 'date' => '2028-02-09', 'start_time' => '09:00', 'presentation_minutes' => 15, 'break_minutes' => 20]);
+    $admin = User::factory()->create(['is_admin' => true]);
+
+    expect($future->isReadOnly())->toBeFalse();
+
+    $this->actingAs($admin)->post(route('admin.conferences.select', $future));
+    $this->get(route('admin.program.create'))->assertOk();
 });

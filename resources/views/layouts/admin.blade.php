@@ -13,12 +13,22 @@
     @include('layouts.admin-navigation')
     <main class="px-4 py-6 sm:px-6 lg:px-8">
         @php($workingConference = \App\Models\Conference::current())
-        @unless ($workingConference->is_active)
+        @if ($workingConference->isReadOnly())
+            <div class="max-w-5xl mx-auto mb-4 p-3 rounded-lg bg-sky-950/50 border border-sky-800 text-sky-100 text-sm">
+                🔒 Prezeráte archívny ročník <strong>{{ $workingConference->year }}</strong> – len na čítanie.
+                <a href="{{ route('admin.conferences.index') }}" class="underline hover:text-white">Zmeniť ročník</a>
+            </div>
+        @elseif (! $workingConference->is_active)
             <div class="max-w-5xl mx-auto mb-4 p-3 rounded-lg bg-amber-950/50 border border-amber-800 text-amber-100 text-sm">
                 Pracujete s ročníkom <strong>{{ $workingConference->year }}</strong>, ktorý nie je zverejnený na webe.
                 <a href="{{ route('admin.conferences.index') }}" class="underline hover:text-white">Zmeniť ročník</a>
             </div>
-        @endunless
+        @endif
+        @if (session('error'))
+            <div class="max-w-5xl mx-auto mb-4 p-3 rounded-lg bg-red-950/50 border border-red-800 text-red-100 text-sm">
+                {{ session('error') }}
+            </div>
+        @endif
         @if (session('success'))
             <div class="max-w-5xl mx-auto mb-4 p-3 rounded-lg bg-emerald-950/50 border border-emerald-800 text-emerald-100 text-sm">
                 {{ session('success') }}

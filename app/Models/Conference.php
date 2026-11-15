@@ -94,6 +94,14 @@ class Conference extends Model
         });
     }
 
+    /**
+     * Past, unpublished editions are an archive: admins can browse them but not change them.
+     */
+    public function isReadOnly(): bool
+    {
+        return ! $this->is_active && $this->date !== null && $this->date->lt(today());
+    }
+
     /** Ordinal of this edition (1 for the first year, 2 for the next one, …). */
     public function editionNumber(): int
     {
