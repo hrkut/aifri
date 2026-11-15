@@ -84,3 +84,36 @@ it('sets the talk length without touching break lengths unless asked', function 
 
     expect(programState())->toBe(['A 10:00', 'Br 10:20', 'C 10:50', 'D 11:10', 'E 11:30']);
 });
+
+it('changes the length of one item and returns the new times', function () {
+    $c = Registration::where('title', 'C')->first();
+
+    $this->postJson(route('admin.program.duration.update', $c), ['duration_minutes' => 30])
+        ->assertOk()
+        ->assertJsonPath('times.' . Registration::where('title', 'D')->value('id'), '10:05');
+
+    expect(programState())->toBe(['A 09:00', 'Br 09:15', 'C 09:35', 'D 10:05', 'E 10:20']);
+});
+
+it('does not change the length of an item outside the programme', function () {
+    $pending = Registration::create([
+        'name' => 'P', 'email' => 'p@example.com', 'institution' => 'X', 'participation_type' => 'presentation',
+        'review_status' => Registration::REVIEW_PENDING, 'title' => 'P', 'duration_minutes' => 15,
+    ]);
+
+    $this->postJson(route('admin.program.duration.update', $pending), ['duration_minutes' => 45])->assertStatus(422);
+    expect($pending->fresh()->duration_minutes)->toBe(15);
+});
+
+it('adds a talk only at a programme slot or exactly at its end', function () {
+    $talk = ['name' => 'Nový', 'email' => 'n@example.com', 'institution' => 'X', 'online_participation' => '0', 'title' => 'Nový'];
+
+    // the programme ends at 10:20 (E 10:05 + 15 min); a later time would be silently moved
+    $this->post(route('admin.program.store'), $talk + ['time_start' => '14:00'])
+        ->assertSessionHasErrors(['time_start' => 'Čas začiatku príspevku musí byť zhodný so začiatkom niektorej položky programu alebo s koncom programu. Povolené časy: 09:00, 09:15, 09:35, 09:50, 10:05, 10:20']);
+
+    $this->post(route('admin.program.store'), $talk + ['time_start' => '10:20'])->assertSessionHasNoErrors();
+
+    expect(programState())->toBe(['A 09:00', 'Br 09:15', 'C 09:35', 'D 09:50', 'E 10:05', 'Nový 10:20'])
+        ->and(Registration::where('title', 'Nový')->value('duration_minutes'))->toBe(15);
+});

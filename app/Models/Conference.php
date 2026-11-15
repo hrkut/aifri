@@ -107,8 +107,11 @@ class Conference extends Model
     /** Ordinal of this edition (1 for the first year, 2 for the next one, …). */
     public function editionNumber(): int
     {
-        return static::query()->where('year', '<=', $this->year)->count();
+        // asked several times per page (stamp, recordings list); count only once per edition
+        return $this->editionNumber ??= static::query()->where('year', '<=', $this->year)->count();
     }
+
+    private ?int $editionNumber = null;
 
     /** "2. ročník" / "2nd edition" in the current language. */
     public function editionLabel(): string

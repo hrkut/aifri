@@ -417,16 +417,19 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
                 if ($lastDur > 0) {
                     $lastEnd->addMinutes($lastDur);
                 }
-                $isAfterLastEnd = \Illuminate\Support\Carbon::parse($start)->greaterThan($lastEnd);
+                // times are consecutive, so a new item can only start exactly where the programme ends
+                $programEnd = $lastEnd->format('H:i');
+                $isAfterLastEnd = $start === $programEnd;
             }
         } else {
-            // If no items exist, anything is allowed
-            $isAfterLastEnd = true;
+            // empty programme: it starts at the edition's start time
+            $programEnd = \Illuminate\Support\Carbon::parse(Conference::current()->startTimeLabel())->format('H:i');
+            $isAfterLastEnd = $start === $programEnd;
         }
 
         if (!$isSlotStart && !$isAfterLastEnd) {
             return back()
-                ->withErrors(['time_start' => 'Čas začiatku príspevku musí byť zhodný so začiatkom niektorého príspevku alebo prestávky v programe, alebo musí byť po poslednom príspevku. Povolené časy: ' . implode(', ', $allowedStarts)])
+                ->withErrors(['time_start' => 'Čas začiatku príspevku musí byť zhodný so začiatkom niektorej položky programu alebo s koncom programu. Povolené časy: ' . implode(', ', array_unique(array_merge($allowedStarts, isset($programEnd) ? [$programEnd] : [])))])
                 ->withInput();
         }
 
@@ -438,7 +441,7 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
         // Assign duration if conference has default
         $conference = Conference::current();
         if ($conference && empty($data['duration_minutes'])) {
-            $data['duration_minutes'] = (int) ($conference->presentation_minutes ?? 0);
+            $data['duration_minutes'] = (int) ($conference->presentation_minutes ?: 15);
         }
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($data, $start, $items, $isSlotStart) {
@@ -748,15 +751,18 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
                     if ($lastDur > 0) {
                         $lastEnd->addMinutes($lastDur);
                     }
-                    $isAfterLastEnd = \Illuminate\Support\Carbon::parse($newStart)->greaterThan($lastEnd);
+                    // times are consecutive, so a new item can only start exactly where the programme ends
+                $programEnd = $lastEnd->format('H:i');
+                $isAfterLastEnd = $newStart === $programEnd;
                 }
             } else {
-                $isAfterLastEnd = true;
+                $programEnd = \Illuminate\Support\Carbon::parse(Conference::current()->startTimeLabel())->format('H:i');
+                $isAfterLastEnd = $newStart === $programEnd;
             }
 
             if (!$isSlotStart && !$isAfterLastEnd) {
                 return back()
-                    ->withErrors(['time_start' => 'Čas začiatku príspevku musí byť zhodný so začiatkom niektorého príspevku alebo prestávky v programe, alebo musí byť po poslednom príspevku. Povolené časy: ' . implode(', ', $allowedStarts)])
+                    ->withErrors(['time_start' => 'Čas začiatku príspevku musí byť zhodný so začiatkom niektorej položky programu alebo s koncom programu. Povolené časy: ' . implode(', ', array_unique(array_merge($allowedStarts, isset($programEnd) ? [$programEnd] : [])))])
                     ->withInput();
             }
 
@@ -1018,49 +1024,19 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
             'duration_minutes' => ['required', 'integer', 'min:0', 'max:480'],
         ]);
 
-        $dur = (int) $payload['duration_minutes'];
-
-        $registration->duration_minutes = $dur;
-        $registration->save();
-
-        // Recalculate time_start for following items based on stored durations
-        $items = \App\Models\Registration::query()
-            ->inProgram()
-            ->orderByRaw('program_order is null')
-            ->orderBy('program_order')
-            ->orderBy('id')
-            ->get();
-
-        $index = $items->search(fn ($item) => (int) $item->id === (int) $registration->id);
-        if ($index === false) {
+        // only programme items (breaks, approved talks) have a length that moves other items
+        if (! \App\Models\Registration::query()->inProgram()->whereKey($registration->id)->exists()) {
             abort(422, 'Položka nie je v programe.');
         }
 
-        $start = $registration->time_start;
-        if (!$start) {
-            abort(422, 'Položka nemá nastavený čas začiatku.');
-        }
+        $registration->duration_minutes = (int) $payload['duration_minutes'];
+        $registration->save();
 
-        $cursor = \Illuminate\Support\Carbon::parse($start);
-        $cursor->addMinutes(max(0, $dur));
+        \App\Models\Registration::recalculateProgramTimes();
 
-        $updatedTimes = [];
-
-        \Illuminate\Support\Facades\DB::transaction(function () use ($items, $index, $cursor, &$updatedTimes) {
-            $current = $cursor->copy();
-
-            for ($i = $index + 1; $i < $items->count(); $i++) {
-                $item = $items[$i];
-                $item->time_start = $current->format('H:i');
-                $item->save();
-                $updatedTimes[(int) $item->id] = $item->time_start;
-
-                $minutes = (int) ($item->duration_minutes ?? 0);
-                if ($minutes > 0) {
-                    $current->addMinutes($minutes);
-                }
-            }
-        });
+        $updatedTimes = \App\Models\Registration::query()->inProgram()->get(['id', 'time_start'])
+            ->mapWithKeys(fn ($item) => [(int) $item->id => \Illuminate\Support\Carbon::parse($item->time_start)->format('H:i')])
+            ->all();
 
         return response()->json(['ok' => true, 'times' => $updatedTimes]);
     })->name('program.duration.update');

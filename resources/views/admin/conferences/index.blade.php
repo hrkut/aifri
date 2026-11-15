@@ -6,7 +6,7 @@
     /** @var \App\Models\Conference $working */
 @endphp
 
-<div class="max-w-5xl mx-auto">
+<div class="max-w-7xl mx-auto">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-3xl font-semibold text-slate-100">Ročníky konferencie</h1>

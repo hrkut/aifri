@@ -206,7 +206,7 @@
                                 <td class="px-6 py-3 text-sm text-slate-200">
                                     {{ !($registration->online_participation ?? false) ? 'Prezenčne' : 'Online' }}
                                 </td>
-                                <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->block ?? '—' }}</td>
+                                <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->blockLabel() ?? '—' }}</td>
                                 <td class="px-6 py-3 text-right">
                                     <div class="inline-flex items-center gap-2">
                                         @unless($readOnly)

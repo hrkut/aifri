@@ -15,6 +15,7 @@ function makeRegistration(array $attrs = []): Registration
         'email' => 'test@example.com',
         'institution' => 'X',
         'participation_type' => 'presentation',
+        'review_status' => Registration::REVIEW_APPROVED,
         'online_participation' => true,
         'time_start' => '09:00',
     ]);
@@ -151,9 +152,12 @@ it('lists recordings of all past editions on one page', function () {
         'email' => 'old@example.com',
         'institution' => 'X',
         'participation_type' => 'presentation',
+        'review_status' => Registration::REVIEW_APPROVED,
         'time_start' => '09:00',
     ]);
     makeRegistration(['name' => 'Nový Prednášajúci']);
+    // a pending talk with a time set by hand is not part of the recordings
+    makeRegistration(['name' => 'Čakajúci Prednášajúci', 'email' => 'pending@example.com', 'review_status' => Registration::REVIEW_PENDING]);
 
     $this->post('/zaznamy', ['password' => 'test-recordings-password']);
 
@@ -171,6 +175,7 @@ it('lists recordings of all past editions on one page', function () {
 
     $this->get(route('recordings.list'))
         ->assertSeeInOrder(['2. ročník', 'Nový Prednášajúci', '1. ročník', 'Archívny Prednášajúci'])
+        ->assertDontSee('Čakajúci Prednášajúci')
         ->assertSee('href="#rocnik-2026"', false);
 });
 

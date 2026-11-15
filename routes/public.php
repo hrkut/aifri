@@ -201,7 +201,9 @@ Route::post($path('/zaznamy', '/recordings'), function (Request $request) {
 Route::middleware(['auth.recordings'])->prefix($path('/zaznamy', '/recordings'))->group(function () {
     Route::get('/list', function () {
         // All editions that already took place (incl. today), newest first, with their talks
-        $presentations = fn ($q) => $q->where('participation_type', 'presentation')->whereNotNull('time_start');
+        $presentations = fn ($q) => $q->where('participation_type', 'presentation')
+            ->where('review_status', Registration::REVIEW_APPROVED)
+            ->whereNotNull('time_start');
 
         $editions = Conference::query()
             ->whereDate('date', '<=', local_now()->toDateString())
