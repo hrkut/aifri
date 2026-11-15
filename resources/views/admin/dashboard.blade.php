@@ -25,14 +25,14 @@
 @endphp
 
 <div class="mx-auto w-[90vw] max-w-none">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between mb-6">
         <h1 class="text-3xl font-semibold text-slate-100">Registrácie</h1>
 
         <form method="GET" action="{{ route('admin.dashboard') }}" class="flex flex-col gap-2 sm:flex-row sm:items-center">
             <input type="hidden" name="sort" value="{{ $sort ?? 'created_at' }}">
             <input type="hidden" name="direction" value="{{ $direction ?? 'desc' }}">
 
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+            <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
                 <label class="text-sm text-slate-200 select-none flex items-center gap-2">
                     <span class="whitespace-nowrap">Typ účasti</span>
                     <select
@@ -56,6 +56,20 @@
                         <option value="" @selected(($onlineParticipationFilter ?? '') === '')>Všetky</option>
                         <option value="in_person" @selected(($onlineParticipationFilter ?? '') === 'in_person')>Prezenčne</option>
                         <option value="online" @selected(($onlineParticipationFilter ?? '') === 'online')>Online</option>
+                    </select>
+                </label>
+
+                <label class="text-sm text-slate-200 select-none flex items-center gap-2">
+                    <span class="whitespace-nowrap">Stav príspevku</span>
+                    <select
+                        name="review"
+                        class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        onchange="this.form.submit()"
+                    >
+                        <option value="" @selected(($reviewFilter ?? '') === '')>Všetky</option>
+                        @foreach(\App\Models\Registration::REVIEW_LABELS as $value => $label)
+                            <option value="{{ $value }}" @selected(($reviewFilter ?? '') === $value)>{{ $label }}</option>
+                        @endforeach
                     </select>
                 </label>
 
@@ -121,56 +135,63 @@
 
     <div class="bg-slate-900 border border-slate-800 rounded-lg shadow-lg overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-max min-w-full divide-y divide-slate-800">
+            <table class="w-full divide-y divide-slate-800">
                 <thead class="bg-slate-800">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">
                             <a href="{{ $sortUrl('name') }}" class="hover:text-slate-100 whitespace-nowrap">Meno{!! (($sort ?? '') === 'name') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">
                             <a href="{{ $sortUrl('email') }}" class="hover:text-slate-100 whitespace-nowrap">Email{!! (($sort ?? '') === 'email') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap min-w-[140px]">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap ">
                             <a href="{{ $sortUrl('participation_type') }}" class="hover:text-slate-100 whitespace-nowrap">Typ účasti{!! (($sort ?? '') === 'participation_type') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap min-w-[160px]">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">Stav príspevku</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap ">
                             <a href="{{ $sortUrl('online_participation') }}" class="hover:text-slate-100 whitespace-nowrap">Forma účasti{!! (($sort ?? '') === 'online_participation') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">
                             <a href="{{ $sortUrl('institution') }}" class="hover:text-slate-100 whitespace-nowrap">Inštitúcia{!! (($sort ?? '') === 'institution') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap min-w-[160px]">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap ">
                             <a href="{{ $sortUrl('created_at') }}" class="hover:text-slate-100 whitespace-nowrap">Vytvorené{!! (($sort ?? '') === 'created_at') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
                         </th>
-                        <th class="px-6 py-3 text-center text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">Akcia</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">Akcia</th>
                     </tr>
                 </thead>
                 <tbody class="bg-slate-900 divide-y divide-slate-800">
                     @forelse($registrations as $registration)
                         <tr class="hover:bg-slate-800 transition-colors">
-                            <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->name }}</td>
-                            <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->email }}</td>
-                            <td class="px-6 py-3 text-sm text-slate-200 whitespace-nowrap">
+                            <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->name }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->email }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-200 whitespace-nowrap">
                                 {{ $registration->participation_type === 'presentation' ? 'Aktívna' : 'Pasívna' }}
                             </td>
-                            <td class="px-6 py-3 text-sm text-slate-200 whitespace-nowrap">
+                            <td class="px-4 py-3 text-sm whitespace-nowrap">
+                                <x-admin.review-badge :registration="$registration" />
+                            </td>
+                            <td class="px-4 py-3 text-sm text-slate-200 whitespace-nowrap">
                                 {{ $registration->online_participation ? 'Online' : 'Prezenčne' }}
                             </td>
-                            <td class="px-6 py-3 text-sm text-slate-200">{{ $registration->institution }}</td>
-                            <td class="px-6 py-3 text-sm text-slate-200 whitespace-nowrap">{{ $registration->created_at?->format('d.m.Y H:i') }}</td>
-                            <td class="px-6 py-3 text-center">
-                                <a href="{{ route('admin.registration.show', ['registration' => $registration->id, 'return' => 'dashboard']) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors" title="Zobraziť detaily">
-                                    <svg class="w-4 h-4 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                </a>
+                            <td class="px-4 py-3 text-sm text-slate-200">{{ $registration->institution }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-200 whitespace-nowrap">{{ $registration->created_at?->format('d.m.Y H:i') }}</td>
+                            <td class="px-4 py-3 text-left">
+                                <div class="inline-flex items-center gap-2">
+                                    <x-admin.icon-action tooltip="Zobraziť detaily" :href="route('admin.registration.show', ['registration' => $registration->id, 'return' => 'dashboard'])">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                    </x-admin.icon-action>
+                                    @include('admin.partials.review-actions', ['registration' => $registration])
+                                </div>
                             </td>
 
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-6 text-center text-sm text-slate-500">
+                            <td colspan="8" class="px-6 py-6 text-center text-sm text-slate-500">
                                 Žiadne registrácie.
                             </td>
                         </tr>

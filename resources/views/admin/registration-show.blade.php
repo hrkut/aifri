@@ -70,6 +70,27 @@
                         @endif
                     </div>
 
+                    @if($registration->isTalk())
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Stav príspevku</p>
+                            <div class="flex items-center gap-3">
+                                <x-admin.review-badge :registration="$registration" />
+                                @if($registration->reviewed_at)
+                                    <span class="text-xs text-slate-400">posúdené {{ $registration->reviewed_at->format('j. n. Y H:i') }}</span>
+                                @endif
+                                <span class="inline-flex items-center gap-2">
+                                    @include('admin.partials.review-actions', ['registration' => $registration])
+                                </span>
+                            </div>
+                            @if($registration->review_comment)
+                                <div class="mt-3 rounded-lg border border-red-900/60 bg-red-950/30 p-3">
+                                    <p class="text-xs font-semibold text-red-200 mb-1">Zdôvodnenie zaslané autorovi</p>
+                                    <p class="text-sm text-slate-200 whitespace-pre-line">{{ $registration->review_comment }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
                     <div>
                         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Forma účasti</p>
                         @if($registration->online_participation)

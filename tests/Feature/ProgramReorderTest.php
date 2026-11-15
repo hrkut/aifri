@@ -19,6 +19,7 @@ it('allows admin to reorder program registrations and persists program_order', f
         'email' => 'a@example.com',
         'institution' => 'X',
         'participation_type' => 'presentation',
+        'review_status' => Registration::REVIEW_APPROVED,
         'online_participation' => true,
     ]);
     $r2 = Registration::create([
@@ -26,6 +27,7 @@ it('allows admin to reorder program registrations and persists program_order', f
         'email' => 'b@example.com',
         'institution' => 'X',
         'participation_type' => 'presentation',
+        'review_status' => Registration::REVIEW_APPROVED,
         'online_participation' => true,
     ]);
     $r3 = Registration::create([
@@ -33,6 +35,7 @@ it('allows admin to reorder program registrations and persists program_order', f
         'email' => 'c@example.com',
         'institution' => 'X',
         'participation_type' => 'presentation',
+        'review_status' => Registration::REVIEW_APPROVED,
         'online_participation' => true,
     ]);
 
