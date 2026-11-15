@@ -58,7 +58,8 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
             $direction = 'desc';
         }
 
-        $registrationsQuery = Registration::query();
+        // breaks are programme items, not participants
+        $registrationsQuery = Registration::query()->where('participation_type', '!=', 'break');
 
         if ($q !== '') {
             // Basic text search across name/email/institution
@@ -146,7 +147,8 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
             $direction = 'desc';
         }
 
-        $registrationsQuery = Registration::query();
+        // breaks are programme items, not participants
+        $registrationsQuery = Registration::query()->where('participation_type', '!=', 'break');
 
         if ($q !== '') {
             $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
@@ -201,7 +203,8 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
             $onlineParticipationFilter = 'in_person';
         }
 
-        $registrationsQuery = Registration::query();
+        // breaks are programme items, not participants
+        $registrationsQuery = Registration::query()->where('participation_type', '!=', 'break');
 
         if ($q !== '') {
             $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';

@@ -203,3 +203,21 @@ it('renders the approve dialog without a programme time', function () {
         ->assertDontSee('predbežne')
         ->assertDontSee('confirm(', false);
 });
+
+it('does not list programme breaks as registrations', function () {
+    $this->freezeTime(); // the export file name contains the current time
+    Registration::create(['name' => '—', 'email' => 'break@local', 'institution' => '—', 'participation_type' => 'break', 'title' => 'Prestávka na obed']);
+    Registration::create(['name' => 'Účastník', 'email' => 'u@example.com', 'institution' => 'X', 'participation_type' => 'passive']);
+
+    $this->actingAs($this->admin)->get(route('admin.dashboard'))
+        ->assertSee('u@example.com')
+        ->assertDontSee('break@local');
+
+    \Maatwebsite\Excel\Facades\Excel::fake();
+    $this->get(route('admin.registrations.export'));
+    \Maatwebsite\Excel\Facades\Excel::assertDownloaded('registrations_2027_' . now()->format('Y-m-d_His') . '.xlsx', function ($export) {
+        $emails = $export->query()->pluck('email')->all();
+
+        return $emails === ['u@example.com'];
+    });
+});
