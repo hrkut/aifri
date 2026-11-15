@@ -153,7 +153,7 @@ it('lists recordings per edition', function () {
         'time_start' => '09:00',
     ]);
 
-    $this->post('/zaznamy', ['password' => 'konferenciaai']);
+    $this->post('/zaznamy', ['password' => 'test-recordings-password']);
 
     // Active edition has no program yet -> falls back to the archive
     $this->get(route('recordings.list'))

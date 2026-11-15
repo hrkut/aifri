@@ -19,6 +19,7 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="RECORDINGS_PASSWORD" value="test-recordings-password"/>
         <env name="LOG_CHANNEL" value="errorlog"/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>

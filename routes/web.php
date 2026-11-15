@@ -11,7 +11,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Conference;
 use App\Http\Controllers\Admin\ConferenceController;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Schema;
 
 Route::get('/', function () {
     $allowed = ['jpg','jpeg','png','gif','webp','svg'];
@@ -101,18 +100,6 @@ Route::post('/otazka', function (Request $request) {
         'question.max' => 'Otázka môže obsahovať maximálne 5000 znakov',
     ]);
 
-    // Create table if not exists (fallback for migration issue)
-    if (!Schema::hasTable('questions')) {
-        Schema::create('questions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 255);
-            $table->string('email', 255)->nullable();
-            $table->text('question');
-            $table->boolean('answered')->default(false);
-            $table->timestamps();
-        });
-    }
-
     \App\Models\Question::create($data);
 
     return redirect()->route('question')
@@ -123,22 +110,6 @@ Route::post('/otazka', function (Request $request) {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
-
-Route::get('/debug-auth', function () {
-    if (!auth()->check()) {
-        return 'Not logged in';
-    }
-    $user = auth()->user();
-    return [
-        'id' => $user->id,
-        'name' => $user->name,
-        'email' => $user->email,
-        'is_admin' => $user->is_admin,
-        'is_admin_type' => gettype($user->is_admin),
-        'is_admin_bool_check' => $user->is_admin ? 'YES' : 'NO',
-        'can_access_admin' => $user->is_admin ? 'Should see Admin link' : 'Should NOT see Admin link',
-    ];
-})->middleware(['auth']);
 
 Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function (Request $request) {
@@ -1155,13 +1126,6 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
 
     // ---- Questions (Otázky) ----
     Route::get('/questions', function (Request $request) {
-        // Ensure answered column exists
-        if (Schema::hasTable('questions') && !Schema::hasColumn('questions', 'answered')) {
-            Schema::table('questions', function (Blueprint $table) {
-                $table->boolean('answered')->default(false);
-            });
-        }
-
         $q = trim((string) $request->query('q', ''));
 
         $questionsQuery = \App\Models\Question::query();
@@ -1190,10 +1154,6 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
     })->name('questions.mark_answered');
 });
 
-Route::get('/debug/session', function () {
-    return view('session-test');
-})->name('debug.session');
-
 // ---- Public Recordings (Príspevky z konferencie) ----
 Route::get('/zaznamy', function (Request $request) {
     // Ak je user už prihlásený, presmeruj na zoznam
@@ -1206,7 +1166,9 @@ Route::get('/zaznamy', function (Request $request) {
 Route::post('/zaznamy', function (Request $request) {
     $password = (string) $request->input('password', '');
 
-    if ($password === 'konferenciaai') {
+    $expected = (string) config('services.recordings.password');
+
+    if ($expected !== '' && hash_equals($expected, $password)) {
         // Ulož do session
         $request->session()->flush(); // Vymaž stare session data
         $request->session()->put('recordings_authenticated', true);

@@ -14,6 +14,11 @@ return [
     |
     */
 
+    // Shared password protecting /zaznamy (conference recordings and slides)
+    'recordings' => [
+        'password' => env('RECORDINGS_PASSWORD'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
