@@ -1,59 +1,218 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Nasadenie na produkciu
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Návod na nasadenie zmien z 15. 11. 2026: ročníky (2. ročník 2. 2. 2027), posudzovanie príspevkov,
+anglická verzia webu, nový dizajn, e-maily účastníkom, PDF programu, oprava prístupu k záznamom
+a prechod na Laravel 13.
 
-## About Laravel
+Postup je overený na kópii ostrej databázy: všetkých 5 nových migrácií prešlo a web, administrácia,
+registrácia, posudzovanie, otázky aj záznamy fungovali nad ostrými dátami.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+V príkladoch je aplikácia v `/var/www/aifri` a web server beží pod používateľom `www-data`.
+Upravte podľa servera.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 1. Požiadavky na server
 
-## Learning Laravel
+| Čo | Požiadavka |
+|---|---|
+| PHP | **8.4 alebo novšie** (Laravel 13; doteraz stačilo 8.2) |
+| PHP rozšírenia | ctype, dom, fileinfo, filter, gd, hash, iconv, json, libxml, mbstring, openssl, pcre, session, simplexml, tokenizer, xml, xmlreader, xmlwriter, zip, zlib, pdo_mysql |
+| odporúčané | **intl** – slovenské abecedné radenie prezenčnej listiny (Č za C, Š za S); bez neho sa radí jednoduchšie |
+| Composer | 2.x |
+| Node.js | 20.19+ alebo 22.12+ (len na zostavenie CSS/JS administrácie; dá sa to urobiť aj mimo servera, pozri krok 6) |
+| MySQL | bez zmeny |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Kontrola:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+php -v
+php -m | grep -E -i 'intl|gd|zip|mbstring|pdo_mysql'
+cd /var/www/aifri && composer check-platform-reqs --no-dev   # po kroku 4
+```
 
-## Laravel Sponsors
+Fronta (queue) ani cron nie sú potrebné, e-maily sa posielajú hneď.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 2. Záloha
 
-### Premium Partners
+```bash
+cd /var/www/aifri
+git rev-parse HEAD > ~/aifri-pred-nasadenim.commit      # na návrat kódu
+cp .env ~/aifri-env-$(date +%F).bak
+mysqldump --single-transaction --no-tablespaces -u UZIVATEL -p NAZOV_DB > ~/aifri-db-$(date +%F).sql
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Videá a prezentácie v `storage/app/private/zaznamy` a `storage/app/private/prezentacie` nie sú
+v gite. Nasadenie sa ich nedotkne, ale ak ich nemáte zálohované inde, zálohujte aj tieto adresáre.
 
-## Contributing
+## 3. Údržbový režim
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+sudo -u www-data php artisan down
+```
 
-## Code of Conduct
+## 4. Nový kód a balíčky
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+git fetch origin
+git checkout main
+git pull --ff-only origin main
+sudo -u www-data composer install --no-dev --optimize-autoloader
+```
 
-## Security Vulnerabilities
+Ak sa kód na server nekopíruje cez git, zmažte ručne staré ladiace súbory, ktoré boli odstránené:
+`public/konferenciaAI.html`, `public/recordings-test.html`, `public/session-debug.php`,
+`public/test-direct-link.html`, `public/test-session.html`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 5. Úprava `.env`
 
-## License
+Porovnajte s `.env.example`. Na produkcii musí byť:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```dotenv
+APP_ENV=production
+APP_DEBUG=false
+# používa sa v odkazoch v e-mailoch
+APP_URL=https://VEREJNA-ADRESA-WEBU
+
+APP_LOCALE=sk
+APP_FALLBACK_LOCALE=en
+# APP_LOCAL_TIMEZONE=Europe/Bratislava  # predvolené, netreba meniť
+
+# NOVÉ: heslo k stránke Záznamy z minulých ročníkov (/zaznamy).
+# Bez neho sa do záznamov nedá prihlásiť nikto.
+RECORDINGS_PASSWORD=nove-heslo
+
+# E-maily cez sendmail servera (lokálne sa používa Mailpit)
+MAIL_MAILER=sendmail
+MAIL_FROM_ADDRESS="konferenciaAI@fri.uniza.sk"
+MAIL_FROM_NAME="Konferencia o AI vo vzdelávaní"
+```
+
+**E-maily (sendmail).** Aplikácia číta príkaz zo `MAIL_SENDMAIL_PATH`. Riadok `MAIL_SENDMAIL=...`
+nečíta nič, môžete ho zmazať. Bez neho sa použije `/usr/sbin/sendmail -bs -i`, rovnako ako doteraz
+pri oznámeniach organizátorom. Tento režim nechajte: ako odosielateľa obálky (`Return-Path`) pošle
+`konferenciaAI@fri.uniza.sk`, takže maily účastníkom na cudzích doménach lepšie prejdú SPF/DMARC
+a vrátené maily chodia vám. Pri `-t` by odosielateľom bol používateľ web servera
+(napr. `www-data@nazov-servera`). Ak by ste predsa chceli `-t`, premenná musí vyzerať takto:
+
+```dotenv
+MAIL_SENDMAIL_PATH="/usr/sbin/sendmail -t -i -f konferenciaAI@fri.uniza.sk"
+```
+
+`MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME` a `MAIL_PASSWORD` sa pri sendmaile nepoužívajú.
+
+Pôvodné heslo k záznamom bolo napísané priamo v kóde a je vo verejnej histórii repozitára na GitHube.
+Zvoľte preto **nové heslo** a pošlite ho účastníkom.
+
+`APP_TIMEZONE` nemeňte: databáza ostáva v UTC ako doteraz, slovenský čas sa používa pri zobrazení
+a termínoch.
+
+## 6. CSS a JavaScript administrácie
+
+Na serveri:
+
+```bash
+npm ci
+npm run build
+```
+
+Alebo bez Node.js na serveri: spustite `npm ci && npm run build` u seba a nahrajte celý adresár
+`public/build` na server. Verejná časť webu používa `public/css/conference.css` a písmo
+v `public/fonts`, tie sú priamo v gite.
+
+## 7. Migrácie databázy
+
+```bash
+sudo -u www-data php artisan migrate --force
+```
+
+Spustí sa týchto 5 migrácií:
+
+| Migrácia | Čo urobí |
+|---|---|
+| `2026_02_18_000000_add_record_and_presentation_to_registrations` | stĺpce už na produkcii sú, preskočí ich |
+| `2026_11_15_000000_add_editions_to_conferences` | z doterajšej konferencie urobí ročník 2026 (archív), vytvorí aktívny ročník 2027 (2. 2. 2027) a priradí registrácie a otázky k ročníku 2026 |
+| `2026_11_15_100000_add_contribution_deadline_to_conferences` | termín na príspevky; ročník 2026 dostane 4. 2. 2026 |
+| `2026_11_15_120000_add_review_status_to_registrations` | stav posúdenia; doterajších 27 príspevkov bude schválených |
+| `2026_11_15_140000_add_locale_to_registrations` | jazyk účastníka (doterajší: slovenčina) |
+
+Kontrola: `php artisan migrate:status` nesmie ukázať nič ako `Pending`.
+
+## 8. Cache a práva
+
+```bash
+sudo -u www-data php artisan optimize:clear
+sudo -u www-data php artisan optimize
+sudo chown -R www-data:www-data storage bootstrap/cache
+sudo chmod -R ug+rwX storage bootstrap/cache
+```
+
+Príkazy `php artisan` spúšťajte ako používateľ web servera, nie ako root. Inak vzniknú súbory
+patriace rootovi a administrácia spadne s chybou `touch(): Utime failed`.
+Ak sa to stane, pomôže príkaz `chown` uvedený vyššie.
+
+## 9. Spustenie
+
+```bash
+sudo -u www-data php artisan up
+```
+
+## 10. Kontrola po nasadení
+
+Verejný web:
+
+- [ ] Úvodná stránka ukazuje **2. ročník** a dátum **2. 2. 2027**.
+- [ ] `/en` je anglická verzia, prepínač SK/EN v hlavičke stránky funguje.
+- [ ] `/zaznamy`: prihlásenie novým heslom, zoznam ročníka 2026, video aj prezentácia sa otvoria.
+- [ ] Na mobile je viditeľné celé menu.
+
+Administrácia (`/admin`):
+
+- [ ] **Ročníky**: doplňte pre 2027 termín registrácie, termín na príspevky a notifikáciu autorov
+  (zatiaľ nie sú vyplnené). Kým termín registrácie chýba, registrácia je otvorená až do dňa konferencie.
+- [ ] Prepnutie na ročník 2026: registrácie, program a otázky sú viditeľné, iba na čítanie.
+- [ ] Export do Excelu, prezenčná listina (filter Forma účasti: Prezenčne) a PDF programu sa stiahnu.
+
+E-maily:
+
+- [ ] Testovací mail na vlastnú adresu:
+  ```bash
+  sudo -u www-data php artisan tinker --execute="Mail::raw('Test', fn (\$m) => \$m->to('vasa@adresa.sk')->subject('Test AIFRI'));"
+  ```
+  V hlavičke prijatého mailu má byť `Return-Path: <konferenciaAI@fri.uniza.sk>` a SPF/DKIM `pass`.
+  Ak mail nepríde, pozrite `/var/log/mail.log` a `storage/logs/laravel.log`.
+- [ ] Zaregistrujte sa na `/prihlasenie` so svojou adresou ako aktívny účastník.
+  Príde potvrdenie a organizátorom oznámenie o novej registrácii.
+- [ ] V administrácii príspevok schváľte alebo odmietnite (so zdôvodnením). Príde e-mail o výsledku.
+- [ ] Testovaciu registráciu potom zmažte.
+
+Logy: `tail -n 50 storage/logs/laravel.log` (nesmú tam byť nové chyby).
+
+## 11. Bezpečnosť: kontrola starej chyby v záznamoch
+
+Pôvodný kód umožňoval cez `/zaznamy/record/...` a `/zaznamy/presentation/...` stiahnuť aj iné súbory
+zo servera vrátane `.env` (path traversal). Dnešná verzia to opravuje. Skontrolujte prístupové logy
+web servera, či to niekto nevyužil:
+
+```bash
+grep -E '/zaznamy/(record|presentation)/.*(\.\.|%2[eEfF])' /var/log/apache2/access.log* /var/log/nginx/access.log* 2>/dev/null
+```
+
+Ak sa nájde podozrivý úspešný prístup (kód 200), považujte obsah `.env` za uniknutý a zmeňte:
+heslo k databáze, `APP_KEY` (`php artisan key:generate`; odhlási všetkých prihlásených)
+a heslo k záznamom.
+
+## 12. Návrat späť (ak by niečo zlyhalo)
+
+```bash
+sudo -u www-data php artisan down
+mysql -u UZIVATEL -p NAZOV_DB < ~/aifri-db-DATUM.sql
+git checkout $(cat ~/aifri-pred-nasadenim.commit)
+cp ~/aifri-env-DATUM.bak .env
+sudo -u www-data composer install --no-dev --optimize-autoloader
+sudo -u www-data php artisan optimize:clear
+sudo -u www-data php artisan up
+```
+
+Pozor: pôvodná verzia potrebuje Laravel 12. Ak sa PHP medzitým aktualizovalo na 8.4, pôvodný kód
+na ňom beží tiež.
