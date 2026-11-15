@@ -573,3 +573,17 @@ it('uses one name for each thing across the site and the admin', function () {
     expect($pages[1])->toContain('REGISTRÁCIA NA KONFERENCIU')->toContain('Odoslať registráciu');
     expect($pages[3])->toContain('Odmietnutý');
 });
+
+it('confirms a sent question with one message in the page language', function () {
+    $this->post(route('question.store'), ['name' => 'Ján', 'question' => 'Bude záznam aj z panelovej diskusie?'])
+        ->assertRedirect(route('question'));
+    $this->get(route('question'))
+        ->assertSee('Vaša otázka bola odoslaná. Ďakujeme!')
+        ->assertDontSee('Ďakujeme vám za vašu otázku');
+
+    $this->post('/en/question', ['name' => 'Jane', 'question' => 'Will the panel be recorded?'])
+        ->assertRedirect(url('/en/question'));
+    $this->get('/en/question')->assertSee('Your question has been sent. Thank you!');
+
+    expect(\App\Models\Question::count())->toBe(2);
+});

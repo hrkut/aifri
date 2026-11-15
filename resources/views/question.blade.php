@@ -26,7 +26,7 @@
 
             @if (session('success'))
                 <div id="question-success" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; color: #16a34a;">
-                    {{ __('Vaša otázka bola úspešne odoslaná. Ďakujeme vám za vašu otázku.') }}
+                    {{ session('success') }}
                 </div>
                 <script>
                     setTimeout(() => {

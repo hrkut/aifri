@@ -165,7 +165,7 @@ Route::post($path('/otazka', '/question'), function (Request $request) {
     \App\Models\Question::create($data);
 
     return redirect()->to(lroute('question'))
-        ->with('success', __('Vaša otázka bola úspešne odoslaná!'))
+        ->with('success', __('Vaša otázka bola odoslaná. Ďakujeme!'))
         ->withInput($request->only('name'));
 })->name('question.store');
 
