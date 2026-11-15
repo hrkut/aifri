@@ -65,3 +65,16 @@ if (! function_exists('local_time')) {
         return $time ? \Illuminate\Support\Carbon::instance($time)->setTimezone(config('app.local_timezone')) : null;
     }
 }
+
+if (! function_exists('versioned_asset')) {
+    /**
+     * URL of a file in public/ with its modification time as ?v=…, so browsers fetch
+     * the new version right after a deploy instead of using the cached old one.
+     */
+    function versioned_asset(string $path): string
+    {
+        $file = public_path($path);
+
+        return asset($path) . (is_file($file) ? '?v=' . filemtime($file) : '');
+    }
+}

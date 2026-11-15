@@ -13,7 +13,7 @@
         <link rel="alternate" hreflang="en" href="{{ locale_url('en') }}">
         <link rel="alternate" hreflang="x-default" href="{{ locale_url('sk') }}">
         <link rel="preload" href="{{ asset('fonts/archivo/archivo-latin-wdth-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
-        <link rel="stylesheet" href="{{ asset('css/conference.css') }}">
+        <link rel="stylesheet" href="{{ versioned_asset('css/conference.css') }}">
     </head>
     <body>
         <div class="wrap">
