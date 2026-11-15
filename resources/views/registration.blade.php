@@ -217,10 +217,9 @@
                         <label for="block">Preferovaný blok</label>
                         <select id="block" name="block" class="@error('block') has-error @enderror">
                             <option value="">-- Vyberte blok --</option>
-                            <option value="intro" {{ old('block') == 'intro' ? 'selected' : '' }}>Úvodný blok – Vízia a trendy</option>
-                            <option value="teaching" {{ old('block') == 'teaching' ? 'selected' : '' }}>Blok 1 – AI vo výučbe a výskume</option>
-                            <option value="practice" {{ old('block') == 'practice' ? 'selected' : '' }}>Blok 2 – AI v praxi</option>
-                            <option value="students" {{ old('block') == 'students' ? 'selected' : '' }}>Blok 3 – AI očami študentov</option>
+                            @foreach(\App\Models\Registration::BLOCKS as $key => $label)
+                                <option value="{{ $key }}" @selected(old('block') === $key)>{{ $label }}</option>
+                            @endforeach
                         </select>
                         @error('block')
                             <div class="error-message">{{ $message }}</div>

@@ -42,12 +42,20 @@ class Registration extends Model
         'intro' => 'Úvodný blok – Vízia a trendy',
         'teaching' => 'Blok 1 – AI vo výučbe a výskume',
         'practice' => 'Blok 2 – AI v praxi',
+    ];
+
+    /** Blocks no longer offered; kept only so talks of past editions still show their block. */
+    public const RETIRED_BLOCKS = [
         'students' => 'Blok 3 – AI očami študentov',
     ];
 
     public function blockLabel(): ?string
     {
-        return $this->block ? (self::BLOCKS[$this->block] ?? $this->block) : null;
+        if (! $this->block) {
+            return null;
+        }
+
+        return self::BLOCKS[$this->block] ?? self::RETIRED_BLOCKS[$this->block] ?? $this->block;
     }
 
     /** Name with academic titles, e.g. "Ing. Jana Nováková, PhD." */

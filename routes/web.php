@@ -428,7 +428,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
             'title' => ['required', 'string', 'max:255'],
             'abstract' => ['nullable', 'string'],
             'keywords' => ['nullable', 'string', 'max:255'],
-            'block' => ['nullable', 'in:intro,teaching,practice,students'],
+            'block' => ['nullable', 'in:' . implode(',', array_keys(Registration::BLOCKS))],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
@@ -783,7 +783,7 @@ Route::middleware(['auth', 'admin', 'admin.conference'])->prefix('admin')->name(
             'title' => ['nullable', 'string', 'max:255'],
             'abstract' => ['nullable', 'string'],
             'keywords' => ['nullable', 'string', 'max:255'],
-            'block' => ['nullable', 'in:intro,teaching,practice,students'],
+            'block' => ['nullable', \Illuminate\Validation\Rule::in(array_merge(array_keys(Registration::BLOCKS), array_filter([$registration->block])))],
         ]);
 
         if (array_key_exists('online_participation', $data)) {

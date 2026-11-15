@@ -48,15 +48,6 @@
         </ul>
     </div>
 
-    <h3>Blok 3 – AI očami študentov</h3>
-    <p><b>Cieľ:</b> dať priestor študentom prezentovať svoje projekty a názory.</p>
-    <p><b>Témy:</b></p>
-    <ul>
-        <li>Ako študenti používajú AI nástroje pri učení, príprave projektov alebo písaní záverečných prác</li>
-        <li>Ako študenti vnímajú zodpovedné využívanie AI, plagiátorstvo a akademickú integritu</li>
-        <li>Nápady na zlepšenie vzdelávania a podporu študentov prostredníctvom AI</li>
-    </ul>
-
     <h3>Panelová diskusia</h3>
     <p>„Ako AI mení spôsob, akým (sa) učíme?“</p>
 </main>

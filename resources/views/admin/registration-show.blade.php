@@ -109,22 +109,7 @@
                     <div>
                         <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Preferovaný blok</p>
                         <p class="text-slate-200">
-                            @switch($registration->block)
-                                @case('intro')
-                                    Úvodný blok – Vízia a trendy
-                                    @break
-                                @case('teaching')
-                                    Blok 1 – AI vo výučbe a výskume
-                                    @break
-                                @case('practice')
-                                    Blok 2 – AI v praxi
-                                    @break
-                                @case('students')
-                                    Blok 3 – AI očami študentov
-                                    @break
-                                @default
-                                    —
-                            @endswitch
+                            {{ $registration->blockLabel() ?? '—' }}
                         </p>
                     </div>
                 </div>

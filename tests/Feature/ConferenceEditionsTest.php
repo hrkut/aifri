@@ -432,3 +432,26 @@ it('validates the contribution deadline in the edition form', function () {
 it('backfills the 2026 contribution deadline', function () {
     expect(Conference::where('year', 2026)->first()->contribution_deadline->format('Y-m-d'))->toBe('2026-02-04');
 });
+
+it('no longer offers block 3 but still labels it for past talks', function () {
+    Mail::fake();
+
+    $this->get(route('registration'))->assertOk()->assertDontSee('Blok 3')->assertSee('Blok 2 – AI v praxi');
+    $this->get(route('home'))->assertDontSee('Blok 3');
+
+    $this->post(route('registration.submit'), [
+        'name' => 'P', 'email' => 'p@example.com', 'institution' => 'X',
+        'participation_type' => 'presentation', 'title' => 'T', 'abstract' => 'A', 'block' => 'students',
+    ])->assertSessionHasErrors('block');
+
+    $archive = Conference::where('year', 2026)->firstOrFail();
+    $old = archivedRegistration([
+        'conference_id' => $archive->id, 'name' => 'Študent', 'email' => 's@example.com', 'institution' => 'X',
+        'participation_type' => 'presentation', 'block' => 'students', 'time_start' => '09:00',
+    ]);
+    expect($old->blockLabel())->toBe('Blok 3 – AI očami študentov');
+
+    $admin = User::factory()->create(['is_admin' => true]);
+    $this->actingAs($admin)->post(route('admin.conferences.select', $archive));
+    $this->get(route('admin.registration.show', $old))->assertSee('Blok 3 – AI očami študentov');
+});

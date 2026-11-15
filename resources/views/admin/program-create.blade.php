@@ -87,10 +87,9 @@
                         @php($val = old('block'))
                         <select id="block" name="block" class="w-full rounded-md bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2">
                             <option value="" {{ $val === null || $val === '' ? 'selected' : '' }}>—</option>
-                            <option value="intro" {{ $val === 'intro' ? 'selected' : '' }}>Úvodný blok – Vízia a trendy</option>
-                            <option value="teaching" {{ $val === 'teaching' ? 'selected' : '' }}>Blok 1 – AI vo výučbe a vo výskume</option>
-                            <option value="practice" {{ $val === 'practice' ? 'selected' : '' }}>Blok 2 – AI v praxi</option>
-                            <option value="students" {{ $val === 'students' ? 'selected' : '' }}>Blok 3 – AI očami študentov</option>
+                            @foreach(\App\Models\Registration::BLOCKS as $key => $label)
+                                <option value="{{ $key }}" @selected($val === $key)>{{ $label }}</option>
+                            @endforeach
                         </select>
                     </div>
 
