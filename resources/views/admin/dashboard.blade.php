@@ -123,7 +123,7 @@
                 @else
                     <span
                         class="px-4 py-2 rounded-lg bg-indigo-950/40 text-indigo-200/50 font-medium border border-indigo-900/40 cursor-not-allowed select-none"
-                        title="Prezenčná listina je dostupná len pri filtre Forma účasti: Prezenčne"
+                        title="Prezenčná listina je dostupná len pri filtri Forma účasti: Prezenčne"
                         aria-disabled="true"
                     >
                         Prezenčná listina (PDF)
@@ -142,7 +142,7 @@
                             <a href="{{ $sortUrl('name') }}" class="hover:text-slate-100 whitespace-nowrap">Meno{!! (($sort ?? '') === 'name') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
                         </th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">
-                            <a href="{{ $sortUrl('email') }}" class="hover:text-slate-100 whitespace-nowrap">Email{!! (($sort ?? '') === 'email') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
+                            <a href="{{ $sortUrl('email') }}" class="hover:text-slate-100 whitespace-nowrap">E-mail{!! (($sort ?? '') === 'email') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
                         </th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap ">
                             <a href="{{ $sortUrl('participation_type') }}" class="hover:text-slate-100 whitespace-nowrap">Typ účasti{!! (($sort ?? '') === 'participation_type') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
@@ -157,7 +157,7 @@
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap ">
                             <a href="{{ $sortUrl('created_at') }}" class="hover:text-slate-100 whitespace-nowrap">Vytvorené{!! (($sort ?? '') === 'created_at') ? (($direction ?? 'asc') === 'asc' ? ' ▲' : ' ▼') : '' !!}</a>
                         </th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">Akcia</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider whitespace-nowrap">Akcie</th>
                     </tr>
                 </thead>
                 <tbody class="bg-slate-900 divide-y divide-slate-800">

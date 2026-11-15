@@ -18,7 +18,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
             <div>
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-slate-100" />
+                    <img src="{{ asset('images/FRI_logo.png') }}" alt="{{ __('Logo FRI') }}" class="h-20 w-auto">
                 </a>
             </div>
 

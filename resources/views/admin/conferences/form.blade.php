@@ -92,7 +92,7 @@
             @else
                 <p class="text-sm text-slate-400">
                     Začiatok programu ({{ $conference->startTimeLabel() }}) a dĺžky príspevkov sa menia v časti
-                    <span class="text-slate-200">Program → Nastaviť dĺžku príspevku</span>, kde sa zároveň prepočítajú časy.
+                    <span class="text-slate-200">Program → Nastaviť dĺžku príspevkov</span>, kde sa zároveň prepočítajú časy.
                 </p>
             @endif
         </div>

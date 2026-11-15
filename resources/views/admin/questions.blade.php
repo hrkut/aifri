@@ -69,7 +69,7 @@
                             <th class="px-6 py-3 text-left font-semibold text-slate-200">Meno</th>
                             <th class="px-6 py-3 text-left font-semibold text-slate-200">Otázka</th>
                             <th class="px-6 py-3 text-left font-semibold text-slate-200">Vytvorená</th>
-                            <th class="px-6 py-3 text-right font-semibold text-slate-200">Akcia</th>
+                            <th class="px-6 py-3 text-right font-semibold text-slate-200">Akcie</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700">

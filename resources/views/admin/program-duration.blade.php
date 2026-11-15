@@ -17,7 +17,7 @@
 
 <div class="max-w-3xl mx-auto" x-data="{ confirmOpen: false }" x-on:keydown.escape.window="confirmOpen = false">
     <div class="mb-6 flex items-center justify-between">
-        <h1 class="text-3xl font-semibold text-slate-100">Nastaviť dĺžku príspevku</h1>
+        <h1 class="text-3xl font-semibold text-slate-100">Nastaviť dĺžku príspevkov</h1>
         <a href="{{ route('admin.program') }}" class="inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors">
             Späť
         </a>

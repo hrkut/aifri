@@ -528,3 +528,14 @@ it('saves the registration even when the organiser mail cannot be sent', functio
 
     expect(Registration::where('email', 'jan@example.com')->exists())->toBeTrue();
 });
+
+it('shows framework validation messages and the login page in Slovak', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+
+    $this->actingAs($admin)->put(route('admin.conferences.update', Conference::active()), [
+        'year' => 2027, 'date' => '2027-02-02', 'teams_url' => 'nie-je-adresa',
+    ])->assertSessionHasErrors(['teams_url' => 'Pole Odkaz na MS Teams musí byť platná webová adresa.']);
+
+    auth()->logout();
+    $this->get('/login')->assertSee('Zapamätať si ma')->assertSee('Prihlásiť sa')->assertDontSee('Remember me');
+});

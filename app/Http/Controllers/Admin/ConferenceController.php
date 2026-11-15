@@ -49,7 +49,7 @@ class ConferenceController extends Controller
         $conference = Conference::create($data + ['is_active' => false]);
 
         return redirect()->route('admin.conferences.index')
-            ->with('success', "Ročník {$conference->year} bol vytvorený. Na verejnom webe sa zobrazí až po aktivovaní.");
+            ->with('success', "Ročník {$conference->year} bol vytvorený. Na verejnom webe sa zobrazí až po zverejnení.");
     }
 
     public function edit(Conference $conference): View
@@ -104,7 +104,7 @@ class ConferenceController extends Controller
         ];
 
         // Program timing is only set here for a new edition; afterwards it is changed
-        // via "Nastaviť dĺžku príspevku", which also recalculates the program.
+        // via "Nastaviť dĺžku príspevkov", which also recalculates the program.
         if ($conference === null) {
             $rules += [
                 'start_time' => ['required', 'date_format:H:i'],

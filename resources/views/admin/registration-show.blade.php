@@ -121,7 +121,7 @@
                         <p class="text-slate-200 whitespace-pre-wrap leading-relaxed">{{ $registration->abstract }}</p>
                     </div>
                     <div>
-                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Klúčové slová</p>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Kľúčové slová</p>
                         @if($registration->keywords)
                             <div class="flex flex-wrap gap-2">
                                 @foreach(explode(',', $registration->keywords) as $keyword)

@@ -311,7 +311,7 @@ Route::middleware(['auth', 'admin', 'admin.conference', 'locale:sk'])->prefix('a
         } catch (\Throwable $e) {
             report($e);
 
-            return ' E-mail autorovi sa nepodarilo odoslať, kontaktujte ho prosím priamo.';
+            return ' E-mail autorovi sa nepodarilo odoslať, kontaktujte prosím autora priamo.';
         }
     };
 
