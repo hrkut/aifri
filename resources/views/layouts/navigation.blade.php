@@ -50,8 +50,7 @@
                 </x-dropdown>
                 @else
                     <div class="space-x-4">
-                        <a href="{{ route('login') }}" class="text-sm text-slate-400 hover:text-slate-200">Login</a>
-                        <a href="{{ route('register') }}" class="text-sm text-slate-400 hover:text-slate-200">Register</a>
+                        <a href="{{ route('login') }}" class="text-sm text-slate-400 hover:text-slate-200">{{ __('Log in') }}</a>
                     </div>
                 @endauth
             </div>
@@ -106,8 +105,7 @@
             </div>
             @else
                 <div class="px-4 pb-4 space-y-2">
-                    <a href="{{ route('login') }}" class="block text-sm text-slate-400 hover:text-slate-200">Login</a>
-                    <a href="{{ route('register') }}" class="block text-sm text-slate-400 hover:text-slate-200">Register</a>
+                    <a href="{{ route('login') }}" class="block text-sm text-slate-400 hover:text-slate-200">{{ __('Log in') }}</a>
                 </div>
             @endauth
         </div>

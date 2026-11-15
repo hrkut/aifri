@@ -539,3 +539,12 @@ it('shows framework validation messages and the login page in Slovak', function 
     auth()->logout();
     $this->get('/login')->assertSee('Zapamätať si ma')->assertSee('Prihlásiť sa')->assertDontSee('Remember me');
 });
+
+it('has no public sign-up for admin accounts', function () {
+    $this->get('/register')->assertNotFound();
+    $this->post('/register', ['name' => 'X', 'email' => 'x@example.com', 'password' => 'secret123', 'password_confirmation' => 'secret123'])
+        ->assertNotFound();
+
+    expect(User::where('email', 'x@example.com')->exists())->toBeFalse()
+        ->and(Route::has('register'))->toBeFalse();
+});
