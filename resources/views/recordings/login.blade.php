@@ -75,13 +75,13 @@
              sub="Videozáznamy a prezentácie príspevkov" />
 
 <div class="stack">
-    <div class="card" style="max-width: 500px; width: 100%; margin: 0 auto;">
-        <h2 style="text-align: center;">🔐 Prístup k záznamom</h2>
-        <p style="color: #cbd5e1; text-align: center; margin-bottom: 1.5rem; font-size: 0.95rem;">
+    <div class="card">
+        <h2>🔐 Prístup k záznamom</h2>
+        <p style="margin-bottom: 1.5rem;">
             Zadajte heslo na prístup k záznamom a prezentáciám z minulých ročníkov konferencie:
         </p>
 
-        <form method="POST" action="{{ route('recordings.authenticate') }}" novalidate>
+        <form method="POST" action="{{ route('recordings.authenticate') }}" novalidate style="max-width: 420px;">
             @csrf
 
             <div class="login-form-group">
@@ -101,7 +101,7 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn-submit">Prístupiť k záznamom</button>
+            <button type="submit" class="btn-submit">Pristúpiť k záznamom</button>
         </form>
 
     </div>
