@@ -1,14 +1,30 @@
 @php($fullName = $registration->fullName())
+@php($isTalk = $registration->participation_type === 'presentation')
+@php($notification = \App\Models\Conference::formatDate($conference->notification_date))
 KONFERENCIA O UMELEJ INTELIGENCII VO VZDELÁVANÍ – {{ $conference->editionNumber() }}. ročník ({{ $conference->year }})
 
 Registrácia potvrdená
 
 Dobrý deň{{ $fullName !== '' ? ', ' . $fullName : '' }},
 
-ďakujeme za prihlásenie na Konferenciu o umelej inteligencii vo vzdelávaní. Vašu registráciu ako pasívneho účastníka sme zaznamenali a týmto ju potvrdzujeme.
+ďakujeme za prihlásenie na Konferenciu o umelej inteligencii vo vzdelávaní. Vašu registráciu ako {{ $isTalk ? 'aktívneho účastníka s príspevkom' : 'pasívneho účastníka' }} sme zaznamenali a týmto ju potvrdzujeme.
+@if($isTalk)
+
+Príspevok teraz posúdi programový výbor. O výsledku a zaradení do programu vás budeme informovať e-mailom{{ $notification ? ' do ' . $notification : '' }}.
+
+VÁŠ PRÍSPEVOK
+Názov: {{ $registration->title }}
+@if($registration->blockLabel())
+Preferovaný blok: {{ $registration->blockLabel() }}
+@endif
+@if($registration->keywords)
+Kľúčové slová: {{ $registration->keywords }}
+@endif
+Dĺžka prezentácie: max. {{ $conference->presentation_minutes ?: 15 }} minút
+@endif
 
 KEDY A KDE
-Dátum: {{ $conference->dateLabel() }}
+Dátum konania: {{ $conference->dateLabel() }}
 Miesto: Fakulta riadenia a informatiky, Žilinská univerzita v Žiline, Veľký diel 3323, 010 26 Žilina
 Forma: hybridná (prezenčne aj online)
 @if($conference->teams_url)
@@ -24,6 +40,7 @@ Inštitúcia: {{ $registration->institution }}
 @if($registration->position)
 Pozícia: {{ $registration->position }}
 @endif
+Forma účasti: {{ $registration->online_participation ? 'online' : 'prezenčne' }}
 
 Program konferencie: {{ route('program') }}
 

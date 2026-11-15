@@ -8,6 +8,9 @@
     /** @var \App\Models\Conference $conference */
     $date = $conference->dateLabel();
     $deadline = \App\Models\Conference::formatDate($conference->registration_deadline);
+    // Shown separately only when the edition has its own deadline for contributions
+    $contributionDeadline = $conference->contribution_deadline ? \App\Models\Conference::formatDate($conference->contributionDeadline()) : null;
+    $contributionOpen = $conference->isContributionOpen();
     $notification = \App\Models\Conference::formatDate($conference->notification_date);
 @endphp
 
@@ -32,10 +35,13 @@
             <div class="meta">
                 <p><b>Organizátor:</b> <a href="https://www.fri.uniza.sk" target="_blank">Fakulta riadenia a informatiky</a> Žilinská univerzita v Žiline</p>
                 <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
-                <p><b>Adresa:</b> Fakulta riadenia a informatiky, Veľký diel 3323, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
-                <p><b>Dátum:</b> {{ $date }}</p>
+                <p><b>Adresa:</b> Veľký diel 3323, 010&nbsp;26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
+                <p><b>Dátum konania:</b> {{ $date }}</p>
+                @if($contributionDeadline)
+                <p><b>Deadline príspevkov:</b> {{ $contributionDeadline }}</p>
+                @endif
                 @if($deadline)
-                <p><b>Deadline:</b> {{ $deadline }}</p>
+                <p><b>{{ $contributionDeadline ? 'Deadline registrácie:' : 'Deadline:' }}</b> {{ $deadline }}</p>
                 @endif
             </div>
         </div>
@@ -50,14 +56,28 @@
     <div class="stack">
         <section class="card lightCard">
             <h2>Typy účasti</h2>
-            <p><b>Účasť je možná už len online a prihlasovanie príspevkov je uzatvorené.</b></p>
+            <p>Vyberte si formu vašej účasti na konferencii:</p>
 
             <div class="registrationTypes">
                 <div class="regType">
-                    <h3>Pasívna účasť (online)</h3>
+                    <h3>Aktívna účasť s príspevkom</h3>
+                    <p>Pre autorov, ktorí chcú prezentovať svoje skúsenosti.</p>
+                    <ul class="list">
+                        <li>Príspevok (max. {{ $conference->presentation_minutes ?: 15 }} minút)</li>
+                        <li>Diskutujúci na panelovej diskusii (v prípade záujmu)</li>
+                    </ul>
+                    @if(! $contributionOpen)
+                        <p><b>Prihlasovanie príspevkov je uzatvorené.</b></p>
+                    @elseif($contributionDeadline)
+                        <p><b>Príspevky prijímame do {{ $contributionDeadline }}.</b></p>
+                    @endif
+                </div>
+
+                <div class="regType">
+                    <h3>Pasívna účasť</h3>
                     <p>Pre účastníkov, ktorí sa chcú zúčastniť ako poslucháči.</p>
                     <ul class="list">
-                        <li>Online prístup na všetky prednášky</li>
+                        <li>Prístup na všetky prednášky (prezenčne aj online)</li>
                         <li>Účasť na panelových diskusiách</li>
                     </ul>
                 </div>
@@ -148,19 +168,45 @@
                 </div>
 
                 <div class="formSection">
-                    <h3>Forma a typ účasti</h3>
-                    <div class="formGroup">
-                        <div style="color: rgba(255,255,255,.85); font-size: 0.98em;">
-                            Účasť je <b>len online</b> a <b>len pasívna</b>.
+                    <h3>Typ účasti *</h3>
+
+                    <div class="formGroup radioGroup">
+                        <label @unless($contributionOpen) style="opacity: .55;" @endunless>
+                            <input type="radio" name="participation_type" value="presentation" {{ $contributionOpen && old('participation_type', 'passive') === 'presentation' ? 'checked' : '' }} @disabled(! $contributionOpen)>
+                            Aktívna účasť – prednáška
+                            @unless($contributionOpen)
+                                (prihlasovanie príspevkov je uzatvorené)
+                            @endunless
+                        </label>
+                        <label>
+                            <input type="radio" name="participation_type" value="passive" {{ old('participation_type', 'passive') === 'passive' ? 'checked' : '' }}>
+                            Pasívna účasť (poslucháč)
+                        </label>
+                    </div>
+                    @error('participation_type')
+                        <div class="error-message">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="formSection">
+                    <h3>Forma účasti</h3>
+
+                    <div class="formGroup radioGroup">
+                        <label>
+                            <input type="checkbox" name="online_participation" value="1" {{ old('online_participation') ? 'checked' : '' }}>
+                            Online účasť
+                        </label>
+                        <div style="margin-top:6px; color: rgba(255,255,255,.75); font-size: 0.95em;">
+                            Ak zaškrtnete, budeme s vami počítať ako s online účastníkom. Inak počítame s prezenčnou účasťou v Žiline.
                         </div>
                     </div>
                 </div>
 
-                <div class="formSection contributionSection" style="display:none;">
+                <div class="formSection contributionSection">
                     <h3>Informácie o príspevku</h3>
 
                     <div class="formGroup">
-                        <label for="title">Názov príspevku</label>
+                        <label for="title">Názov príspevku *</label>
                         <input type="text" id="title" name="title" value="{{ old('title') }}" class="@error('title') has-error @enderror">
                         @error('title')
                             <div class="error-message">{{ $message }}</div>
@@ -168,7 +214,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label for="abstract">Abstrakt (max 300 slov)</label>
+                        <label for="abstract">Abstrakt (max 300 slov) *</label>
                         <textarea id="abstract" name="abstract" rows="6" class="@error('abstract') has-error @enderror">{{ old('abstract') }}</textarea>
                         @error('abstract')
                             <div class="error-message">{{ $message }}</div>
@@ -219,8 +265,11 @@
 
         <aside class="card lightCard">
             <h2>Dôležité informácie</h2>
+            @if($contributionDeadline)
+            <p><b>Deadline príspevkov:</b> {{ $contributionDeadline }}</p>
+            @endif
             @if($deadline)
-            <p><b>Deadline:</b> {{ $deadline }}</p>
+            <p><b>{{ $contributionDeadline ? 'Deadline registrácie:' : 'Deadline:' }}</b> {{ $deadline }}</p>
             @endif
             <p><b>Potvrdenie účasti:</b> Do 7 dní od prihlásenia</p>
             <p><b>Registračný poplatok:</b> Konferencia je bezplatná</p>
@@ -228,8 +277,11 @@
 
             <h3 style="margin-top:18px;">Dôležité termíny</h3>
             <ul class="list">
+                @if($contributionDeadline)
+                <li>{{ $contributionDeadline }} – Deadline na príspevky (aktívna účasť)</li>
+                @endif
                 @if($deadline)
-                <li>{{ $deadline }} – Deadline na prihlášky</li>
+                <li>{{ $deadline }} – {{ $contributionDeadline ? 'Deadline na registráciu (pasívna účasť)' : 'Deadline na prihlášky' }}</li>
                 @endif
                 @if($notification)
                 <li>{{ $notification }} – Notifikácia autorov</li>
@@ -248,6 +300,17 @@
                     heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             @endif
+
+            // Show the contribution fields only for active participation
+            const contributionSection = document.querySelector('.contributionSection');
+            function updateContributionVisibility() {
+                const selected = document.querySelector('input[name="participation_type"]:checked');
+                contributionSection.style.display = selected && selected.value === 'presentation' ? '' : 'none';
+            }
+            updateContributionVisibility();
+            document.querySelectorAll('input[name="participation_type"]').forEach(radio => {
+                radio.addEventListener('change', updateContributionVisibility);
+            });
 
             // Form validation
             const form = document.querySelector('.regForm');
@@ -288,6 +351,29 @@
                     if (!emailRegex.test(emailField.value)) {
                         showError(emailField, 'Zadajte platnú e-mailovú adresu');
                         hasErrors = true;
+                    }
+                }
+
+                // Contribution fields are required for active participation
+                const participation = document.querySelector('input[name="participation_type"]:checked');
+                if (participation && participation.value === 'presentation') {
+                    const titleField = document.getElementById('title');
+                    const abstractField = document.getElementById('abstract');
+
+                    if (!titleField.value.trim()) {
+                        showError(titleField, 'Názov príspevku je povinný');
+                        hasErrors = true;
+                    }
+
+                    if (!abstractField.value.trim()) {
+                        showError(abstractField, 'Abstrakt je povinný');
+                        hasErrors = true;
+                    } else {
+                        const wordCount = abstractField.value.trim().split(/\s+/).length;
+                        if (wordCount > {{ \App\Models\Registration::ABSTRACT_MAX_WORDS }}) {
+                            showError(abstractField, `Abstrakt prekračuje limit {{ \App\Models\Registration::ABSTRACT_MAX_WORDS }} slov (aktuálne: ${wordCount} slov)`);
+                            hasErrors = true;
+                        }
                     }
                 }
 

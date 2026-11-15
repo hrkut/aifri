@@ -24,7 +24,8 @@
             <thead class="bg-slate-800 text-slate-300 text-left">
                 <tr>
                     <th class="px-4 py-3">Ročník</th>
-                    <th class="px-4 py-3">Dátum</th>
+                    <th class="px-4 py-3">Dátum konania</th>
+                    <th class="px-4 py-3">Deadline príspevkov</th>
                     <th class="px-4 py-3">Deadline registrácie</th>
                     <th class="px-4 py-3 text-right">Prihlášky</th>
                     <th class="px-4 py-3 text-right">Otázky</th>
@@ -37,6 +38,7 @@
                     <tr class="{{ $c->id === $working->id ? 'bg-slate-800/40' : '' }}">
                         <td class="px-4 py-3 font-semibold text-slate-100">{{ $c->year }}</td>
                         <td class="px-4 py-3 text-slate-200 whitespace-nowrap">{{ $c->date ? $c->dateLabel() : '—' }}</td>
+                        <td class="px-4 py-3 text-slate-300 whitespace-nowrap">{{ \App\Models\Conference::formatDate($c->contribution_deadline) ?? '—' }}</td>
                         <td class="px-4 py-3 text-slate-300 whitespace-nowrap">{{ \App\Models\Conference::formatDate($c->registration_deadline) ?? '—' }}</td>
                         <td class="px-4 py-3 text-right text-slate-300">{{ $c->registrations_count }}</td>
                         <td class="px-4 py-3 text-right text-slate-300">{{ $c->questions_count }}</td>

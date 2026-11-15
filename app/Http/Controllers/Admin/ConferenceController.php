@@ -95,6 +95,10 @@ class ConferenceController extends Controller
             'year' => ['required', 'integer', 'min:2000', 'max:2100', Rule::unique('conferences', 'year')->ignore($conference?->id)],
             'date' => ['required', 'date'],
             'registration_deadline' => ['nullable', 'date', 'before_or_equal:date'],
+            'contribution_deadline' => array_merge(
+                ['nullable', 'date', 'before_or_equal:date'],
+                $request->filled('registration_deadline') ? ['before_or_equal:registration_deadline'] : [],
+            ),
             'notification_date' => ['nullable', 'date', 'before_or_equal:date'],
             'teams_url' => ['nullable', 'url', 'max:2000'],
         ];
@@ -112,6 +116,7 @@ class ConferenceController extends Controller
         $data = $request->validate($rules, [
             'year.unique' => 'Tento ročník už existuje.',
             'registration_deadline.before_or_equal' => 'Deadline registrácie musí byť najneskôr v deň konferencie.',
+            'contribution_deadline.before_or_equal' => 'Deadline príspevkov musí byť najneskôr v deň konferencie a nie neskôr ako deadline registrácie.',
             'notification_date.before_or_equal' => 'Notifikácia autorov musí byť najneskôr v deň konferencie.',
         ]);
 

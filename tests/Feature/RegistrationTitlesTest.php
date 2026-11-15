@@ -16,6 +16,7 @@ it('stores title_before and title_after into DB', function () {
         'phone' => '0900123456',
         'institution' => 'UNIZA',
         'position' => 'Researcher',
+        'participation_type' => 'passive',
         'notes' => 'hello',
     ]);
 

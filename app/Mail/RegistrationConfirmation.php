@@ -12,7 +12,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Sent to a participant right after they register (passive participation).
+ * Sent to a participant right after they register (passive or active participation).
  */
 class RegistrationConfirmation extends Mailable
 {

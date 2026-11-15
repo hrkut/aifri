@@ -7,12 +7,6 @@
     $c = \App\Mail\EmailTheme::COLORS;
     $font = \App\Mail\EmailTheme::FONT;
     $isTalk = $registration->participation_type === 'presentation';
-    $blocks = [
-        'intro' => 'Úvodný blok – Vízia a trendy',
-        'teaching' => 'Blok 1 – AI vo výučbe a výskume',
-        'practice' => 'Blok 2 – AI v praxi',
-        'students' => 'Blok 3 – AI očami študentov',
-    ];
     $p = 'margin: 0 0 14px; font-family: ' . $font . '; font-size: 16px; line-height: 1.6; color: ' . $c['text'] . ';';
     $link = 'color: ' . $c['link'] . '; text-decoration: none;';
     $pre = 'margin: 0; white-space: pre-wrap; font-family: ' . $font . '; font-size: 15px; line-height: 1.6; color: ' . $c['text'] . ';';
@@ -49,7 +43,7 @@
                 <p style="{!! $pre !!} color: {{ $c['muted'] }}; padding-bottom: 8px;">{{ $registration->abstract }}</p>
             @endif
             <div><strong>Kľúčové slová:</strong> {{ $registration->keywords ?: '—' }}</div>
-            <div><strong>Preferovaný blok:</strong> {{ $blocks[$registration->block] ?? ($registration->block ?: '—') }}</div>
+            <div><strong>Preferovaný blok:</strong> {{ $registration->blockLabel() ?? '—' }}</div>
         </x-email.panel>
     @endif
 

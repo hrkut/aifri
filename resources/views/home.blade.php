@@ -8,6 +8,9 @@
     /** @var \App\Models\Conference $conference */
     $date = $conference->dateLabel();
     $deadline = \App\Models\Conference::formatDate($conference->registration_deadline);
+    $contributionDeadline = $conference->contribution_deadline && $conference->isContributionOpen()
+        ? \App\Models\Conference::formatDate($conference->contributionDeadline())
+        : null;
     $notification = \App\Models\Conference::formatDate($conference->notification_date);
     $webUrl = 'https://konferenciaAI.fri.uniza.sk';
 @endphp
@@ -51,6 +54,9 @@
             @endif
             <p><a href="{{ route('question') }}">❓ Položiť otázku</a></p>
             <p><a href="{{ route('recordings.login') }}">📺 Príspevky z konferencie</a></p>
+    @if($contributionDeadline)
+    <div class="pill">Príspevky do {{ $contributionDeadline }}</div>
+    @endif
     @if($conference->isRegistrationOpen() && $deadline)
     <div class="pill">Registrácia do {{ $deadline }}</div>
     @endif
@@ -66,7 +72,10 @@
     <p><b>Organizátor:</b> <a href="https://www.fri.uniza.sk" target="_blank">Fakulta riadenia a informatiky</a> Žilinská univerzita v Žiline</p>
     <p><b>Forma:</b> hybridná (prezenčne aj online)</p>
     <p><b>Adresa:</b> Fakulta riadenia a informatiky, Veľký diel 3323, 010 26 Žilina (<a href="https://maps.app.goo.gl/PaeifyvpnXGbSTbi6" target="_blank">Kde nás nájdete</a>)</p>
-    <p><b>Dátum:</b> {{ $date }}</p>
+    <p><b>Dátum konania:</b> {{ $date }}</p>
+    @if($contributionDeadline)
+    <p><b>Deadline na príspevky:</b> {{ $contributionDeadline }}</p>
+    @endif
     @if($conference->isRegistrationOpen() && $deadline)
     <p><b>Deadline na registráciu:</b> {{ $deadline }}</p>
     @endif

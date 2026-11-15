@@ -22,6 +22,7 @@ class Conference extends Model
         'year',
         'date',
         'registration_deadline',
+        'contribution_deadline',
         'notification_date',
         'teams_url',
         'is_active',
@@ -34,6 +35,7 @@ class Conference extends Model
         'year' => 'integer',
         'date' => 'date',
         'registration_deadline' => 'date',
+        'contribution_deadline' => 'date',
         'notification_date' => 'date',
         'is_active' => 'boolean',
         'presentation_minutes' => 'integer',
@@ -139,8 +141,28 @@ class Conference extends Model
     /** Registration is offered until the deadline (or until the conference day if no deadline is set). */
     public function isRegistrationOpen(): bool
     {
-        $until = $this->registration_deadline ?? $this->date;
+        return self::notPassed($this->registration_deadline ?? $this->date);
+    }
 
+    /** Last day for submitting a contribution (falls back to the registration deadline). */
+    public function contributionDeadline(): ?Carbon
+    {
+        $deadline = $this->contribution_deadline ?? $this->registration_deadline ?? $this->date;
+
+        // Never later than the general registration deadline
+        return $this->registration_deadline && $deadline && $deadline->gt($this->registration_deadline)
+            ? $this->registration_deadline
+            : $deadline;
+    }
+
+    /** Active participation (with a talk) can be registered until the contribution deadline. */
+    public function isContributionOpen(): bool
+    {
+        return self::notPassed($this->contributionDeadline());
+    }
+
+    private static function notPassed(?Carbon $until): bool
+    {
         return $until !== null && now()->startOfDay()->lte($until);
     }
 }

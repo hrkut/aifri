@@ -35,6 +35,21 @@ class Registration extends Model
         'online_participation' => 'boolean',
     ];
 
+    public const ABSTRACT_MAX_WORDS = 300;
+
+    /** Programme blocks a talk can be submitted to (keys stored in `block`). */
+    public const BLOCKS = [
+        'intro' => 'Úvodný blok – Vízia a trendy',
+        'teaching' => 'Blok 1 – AI vo výučbe a výskume',
+        'practice' => 'Blok 2 – AI v praxi',
+        'students' => 'Blok 3 – AI očami študentov',
+    ];
+
+    public function blockLabel(): ?string
+    {
+        return $this->block ? (self::BLOCKS[$this->block] ?? $this->block) : null;
+    }
+
     /** Name with academic titles, e.g. "Ing. Jana Nováková, PhD." */
     public function fullName(): string
     {

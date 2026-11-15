@@ -40,9 +40,10 @@ Route::get('/vybor', function () {
 })->name('committee');
 
 Route::get('/program', function () {
+    // Only scheduled items: freshly submitted talks have no time until the organisers place them
     $registrations = \App\Models\Registration::query()
         ->whereIn('participation_type', ['presentation', 'break'])
-        ->orderByRaw('time_start is null')
+        ->whereNotNull('time_start')
         ->orderBy('time_start')
         ->orderBy('id')
         ->get();
@@ -59,21 +60,51 @@ Route::post('/prihlasenie', function (Request $request) {
         'phone' => ['nullable', 'string', 'max:100'],
         'institution' => ['required', 'string', 'max:255'],
         'position' => ['nullable', 'string', 'max:255'],
-        'title' => ['nullable', 'string', 'max:255'],
-        'abstract' => ['nullable', 'string'],
+        'participation_type' => [
+            'required', 'in:passive,presentation',
+            function (string $attribute, mixed $value, \Closure $fail) {
+                $conference = Conference::current();
+                if ($value === 'presentation' && ! $conference->isContributionOpen()) {
+                    $until = Conference::formatDate($conference->contributionDeadline());
+                    $fail('Prihlasovanie príspevkov bolo uzatvorené' . ($until ? " ({$until})" : '') . '. Môžete sa prihlásiť ako pasívny účastník.');
+                }
+            },
+        ],
+        'online_participation' => ['sometimes', 'accepted'],
+        'title' => ['required_if:participation_type,presentation', 'nullable', 'string', 'max:255'],
+        'abstract' => [
+            'required_if:participation_type,presentation', 'nullable', 'string',
+            function (string $attribute, mixed $value, \Closure $fail) {
+                $words = count(preg_split('/\s+/u', trim((string) $value), -1, PREG_SPLIT_NO_EMPTY));
+                if ($words > Registration::ABSTRACT_MAX_WORDS) {
+                    $fail('Abstrakt prekračuje limit ' . Registration::ABSTRACT_MAX_WORDS . " slov (aktuálne: {$words} slov)");
+                }
+            },
+        ],
         'keywords' => ['nullable', 'string', 'max:255'],
-        'block' => ['nullable', 'in:intro,teaching,practice,students'],
+        'block' => ['nullable', 'in:' . implode(',', array_keys(Registration::BLOCKS))],
         'notes' => ['nullable', 'string', 'max:2000'],
     ], [
         'name.required' => 'Meno a priezvisko je povinné pole',
         'email.required' => 'E-mail je povinné pole',
         'email.email' => 'Zadajte platnú e-mailovú adresu',
         'institution.required' => 'Inštitúcia / Organizácia je povinné pole',
+        'participation_type.required' => 'Vyberte typ účasti',
+        'participation_type.in' => 'Neplatný typ účasti',
+        'title.required_if' => 'Názov príspevku je povinný pre aktívnu účasť',
+        'abstract.required_if' => 'Abstrakt je povinný pre aktívnu účasť',
         'block.in' => 'Vyberte platný blok',
     ]);
 
-    $data['participation_type'] = 'passive';
-    $data['online_participation'] = true;
+    $data['online_participation'] = $request->boolean('online_participation');
+
+    // Contribution details only belong to active participants (hidden fields may still be posted)
+    if ($data['participation_type'] !== 'presentation') {
+        $data['title'] = $data['abstract'] = $data['keywords'] = $data['block'] = null;
+    } else {
+        // Default length of a talk for this edition
+        $data['duration_minutes'] = (int) (Conference::current()->presentation_minutes ?: 15);
+    }
 
     $registration = Registration::create($data);
 
@@ -88,7 +119,7 @@ Route::post('/prihlasenie', function (Request $request) {
     }
 
     return redirect()->to(route('registration') . '#registration-form')
-        ->with('success', 'Ďakujeme za prihlásenie! Vašu prihlášku sme zaregistrovali.');
+        ->with('success', 'Ďakujeme za prihlásenie! Potvrdenie sme vám poslali na e-mail.');
 })->name('registration.submit');
 
 // ---- Question Routes ----

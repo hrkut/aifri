@@ -16,7 +16,7 @@ Forma: {{ $registration->online_participation ? 'Online' : 'Prezenčne' }}
 PRÍSPEVOK
 Názov: {{ $registration->title ?: '(bez názvu)' }}
 Kľúčové slová: {{ $registration->keywords ?: '—' }}
-Preferovaný blok: {{ $registration->block ?: '—' }}
+Preferovaný blok: {{ $registration->blockLabel() ?? '—' }}
 Abstrakt:
 {{ $registration->abstract }}
 @endif

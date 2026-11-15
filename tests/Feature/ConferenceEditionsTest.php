@@ -181,6 +181,7 @@ it('stores public registrations in the active edition', function () {
         'name' => 'Nový Účastník',
         'email' => 'n@example.com',
         'institution' => 'UNIZA',
+        'participation_type' => 'passive',
     ])->assertRedirect();
 
     expect(Registration::withoutGlobalScope('conference')->where('email', 'n@example.com')->value('conference_id'))
@@ -260,6 +261,7 @@ it('sends a themed confirmation to a passive participant', function () {
         'title_after' => 'PhD.',
         'email' => 'jana@example.com',
         'institution' => 'UNIZA',
+        'participation_type' => 'passive',
     ])->assertRedirect();
 
     Mail::assertSent(\App\Mail\RegistrationConfirmation::class, function ($mail) {
@@ -285,4 +287,148 @@ it('sends a themed confirmation to a passive participant', function () {
 
         return $mail->hasTo('konferenciaAI@fri.uniza.sk') && $mail->hasReplyTo('jana@example.com');
     });
+});
+
+it('registers an active participant with a contribution', function () {
+    Mail::fake();
+    Conference::active()->update(['notification_date' => '2027-01-25']);
+
+    $this->post(route('registration.submit'), [
+        'name' => 'Peter Prednášajúci',
+        'email' => 'peter@example.com',
+        'institution' => 'UNIZA',
+        'participation_type' => 'presentation',
+        'title' => 'AI v laboratórnych cvičeniach',
+        'abstract' => 'Krátky abstrakt príspevku.',
+        'keywords' => 'AI, cvičenia',
+        'block' => 'practice',
+    ])->assertSessionHasNoErrors()->assertRedirect(route('registration') . '#registration-form');
+
+    $reg = Registration::where('email', 'peter@example.com')->firstOrFail();
+    expect($reg->participation_type)->toBe('presentation')
+        ->and($reg->title)->toBe('AI v laboratórnych cvičeniach')
+        ->and($reg->block)->toBe('practice')
+        ->and($reg->online_participation)->toBeFalse()
+        ->and($reg->time_start)->toBeNull()
+        ->and($reg->duration_minutes)->toBe(15);
+
+    Mail::assertSent(\App\Mail\RegistrationConfirmation::class, function ($mail) {
+        $mail->assertSeeInHtml('aktívneho účastníka');
+        $mail->assertSeeInHtml('AI v laboratórnych cvičeniach');
+        $mail->assertSeeInHtml('Blok 2 – AI v praxi');
+        $mail->assertSeeInHtml('25. 1. 2027');
+        $mail->assertSeeInText('Príspevok teraz posúdi programový výbor');
+
+        return $mail->hasTo('peter@example.com');
+    });
+    Mail::assertSent(\App\Mail\NewRegistrationNotification::class, fn ($mail) => $mail->hasTo('konferenciaAI@fri.uniza.sk'));
+
+    // Not published in the public programme until the organisers schedule it
+    $this->get(route('program'))->assertDontSee('AI v laboratórnych cvičeniach');
+    $reg->update(['time_start' => '10:00']);
+    $this->get(route('program'))->assertSee('AI v laboratórnych cvičeniach');
+});
+
+it('requires title and abstract for active participation and limits the abstract', function () {
+    Mail::fake();
+    $base = ['name' => 'P', 'email' => 'p@example.com', 'institution' => 'X', 'participation_type' => 'presentation'];
+
+    $this->post(route('registration.submit'), $base)->assertSessionHasErrors(['title', 'abstract']);
+
+    $this->post(route('registration.submit'), $base + [
+        'title' => 'T',
+        'abstract' => trim(str_repeat('slovo ', Registration::ABSTRACT_MAX_WORDS + 1)),
+    ])->assertSessionHasErrors('abstract');
+
+    $this->post(route('registration.submit'), ['name' => 'P', 'email' => 'p@example.com', 'institution' => 'X'])
+        ->assertSessionHasErrors('participation_type');
+
+    expect(Registration::count())->toBe(0);
+    Mail::assertNothingSent();
+});
+
+it('drops contribution fields for passive participants', function () {
+    Mail::fake();
+
+    $this->post(route('registration.submit'), [
+        'name' => 'P', 'email' => 'p@example.com', 'institution' => 'X',
+        'participation_type' => 'passive',
+        'title' => 'Zabudnutý názov', 'abstract' => 'Text', 'block' => 'intro',
+    ])->assertSessionHasNoErrors();
+
+    $reg = Registration::firstOrFail();
+    expect($reg->title)->toBeNull()->and($reg->abstract)->toBeNull()->and($reg->block)->toBeNull();
+});
+
+it('shows both participation types on the registration form', function () {
+    $this->get(route('registration'))
+        ->assertOk()
+        ->assertSee('Aktívna účasť – prednáška')
+        ->assertSee('Pasívna účasť (poslucháč)')
+        ->assertSee('name="online_participation"', false)
+        ->assertSee('Názov príspevku *');
+});
+
+it('closes active registration after the contribution deadline while passive stays open', function () {
+    Mail::fake();
+    $this->travelTo('2027-01-20 12:00');
+    Conference::active()->update([
+        'contribution_deadline' => '2027-01-15',
+        'registration_deadline' => '2027-01-31',
+    ]);
+
+    $this->get(route('registration'))
+        ->assertOk()
+        ->assertSee('Prihlasovanie príspevkov je uzatvorené')
+        ->assertSee('15. 1. 2027 – Deadline na príspevky (aktívna účasť)')
+        ->assertSee('31. 1. 2027 – Deadline na registráciu (pasívna účasť)');
+
+    $this->post(route('registration.submit'), [
+        'name' => 'Neskorý Autor', 'email' => 'late@example.com', 'institution' => 'X',
+        'participation_type' => 'presentation', 'title' => 'T', 'abstract' => 'A',
+    ])->assertSessionHasErrors('participation_type');
+
+    $this->post(route('registration.submit'), [
+        'name' => 'Poslucháč', 'email' => 'listener@example.com', 'institution' => 'X',
+        'participation_type' => 'passive',
+    ])->assertSessionHasNoErrors();
+
+    expect(Registration::pluck('email')->all())->toBe(['listener@example.com']);
+});
+
+it('shows the contribution deadline while it is open', function () {
+    $this->travelTo('2027-01-10 12:00');
+    Conference::active()->update([
+        'contribution_deadline' => '2027-01-15',
+        'registration_deadline' => '2027-01-31',
+    ]);
+
+    $this->get(route('home'))->assertSee('Príspevky do 15. 1. 2027')->assertSee('Registrácia do 31. 1. 2027');
+    $this->get(route('registration'))
+        ->assertSee('Príspevky prijímame do 15. 1. 2027')
+        ->assertDontSee('prihlasovanie príspevkov je uzatvorené');
+});
+
+it('validates the contribution deadline in the edition form', function () {
+    $admin = User::factory()->create(['is_admin' => true]);
+    $c = Conference::active();
+
+    $this->actingAs($admin)->put(route('admin.conferences.update', $c), [
+        'year' => 2027, 'date' => '2027-02-02',
+        'registration_deadline' => '2027-01-31',
+        'contribution_deadline' => '2027-02-01',
+    ])->assertSessionHasErrors('contribution_deadline');
+
+    $this->actingAs($admin)->put(route('admin.conferences.update', $c), [
+        'year' => 2027, 'date' => '2027-02-02',
+        'registration_deadline' => '2027-01-31',
+        'contribution_deadline' => '2027-01-22',
+    ])->assertSessionHasNoErrors();
+
+    expect($c->fresh()->contribution_deadline->format('Y-m-d'))->toBe('2027-01-22');
+    $this->actingAs($admin)->get(route('admin.conferences.edit', $c))->assertSee('value="2027-01-22"', false);
+});
+
+it('backfills the 2026 contribution deadline', function () {
+    expect(Conference::where('year', 2026)->first()->contribution_deadline->format('Y-m-d'))->toBe('2026-02-04');
 });
