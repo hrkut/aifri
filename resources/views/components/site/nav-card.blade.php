@@ -24,7 +24,9 @@
     @unless(request()->routeIs('question'))
         <p><a href="{{ route('question') }}">❓ Položiť otázku</a></p>
     @endunless
-    <p><a href="{{ route('recordings.login') }}">📺 Záznamy z minulých ročníkov</a></p>
+    @unless(request()->routeIs('recordings.*'))
+        <p><a href="{{ route('recordings.login') }}">📺 Záznamy z minulých ročníkov</a></p>
+    @endunless
 
     @if($contributionDeadline || $deadline)
         <div class="pills">

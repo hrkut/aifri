@@ -4,38 +4,14 @@
 @section('meta_description', 'Položte svoju otázku na konferenciu o umelej inteligencii vo vzdelávaní')
 
 @section('content')
-    <a href="{{ route('home') }}" class="siteHeaderLink">
-        <div class="siteHeader">
-            <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
-        </div>
-    </a>
-
-    <header>
-        <div>
-            <div class="heroTitle">
-                <div class="heroText">
-                    <div>
-                        <h1>POLOŽIŤ OTÁZKU</h1>
-                        <p class="sub">Umelá inteligencia vo vzdelávaní</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="meta">
-                <p><b>Máte otázku?</b> Napíšte nám ju a my sa vám pokúsime odpovedať.</p>
-            </div>
-        </div>
-
-        <div class="card loginCard" style="min-width:325px; max-width:360px;">
-            <h2>Navigácia</h2>
-            <p><a href="{{ route('home') }}">🏠 Späť na úvodnú stránku</a></p>
-            <p><a href="{{ route('program') }}">📅 Program konferencie</a></p>
-        </div>
-    </header>
+    <x-site.hero :conference="$conference"
+                 title="POLOŽIŤ OTÁZKU"
+                 sub="Umelá inteligencia vo vzdelávaní" />
 
     <div class="stack">
-        <section class="card lightCard">
+        <section class="card">
             <h2>Položte svoju otázku</h2>
+            <p><b>Máte otázku?</b> Napíšte nám ju a my sa vám pokúsime odpovedať.</p>
 
             @if ($errors->any())
                 <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; color: #dc2626;">

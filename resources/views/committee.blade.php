@@ -2,27 +2,9 @@
 @section('title', 'Programový a organizačný výbor')
 @section('meta_description', 'Programový a organizačný výbor konferencie o umelej inteligencii vo vzdelávaní')
 @section('content')
-    <a href="{{ route('home') }}" class="siteHeaderLink">
-        <div class="siteHeader">
-            <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
-        </div>
-    </a>
-    <header>
-        <div>
-            <div class="heroTitle">
-                <div class="heroText">
-                    <div>
-                        <h1>PROGRAMOVÝ A ORGANIZAČNÝ VÝBOR</h1>
-                        <p class="sub">Konferencia o umelej inteligencii vo vzdelávaní</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card loginCard" style="min-width:325px; max-width:360px;">
-            <h2>Navigácia</h2>
-            <p><a href="{{ route('home') }}">🏠 Späť na úvodnú stránku</a></p>
-        </div>
-    </header>
+    <x-site.hero :conference="$conference"
+                 title="PROGRAMOVÝ A ORGANIZAČNÝ VÝBOR"
+                 sub="Konferencia o umelej inteligencii vo vzdelávaní" />
     <div class="stack">
         <section class="card">
             <h2>Programový a organizačný výbor</h2>
@@ -57,11 +39,6 @@
                 </div>
             </div>
         </section>
-        <section class="card infoCard">
-            <h2>Kontakt</h2>
-            <p><b>E-mail:</b> <a href="mailto:konferenciaAI@fri.uniza.sk">konferenciaAI@fri.uniza.sk</a></p>
-            <p><b>Web:</b> <a href="{{ route('home') }}">konferenciaAI.fri.uniza.sk</a></p>
-            <p><b>Adresa:</b>Fakulta riadenia a informatiky, Veľký diel 3323, 010 26 Žilina</p>
-        </section>
+        <x-site.info-card :conference="$conference" />
     </div>
 @endsection

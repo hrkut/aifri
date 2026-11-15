@@ -4,13 +4,10 @@
 @section('meta_description', 'Program konferencie o umelej inteligencii vo vzdelávaní')
 
 @section('content')
-<a href="{{ route('home') }}" class="siteHeaderLink">
-    <div class="siteHeader">
-        <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
-    </div>
-</a>
 
 <style>
+    .printOnly { display: none; }
+
     .program-details-content {
         padding: 1rem 0.75rem;
     }
@@ -184,8 +181,9 @@
             margin: 0 auto !important;
         }
 
-        /* Hide screen header */
-        .siteHeaderLink { display: none !important; }
+        /* Hide screen header (logo, title, navigation) */
+        .siteHeaderLink, header { display: none !important; }
+        .printOnly { display: block !important; }
 
           /* Make text of talks black (keep break colors as-is) */
          .program-table tbody tr:not(.break-row) td {
@@ -256,14 +254,18 @@
     });
 </script>
 
-<div class="stack" style="max-width: 90vw; margin: 2rem auto; padding: 0 1rem;">
-    <div class="card" style="background: rgba(11, 75, 103, 0.35); padding: 2rem;">
+<x-site.hero :conference="$conference"
+             title="PROGRAM KONFERENCIE"
+             sub="Umelá inteligencia vo vzdelávaní" />
+
+<div class="stack">
+    <div class="card">
         <!-- Print-only header with FRI_logo2 -->
         <div class="printHeader" style="display: none; margin-bottom: 1.5rem; text-align: center;">
             <img src="{{ asset('images/FRI_logo2.png') }}" alt="FRI Logo" class="printHeaderLogo" style="width: 100%; max-width: 480px; height: auto;"/>
         </div>
 
-        <h1 style="color: #9fe7ff; margin-bottom: 1.5rem; margin-top: 0;">Program konferencie</h1>
+        <h1 class="printOnly" style="color: #9fe7ff; margin-bottom: 1.5rem; margin-top: 0;">Program konferencie</h1>
         <p style="margin-top: -0.75rem; margin-bottom: 1.25rem; color: #cbd5e1; font-size: 0.95rem;">
             Organizátori si vyhradzujú právo na zmeny v programe.
         </p>
@@ -368,11 +370,6 @@
             </div>
         @endif
 
-        <div style="margin-top: 2rem; text-align: center;">
-            <a href="{{ route('home') }}" class="back-home-link" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(159, 231, 255, 0.2); color: #00e5cc; text-decoration: none; border-radius: 0.5rem; font-weight: 500; border: 1px solid rgba(159, 231, 255, 0.3); transition: all 0.2s ease;">
-                ← Späť na hlavnú stránku
-            </a>
-        </div>
     </div>
 </div>
 @endsection

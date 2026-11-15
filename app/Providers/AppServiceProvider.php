@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Public pages show data (date, deadlines, Teams link) of the current edition.
-        View::composer(['home', 'registration', 'program'], function ($view) {
+        View::composer(['home', 'registration', 'program', 'committee', 'question', 'recordings.login', 'recordings.list'], function ($view) {
             $view->with('conference', Conference::current());
         });
     }

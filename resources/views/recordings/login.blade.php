@@ -4,11 +4,6 @@
 @section('meta_description', 'Záznamy z konferencie o umelej inteligencii vo vzdelávaní')
 
 @section('content')
-<a href="{{ route('home') }}" class="siteHeaderLink">
-    <div class="siteHeader">
-        <img src="{{ asset('images/FRI_logo.png') }}" alt="FRI Logo" class="friLogo" loading="lazy"/>
-    </div>
-</a>
 
 <style>
     .login-form-group {
@@ -75,9 +70,13 @@
     }
 </style>
 
-<div class="stack" style="max-width: 90vw; margin: 2rem auto; padding: 0 1rem;">
-    <div class="card" style="background: rgba(11, 75, 103, 0.35); padding: 2rem; max-width: 500px; margin: 2rem auto;">
-        <h1 style="color: #9fe7ff; margin-top: 0; margin-bottom: 0.5rem; text-align: center;">🔐 Záznamy z minulých ročníkov</h1>
+<x-site.hero :conference="$conference"
+             title="ZÁZNAMY Z MINULÝCH ROČNÍKOV"
+             sub="Videozáznamy a prezentácie príspevkov" />
+
+<div class="stack">
+    <div class="card" style="max-width: 500px; width: 100%; margin: 0 auto;">
+        <h2 style="text-align: center;">🔐 Prístup k záznamom</h2>
         <p style="color: #cbd5e1; text-align: center; margin-bottom: 1.5rem; font-size: 0.95rem;">
             Zadajte heslo na prístup k záznamom a prezentáciám z minulých ročníkov konferencie:
         </p>
@@ -105,11 +104,6 @@
             <button type="submit" class="btn-submit">Prístupiť k záznamom</button>
         </form>
 
-        <div style="margin-top: 2rem; text-align: center;">
-            <a href="{{ route('home') }}" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(159, 231, 255, 0.2); color: #00e5cc; text-decoration: none; border-radius: 0.5rem; font-weight: 500; border: 1px solid rgba(159, 231, 255, 0.3); transition: all 0.2s ease;">
-                ← Späť na hlavnú stránku
-            </a>
-        </div>
     </div>
 </div>
 @endsection
