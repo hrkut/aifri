@@ -81,16 +81,24 @@ APP_FALLBACK_LOCALE=en
 # Bez neho sa do záznamov nedá prihlásiť nikto.
 RECORDINGS_PASSWORD=nove-heslo
 
-# Skutočný SMTP server (lokálne sa používa Mailpit)
-MAIL_MAILER=smtp
-MAIL_HOST=...
-MAIL_PORT=...
-MAIL_USERNAME=...
-MAIL_PASSWORD=...
-MAIL_SCHEME=null
+# E-maily cez sendmail servera (lokálne sa používa Mailpit)
+MAIL_MAILER=sendmail
 MAIL_FROM_ADDRESS="konferenciaAI@fri.uniza.sk"
 MAIL_FROM_NAME="Konferencia o AI vo vzdelávaní"
 ```
+
+**E-maily (sendmail).** Aplikácia číta príkaz zo `MAIL_SENDMAIL_PATH`. Riadok `MAIL_SENDMAIL=...`
+nečíta nič, môžete ho zmazať. Bez neho sa použije `/usr/sbin/sendmail -bs -i`, rovnako ako doteraz
+pri oznámeniach organizátorom. Tento režim nechajte: ako odosielateľa obálky (`Return-Path`) pošle
+`konferenciaAI@fri.uniza.sk`, takže maily účastníkom na cudzích doménach lepšie prejdú SPF/DMARC
+a vrátené maily chodia vám. Pri `-t` by odosielateľom bol používateľ web servera
+(napr. `www-data@nazov-servera`). Ak by ste predsa chceli `-t`, premenná musí vyzerať takto:
+
+```dotenv
+MAIL_SENDMAIL_PATH="/usr/sbin/sendmail -t -i -f konferenciaAI@fri.uniza.sk"
+```
+
+`MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME` a `MAIL_PASSWORD` sa pri sendmaile nepoužívajú.
 
 Pôvodné heslo k záznamom bolo napísané priamo v kóde a je vo verejnej histórii repozitára na GitHube.
 Zvoľte preto **nové heslo** a pošlite ho účastníkom.
@@ -166,6 +174,12 @@ Administrácia (`/admin`):
 
 E-maily:
 
+- [ ] Testovací mail na vlastnú adresu:
+      ```bash
+      sudo -u www-data php artisan tinker --execute="Mail::raw('Test', fn (\$m) => \$m->to('vasa@adresa.sk')->subject('Test AIFRI'));"
+      ```
+      V hlavičke prijatého mailu má byť `Return-Path: <konferenciaAI@fri.uniza.sk>` a SPF/DKIM `pass`.
+      Ak mail nepríde, pozrite `/var/log/mail.log` a `storage/logs/laravel.log`.
 - [ ] Zaregistrujte sa na `/prihlasenie` so svojou adresou ako aktívny účastník.
       Príde potvrdenie a organizátorom oznámenie o novej registrácii.
 - [ ] V administrácii príspevok schváľte alebo odmietnite (so zdôvodnením). Príde e-mail o výsledku.
@@ -184,7 +198,7 @@ grep -E '/zaznamy/(record|presentation)/.*(\.\.|%2[eEfF])' /var/log/apache2/acce
 ```
 
 Ak sa nájde podozrivý úspešný prístup (kód 200), považujte obsah `.env` za uniknutý a zmeňte:
-heslo k databáze, heslo k SMTP, `APP_KEY` (`php artisan key:generate`; odhlási všetkých prihlásených)
+heslo k databáze, `APP_KEY` (`php artisan key:generate`; odhlási všetkých prihlásených)
 a heslo k záznamom.
 
 ## 12. Návrat späť (ak by niečo zlyhalo)
