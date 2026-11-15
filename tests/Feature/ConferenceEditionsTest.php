@@ -123,7 +123,8 @@ it('shows edition data on public pages', function () {
         ->assertOk()
         ->assertSee('2. 2. 2027 (utorok) od 9:00')
         ->assertSee('new-edition')
-        ->assertSee(route('registration'));
+        ->assertSee(route('registration'))
+        ->assertSee('2. ročník');
 
     $this->get(route('registration'))->assertOk()->assertSee('2. 2. 2027');
     $this->get(route('program'))->assertOk()->assertSee('new-edition');
@@ -142,7 +143,7 @@ it('hides registration and Teams links when not applicable', function () {
         ->assertDontSee('teams.microsoft.com');
 });
 
-it('lists recordings per edition', function () {
+it('lists recordings of all past editions on one page', function () {
     $archive = Conference::where('year', 2026)->firstOrFail();
     archivedRegistration([
         'conference_id' => $archive->id,
@@ -152,19 +153,25 @@ it('lists recordings per edition', function () {
         'participation_type' => 'presentation',
         'time_start' => '09:00',
     ]);
+    makeRegistration(['name' => 'Nový Prednášajúci']);
 
     $this->post('/zaznamy', ['password' => 'test-recordings-password']);
 
-    // Active edition has no program yet -> falls back to the archive
+    // 2027 has not taken place yet -> only the archive is listed
     $this->get(route('recordings.list'))
         ->assertOk()
+        ->assertSee('1. ročník')
+        ->assertSee('11. 2. 2026')
         ->assertSee('Archívny Prednášajúci')
-        ->assertSee('11. 2. 2026');
+        ->assertDontSee('Nový Prednášajúci')
+        ->assertDontSee('class="edition-nav"', false);
 
-    makeRegistration(['name' => 'Nový Prednášajúci']);
+    // On the conference day the new edition joins the list, newest first
+    Conference::active()->update(['date' => now()->toDateString()]);
 
-    $this->get(route('recordings.list'))->assertSee('Nový Prednášajúci')->assertDontSee('Archívny Prednášajúci');
-    $this->get(route('recordings.list', ['rocnik' => 2026]))->assertSee('Archívny Prednášajúci');
+    $this->get(route('recordings.list'))
+        ->assertSeeInOrder(['2. ročník', 'Nový Prednášajúci', '1. ročník', 'Archívny Prednášajúci'])
+        ->assertSee('href="#rocnik-2026"', false);
 });
 
 it('stores public registrations in the active edition', function () {

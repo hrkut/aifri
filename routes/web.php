@@ -1184,26 +1184,18 @@ Route::post('/zaznamy', function (Request $request) {
 })->name('recordings.authenticate');
 
 Route::middleware(['auth.recordings'])->prefix('/zaznamy')->group(function () {
-    Route::get('/list', function (Request $request) {
-        // Editions that have at least one scheduled presentation (newest first)
+    Route::get('/list', function () {
+        // All editions that already took place (incl. today), newest first, with their talks
+        $presentations = fn ($q) => $q->where('participation_type', 'presentation')->whereNotNull('time_start');
+
         $editions = Conference::query()
-            ->whereHas('registrations', fn ($q) => $q->where('participation_type', 'presentation')->whereNotNull('time_start'))
+            ->whereDate('date', '<=', now()->toDateString())
+            ->whereHas('registrations', $presentations)
+            ->with(['registrations' => fn ($q) => $presentations($q)->orderBy('time_start')->orderBy('id')])
             ->orderByDesc('year')
             ->get();
 
-        $edition = $editions->firstWhere('year', (int) $request->query('rocnik'))
-            ?? $editions->firstWhere('id', Conference::current()->id)
-            ?? $editions->first()
-            ?? Conference::current();
-
-        $registrations = $edition->registrations()
-            ->where('participation_type', 'presentation')
-            ->whereNotNull('time_start')
-            ->orderBy('time_start')
-            ->orderBy('id')
-            ->get();
-
-        return view('recordings.list', compact('registrations', 'editions', 'edition'));
+        return view('recordings.list', compact('editions'));
     })->name('recordings.list');
 
     Route::get('/record/{filename}', function ($filename) {

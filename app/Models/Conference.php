@@ -94,6 +94,12 @@ class Conference extends Model
         });
     }
 
+    /** Ordinal of this edition (1 for the first year, 2 for the next one, …). */
+    public function editionNumber(): int
+    {
+        return static::query()->where('year', '<=', $this->year)->count();
+    }
+
     /** "H:i" start time, tolerant of the DB returning "H:i:s". */
     public function startTimeLabel(): string
     {

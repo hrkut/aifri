@@ -835,3 +835,63 @@ footer {
         gap: 8px;
     }
 }
+
+/* Rubber-stamp style edition badge across the lower part of the hero heading */
+.heroHeading {
+    position: relative;
+    padding-bottom: 28px;
+}
+
+.editionStamp {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    transform: rotate(-9deg);
+    transform-origin: left bottom;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 18px 4px;
+    border: 4px double var(--accent);
+    border-radius: 10px;
+    color: var(--accent);
+    background: rgba(8, 56, 77, .35);
+    text-transform: uppercase;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: .12em;
+    opacity: .9;
+    box-shadow: 0 0 0 2px rgba(255, 184, 28, .25), 0 8px 18px rgba(0, 0, 0, .25);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, .35);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.editionStampMain {
+    font-size: clamp(20px, 2.6vw, 32px);
+}
+
+.editionStampYear {
+    font-size: clamp(11px, 1.1vw, 14px);
+    letter-spacing: .4em;
+    margin-right: -.4em; /* compensate trailing letter-spacing so the year stays centred */
+}
+
+@media (max-width: 760px) {
+    .heroHeading {
+        padding-bottom: 36px;
+    }
+
+    .editionStamp {
+        left: 42%;
+    }
+}
+
+@media (max-width: 520px) {
+    .editionStamp {
+        left: 30%;
+        padding: 4px 12px 3px;
+        border-width: 3px;
+    }
+}

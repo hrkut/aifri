@@ -23,9 +23,13 @@
         <div style="flex: 1; min-width: 0;">
             <div class="heroTitle">
                 <div class="heroText">
-                    <div>
+                    <div class="heroHeading">
                         <h1>KONFERENCIA O UMELEJ INTELIGENCII<br>VO VZDELÁVANÍ</h1>
                         <p class="sub">(Conference on AI in education)</p>
+                        <div class="editionStamp" aria-label="{{ $conference->editionNumber() }}. ročník {{ $conference->year }}">
+                            <span class="editionStampMain">{{ $conference->editionNumber() }}. ročník</span>
+                            <span class="editionStampYear">{{ $conference->year }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
