@@ -141,14 +141,24 @@
         transform: none;
     }
 
+    /* line icons drawn in the link colour (mask), instead of emoji */
+    .recording-icon::before,
+    .presentation-icon::before {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: currentColor;
+        -webkit-mask: var(--icon) center / contain no-repeat;
+        mask: var(--icon) center / contain no-repeat;
+    }
+
     .recording-icon::before {
-        content: '🎬';
-        font-size: 1.1rem;
+        --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='2' y='4' width='16' height='12' rx='2.5' fill='none' stroke='black' stroke-width='1.6'/%3E%3Cpath d='M8.5 7.5v5l4-2.5z'/%3E%3C/svg%3E");
     }
 
     .presentation-icon::before {
-        content: '📑';
-        font-size: 1.1rem;
+        --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 2.5h6.5L15 6v11.5H5z' fill='none' stroke='black' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M11.5 2.5V6H15M7.5 10h5M7.5 13h5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
     @media (max-width: 768px) {

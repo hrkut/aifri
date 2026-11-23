@@ -61,10 +61,10 @@
     @if($showRegister || $conference->teams_url || $contributionDeadline || $deadline)
         <div class="heroActions">
             @if($showRegister)
-                <a href="{{ lroute('registration') }}" class="btn">📝 {{ __('Registrovať sa') }}</a>
+                <a href="{{ lroute('registration') }}" class="btn">{{ __('Registrovať sa') }} <svg class="btnIcon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
             @endif
             @if($conference->teams_url)
-                <a href="{{ $conference->teams_url }}" class="btn secondary" target="_blank" rel="noopener noreferrer">🎧 {{ __('Pripojiť sa na MS Teams') }}</a>
+                <a href="{{ $conference->teams_url }}" class="btn secondary" target="_blank" rel="noopener noreferrer">{{ __('Pripojiť sa na MS Teams') }} <svg class="btnIcon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 3.5H3.5v9h9v-3M9 3h4v4M13 3 7.5 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
             @endif
             @if($contributionDeadline || $deadline)
                 <ul class="heroDeadlines">

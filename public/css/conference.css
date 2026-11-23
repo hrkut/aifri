@@ -1045,22 +1045,26 @@ h3 {
     opacity: 1;
 }
 
-/* --- Navigation: quiet text bar, current page underlined in amber ---------- */
+/* --- Navigation: floating glass bar, text links, registration as the CTA ---- */
 .siteNav {
     position: sticky;
-    top: 0;
+    top: 12px;
     z-index: 20;
     margin: 0 0 56px;
-    border-bottom: 1px solid var(--trace-dim);
-    background: rgba(6, 42, 58, .72);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    padding: 6px;
+    border: 1px solid rgba(159, 231, 255, .16);
+    border-radius: 14px;
+    background: rgba(6, 36, 50, .72);
+    box-shadow: 0 18px 40px -28px rgba(0, 0, 0, .8);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
 }
 
 .siteNav ul {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 4px;
+    align-items: center;
+    gap: 2px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -1069,25 +1073,63 @@ h3 {
 .siteNav a {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 14px 12px 12px;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 9px;
     color: var(--muted);
     font-size: 15px;
     font-weight: 600;
+    letter-spacing: .005em;
     white-space: nowrap;
     text-decoration: none;
-    box-shadow: inset 0 -3px 0 transparent;
-    transition: color .2s var(--ease), box-shadow .2s var(--ease);
+    transition: color .2s var(--ease), background-color .2s var(--ease);
 }
 
 .siteNav a:hover {
     color: var(--text);
-    box-shadow: inset 0 -3px 0 var(--trace-dim);
+    background: rgba(159, 231, 255, .08);
+    text-decoration: none;
+}
+
+.siteNav a:focus-visible {
+    outline: 2px solid var(--accent2);
+    outline-offset: 2px;
 }
 
 .siteNav a[aria-current="page"] {
     color: var(--accent);
-    box-shadow: inset 0 -3px 0 var(--accent);
+    background: rgba(255, 184, 28, .12);
+}
+
+/* registration: the one filled button, pushed to the right */
+.siteNav .navCta {
+    margin-left: auto;
+}
+
+.siteNav .navCta a,
+.siteNav .navCta a[aria-current="page"] {
+    color: #0b1824;
+    background: var(--accent);
+    font-weight: 700;
+}
+
+.siteNav .navCta a:hover {
+    color: #0b1824;
+    background: #ffc94d;
+}
+
+.siteNav .navCta a[aria-current="page"] {
+    box-shadow: inset 0 0 0 2px rgba(11, 24, 36, .35);
+}
+
+.navArrow {
+    width: 15px;
+    height: 15px;
+    transition: transform .2s var(--ease);
+}
+
+.siteNav .navCta a:hover .navArrow {
+    transform: translateX(2px);
 }
 
 /* short labels are only for the phone grid */
@@ -1250,6 +1292,17 @@ header.hero {
     color: #0b1824;
     text-decoration: none;
     filter: none;
+}
+
+.btnIcon {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    transition: transform .2s var(--ease);
+}
+
+.btn:hover .btnIcon {
+    transform: translateX(2px);
 }
 
 .btn.secondary {
@@ -1611,49 +1664,34 @@ header.hero {
         margin-bottom: 14px;
     }
 
-    /* phones: every item visible at once in a 3-column grid, icon above a short label;
+    /* phones: every item visible at once in a 3-column grid of short labels;
        not sticky, two rows would cover too much of the screen */
     .siteNav {
         position: static;
         margin-bottom: 36px;
-        border: 1px solid var(--trace-dim);
-        border-radius: 10px;
-        overflow: hidden;
+        padding: 5px;
+        border-radius: 12px;
     }
 
     .siteNav ul {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0;
+        gap: 4px;
     }
 
-    .siteNav li + li {
-        border-left: 1px solid var(--trace-dim);
-    }
-
-    .siteNav li:nth-child(3n + 1) {
-        border-left: 0;
-    }
-
-    .siteNav li:nth-child(n + 4) {
-        border-top: 1px solid var(--trace-dim);
+    .siteNav .navCta {
+        margin-left: 0;
     }
 
     .siteNav a {
-        display: flex;
-        flex-direction: column;
         justify-content: center;
-        gap: 2px;
-        min-height: 60px;
-        padding: 8px 4px 9px;
-        font-size: 13px;
+        gap: 5px;
+        width: 100%;
+        min-height: 44px;
+        padding: 8px 4px;
+        font-size: 14px;
         text-align: center;
         white-space: normal;
-    }
-
-    .navIcon {
-        font-size: 19px;
-        line-height: 1;
     }
 
     .navLabel {
@@ -1662,6 +1700,10 @@ header.hero {
 
     .navLabelShort {
         display: inline;
+    }
+
+    .navArrow {
+        display: none;
     }
 
     .hero h1 {

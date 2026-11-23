@@ -476,8 +476,16 @@ it('renders the shared navigation bar and hero on every public page', function (
         expect($html)->toMatch('#<a href="' . preg_quote(route($route), '#') . '"\s+aria-current="page"#');
     }
 
-    $this->get(route('home'))->assertSee('Registrovať sa');
-    $this->get(route('registration'))->assertDontSee('Registrovať sa');
+    // registration is the call to action in the menu; the hero button is not repeated on its own page
+    $this->get(route('home'))->assertSee('class="navCta"', false)->assertSee('class="btn">Registrovať sa', false);
+    $this->get(route('registration'))->assertSee('class="navCta"', false)->assertDontSee('class="btn">Registrovať sa', false);
+
+    // plain text menu, no emoji icons
+    expect($this->get(route('home'))->getContent())->not->toMatch('/class="siteNav".*[\x{1F300}-\x{1FAFF}]/su');
+
+    // once registration is closed, the menu no longer offers it
+    Conference::active()->update(['registration_deadline' => now()->subDay()->toDateString()]);
+    $this->get(route('home'))->assertDontSee('class="navCta"', false)->assertDontSee('Registrovať sa');
 });
 
 it('closes registration after the registration deadline', function () {

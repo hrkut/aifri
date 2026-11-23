@@ -76,7 +76,7 @@
 
 <div class="stack">
     <div class="card">
-        <h2>{{ __('🔐 Prístup k záznamom') }}</h2>
+        <h2>{{ __('Prístup k záznamom') }}</h2>
         <p style="margin-bottom: 1.5rem;">
             {{ __('Zadajte heslo na prístup k záznamom a prezentáciám z minulých ročníkov konferencie:') }}
         </p>
