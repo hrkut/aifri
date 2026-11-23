@@ -125,7 +125,7 @@ v `public/fonts`, tie sú priamo v gite.
 sudo -u www-data php artisan migrate --force
 ```
 
-Spustí sa týchto 5 migrácií:
+Spustí sa týchto 5 migrácií (ak už časť prebehla pri skoršom nasadení, spustia sa len zostávajúce):
 
 | Migrácia | Čo urobí |
 |---|---|
@@ -167,8 +167,13 @@ Verejný web:
 
 Administrácia (`/admin`):
 
-- [ ] **Ročníky**: doplňte pre 2027 termín registrácie, termín na príspevky a notifikáciu autorov
-      (zatiaľ nie sú vyplnené). Kým termín registrácie chýba, registrácia je otvorená až do dňa konferencie.
+- [ ] **Ročníky → 2027 → Upraviť**: termíny sa migráciami nenastavujú, doplňte ich ručne:
+      - Termín na príspevky: **13. 1. 2027** (aktívna účasť),
+      - Termín registrácie: **26. 1. 2027** (poslucháči),
+      - Notifikácia autorov: podľa dohody.
+
+      Kým termíny chýbajú, web ich nezobrazuje a registrácia aj príspevky sú otvorené až do dňa
+      konferencie. Po uložení skontrolujte úvod a stránku Registrácia (Dôležité termíny).
 - [ ] Prepnutie na ročník 2026: registrácie, program a otázky sú viditeľné, iba na čítanie.
 - [ ] Export do Excelu, prezenčná listina (filter Forma účasti: Prezenčne) a PDF programu sa stiahnu.
 
